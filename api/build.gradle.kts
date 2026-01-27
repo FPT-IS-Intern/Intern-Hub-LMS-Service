@@ -11,6 +11,7 @@ application {
 
 dependencies {
 
+    api(project(":infra"))
     api(project(":core"))
     api(project(":common"))
 
