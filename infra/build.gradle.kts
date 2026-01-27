@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
 
+    api(project(":core"))
     api(project(":common"))
 
     implementation(libs.spring.boot.starter.data.jpa)

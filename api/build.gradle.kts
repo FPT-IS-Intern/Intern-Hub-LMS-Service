@@ -6,12 +6,13 @@ plugins {
 }
 
 application {
-    mainClass.set("com.fis.baseservice.api.BaseServiceApplication")
+    mainClass.set("com.fis.lms_service.InternHubLMSServiceApplication")
 }
 
 dependencies {
 
     api(project(":core"))
+    api(project(":common"))
 
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.spring.boot.starter.data.jpa)
@@ -20,7 +21,7 @@ dependencies {
     implementation(libs.spring.boot.starter.actuator)
 
     implementation(libs.openapi.doc)
-    
+
     annotationProcessor(libs.spring.boot.configuration.processor)
 
     testImplementation(libs.spring.boot.starter.webmvc.test)
