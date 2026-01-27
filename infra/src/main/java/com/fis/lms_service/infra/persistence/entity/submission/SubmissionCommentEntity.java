@@ -8,9 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Admin 1/27/2026
- */
+/** Admin 1/27/2026 */
 @Entity
 @Table(name = "submission_comments")
 @Getter
@@ -18,21 +16,21 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubmissionCommentEntity extends AuditEntity {
 
-    @Id
-    @SnowflakeGenerated
-    @Column(name = "submission_comment_id", nullable = false, updatable = false)
-    Long submissionCommentId;
+  @Id
+  @SnowflakeGenerated
+  @Column(name = "submission_comment_id", nullable = false, updatable = false)
+  Long submissionCommentId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "lesson_submission_id", nullable = false)
-    LessonSubmissionEntity lessonSubmissionEntity;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "lesson_submission_id", nullable = false)
+  LessonSubmissionEntity lessonSubmissionEntity;
 
-    @Column(name = "user_id", nullable = false)
-    Long userId;
+  @Column(name = "user_id", nullable = false)
+  Long userId;
 
-    @Column(name = "content", nullable = false, columnDefinition = "text")
-    String content;
+  @Column(name = "content", nullable = false, columnDefinition = "text")
+  String content;
 
-    @Column(name = "comment_at", nullable = false)
-    Long commentAt;
+  @Column(name = "comment_at", nullable = false)
+  Long commentAt;
 }

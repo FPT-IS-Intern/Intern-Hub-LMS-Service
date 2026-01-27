@@ -11,9 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Admin 1/27/2026
- */
+/** Admin 1/27/2026 */
 @Entity
 @Table(name = "courses")
 @Getter
@@ -21,17 +19,17 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CourseEntity extends AuditEntity {
 
-    @Id
-    @SnowflakeGenerated
-    @Column(name = "course_id", nullable = false, updatable = false)
-    Long courseId;
+  @Id
+  @SnowflakeGenerated
+  @Column(name = "course_id", nullable = false, updatable = false)
+  Long courseId;
 
-    @Column(name = "name", nullable = false, length = 128)
-    String name;
+  @Column(name = "name", nullable = false, length = 128)
+  String name;
 
-    @Column(name = "description", nullable = false, columnDefinition = "text")
-    String description;
+  @Column(name = "description", nullable = false, columnDefinition = "text")
+  String description;
 
-    @Column(name = "course_image_url", nullable = false, columnDefinition = "text")
-    String courseImageUrl;
+  @Column(name = "course_image_url", nullable = false, columnDefinition = "text")
+  String courseImageUrl;
 }

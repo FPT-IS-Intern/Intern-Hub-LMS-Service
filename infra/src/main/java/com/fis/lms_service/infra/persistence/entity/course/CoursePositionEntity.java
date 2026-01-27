@@ -8,27 +8,25 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Admin 1/27/2026
- */
+/** Admin 1/27/2026 */
 @Entity
 @Table(
-        name = "course_positions",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"course_id", "position_id"})})
+    name = "course_positions",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"course_id", "position_id"})})
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CoursePositionEntity extends AuditEntity {
 
-    @Id
-    @SnowflakeGenerated
-    @Column(name = "course_position_id", nullable = false, updatable = false)
-    Long coursePositionId;
+  @Id
+  @SnowflakeGenerated
+  @Column(name = "course_position_id", nullable = false, updatable = false)
+  Long coursePositionId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "course_id", nullable = false)
-    CourseEntity courseEntity;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "course_id", nullable = false)
+  CourseEntity courseEntity;
 
-    @Column(name = "position_id", nullable = false)
-    Long positionId;
+  @Column(name = "position_id", nullable = false)
+  Long positionId;
 }
