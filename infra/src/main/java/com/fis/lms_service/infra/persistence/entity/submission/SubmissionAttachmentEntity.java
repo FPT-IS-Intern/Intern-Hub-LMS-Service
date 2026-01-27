@@ -13,8 +13,8 @@ import lombok.experimental.FieldDefaults;
  */
 @Entity
 @Table(
-        name = "submission_attachments",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"lesson_enrollment_id"})})
+        name = "submission_attachments"
+)
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
