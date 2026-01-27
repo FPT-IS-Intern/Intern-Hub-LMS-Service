@@ -1,0 +1,33 @@
+[versions]
+springBoot = "4.0.2"
+springCloud = "2025.1.0"
+spotless = "8.1.0"
+googleJavaFormat = "1.33.0"
+sonar = "7.2.2.6593"
+jib = "3.5.2"
+postgresql = "42.7.9"
+springDoc = "3.0.1"
+
+[libraries]
+spring-boot-starter = { group = "org.springframework.boot", name = "spring-boot-starter", version.ref = "springBoot" }
+spring-boot-starter-webmvc = { group = "org.springframework.boot", name = "spring-boot-starter-webmvc", version.ref = "springBoot" }
+spring-boot-starter-security = { group = "org.springframework.boot", name = "spring-boot-starter-security", version.ref = "springBoot" }
+spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation", version.ref = "springBoot" }
+spring-boot-starter-actuator = { group = "org.springframework.boot", name = "spring-boot-starter-actuator", version.ref = "springBoot" }
+spring-boot-starter-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa", version.ref = "springBoot" }
+spring-boot-starter-kafka = { group = "org.springframework.boot", name = "spring-boot-starter-kafka", version.ref = "springBoot" }
+spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test", version.ref = "springBoot" }
+spring-boot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor", version.ref = "springBoot" }
+spring-boot-starter-webmvc-test = { group = "org.springframework.boot", name = "spring-boot-starter-webmvc-test", version.ref = "springBoot" }
+spring-security-test = { group = "org.springframework.security", name = "spring-security-test", version.ref = "springBoot" }
+spring-boot-starter-log4j2 = { group = "org.springframework.boot", name = "spring-boot-starter-log4j2", version.ref = "springBoot" }
+spring-boot-starter-liquibase = { group = "org.springframework.boot", name = "spring-boot-starter-liquibase", version.ref = "springBoot" }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }
+openapi-doc = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springDoc" }
+
+[plugins]
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+dependencyManagement = { id = "io.spring.dependency-management", version = "1.1.7" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+sonar = { id = "org.sonarqube", version.ref = "sonar" }
+jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
