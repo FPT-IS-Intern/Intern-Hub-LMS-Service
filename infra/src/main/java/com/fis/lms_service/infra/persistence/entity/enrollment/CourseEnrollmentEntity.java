@@ -3,7 +3,7 @@ package com.fis.lms_service.infra.persistence.entity.enrollment;
 import com.fis.lms_service.infra.generator.SnowflakeGenerated;
 import com.fis.lms_service.infra.persistence.entity.base.AuditEntity;
 import com.fis.lms_service.infra.persistence.entity.course.CourseEntity;
-import com.fis.lms_service.infra.persistence.entity.enrollment.constant.CourseProgress;
+import com.fis.lms_service.core.domain.model.enrollment.constant.CourseProgress;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

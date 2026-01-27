@@ -2,7 +2,7 @@ package com.fis.lms_service.infra.persistence.entity.lesson;
 
 import com.fis.lms_service.infra.generator.SnowflakeGenerated;
 import com.fis.lms_service.infra.persistence.entity.base.AuditEntity;
-import com.fis.lms_service.infra.persistence.entity.lesson.constant.LessonFileType;
+import com.fis.lms_service.core.domain.model.lesson.constant.LessonFileType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
