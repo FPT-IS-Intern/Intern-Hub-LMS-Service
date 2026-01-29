@@ -47,8 +47,8 @@ target/
 # ====================
 # Configuration & Secrets
 # ====================
-api/src/main/resources/application-dev.yml
-api/src/main/resources/application-prod.yml
+api/src/main/resources/application-dev.yaml
+api/src/main/resources/application-prod.yaml
 api/src/main/resources/application-dev.properties
 api/src/main/resources/application-prod.properties
 
