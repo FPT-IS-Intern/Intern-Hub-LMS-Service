@@ -47,10 +47,10 @@ target/
 # ====================
 # Configuration & Secrets
 # ====================
-src/main/resources/application-dev.yml
-src/main/resources/application-prod.yml
-src/main/resources/application-dev.properties
-src/main/resources/application-prod.properties
+api/src/main/resources/application-dev.yml
+api/src/main/resources/application-prod.yml
+api/src/main/resources/application-dev.properties
+api/src/main/resources/application-prod.properties
 
 .env
 .env.*
