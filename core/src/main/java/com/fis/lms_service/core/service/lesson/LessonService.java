@@ -2,6 +2,7 @@ package com.fis.lms_service.core.service.lesson;
 
 import com.fis.lms_service.core.domain.model.lesson.LessonFileModel;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
+import com.fis.lms_service.core.domain.model.lesson.constant.LessonFileType;
 import com.fis.lms_service.core.repository.FileStorageRepository;
 import com.fis.lms_service.core.repository.lesson.LessonFileRepository;
 import com.fis.lms_service.core.repository.lesson.LessonRepository;
@@ -44,26 +45,35 @@ public class LessonService {
     String allowTypesImage;
 
     @Transactional
-    public void createLesson(LessonModel model, MultipartFile image, List<MultipartFile> files) {
+    public void createLesson(
+            LessonModel model,
+            MultipartFile image,
+            List<MultipartFile> lessonFiles,
+            List<MultipartFile> assignmentFiles
+    ) {
         LessonModel saved = lessonRepository.save(model);
         Long lessonId = saved.getLessonId();
 
         if (image != null && !image.isEmpty()) {
-            
             String imageUrl = fileStorageRepository.uploadFile(
                     image,
                     lessonPath + lessonId + "/avatar",
                     maxFileSize,
                     allowTypesImage
             );
-
             saved.setLessonImageUrl(imageUrl);
             lessonRepository.save(saved);
         }
 
-        if (files != null && !files.isEmpty()) {
-            lessonFileService.uploadFiles(lessonId, files);
+        if (lessonFiles != null && !lessonFiles.isEmpty()) {
+            lessonFileService.uploadFiles(lessonId, lessonFiles, LessonFileType.MATERIAL);
         }
+        
+        if (assignmentFiles != null && !assignmentFiles.isEmpty()) {
+            lessonFileService.uploadFiles(lessonId, assignmentFiles, LessonFileType.ASSIGNMENT);
+        }
+
+
     }
 
     @Transactional

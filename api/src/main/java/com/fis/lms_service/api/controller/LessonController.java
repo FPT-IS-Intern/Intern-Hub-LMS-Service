@@ -38,11 +38,12 @@ public class LessonController {
     public ResponseEntity<@NonNull Void> createLesson(
             @RequestPart("data") @Valid LessonCreateRequest request,
             @RequestPart(value = "image", required = false) MultipartFile image,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files
+            @RequestPart(value = "lessonFiles", required = false) List<MultipartFile> lessonFiles,
+            @RequestPart(value = "assignmentFiles", required = false) List<MultipartFile> assignmentFiles
     ) {
         LessonModel model = lessonRequestMapper.toModel(request);
 
-        lessonService.createLesson(model, image, files);
+        lessonService.createLesson(model, image, lessonFiles, assignmentFiles);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

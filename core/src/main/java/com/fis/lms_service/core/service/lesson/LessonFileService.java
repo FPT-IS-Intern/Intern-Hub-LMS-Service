@@ -1,6 +1,7 @@
 package com.fis.lms_service.core.service.lesson;
 
 import com.fis.lms_service.core.domain.model.lesson.LessonFileModel;
+import com.fis.lms_service.core.domain.model.lesson.constant.LessonFileType;
 import com.fis.lms_service.core.repository.FileStorageRepository;
 import com.fis.lms_service.core.repository.lesson.LessonFileRepository;
 
@@ -39,7 +40,7 @@ public class LessonFileService {
     String allowTypesDocument;
 
     @Transactional
-    public void uploadFiles(Long lessonId, List<MultipartFile> files) {
+    public void uploadFiles(Long lessonId, List<MultipartFile> files, LessonFileType lessonFileType) {
 
         long currentTotalSize = lessonFileRepository.getTotalSizeByLessonId(lessonId);
 
@@ -61,6 +62,7 @@ public class LessonFileService {
                             .fileUrl(s3Key)
                             .fileName(file.getOriginalFilename())
                             .fileSize(file.getSize())
+                            .lessonFileType(lessonFileType)
                             .build();
             lessonFileRepository.save(model);
         }
