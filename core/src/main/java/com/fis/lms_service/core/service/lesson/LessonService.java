@@ -5,6 +5,7 @@ import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import com.fis.lms_service.core.repository.FileStorageRepository;
 import com.fis.lms_service.core.repository.lesson.LessonFileRepository;
 import com.fis.lms_service.core.repository.lesson.LessonRepository;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,80 +15,62 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
-/**
- * Admin 1/29/2026
- *
- **/
+/** Admin 1/29/2026 */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LessonService {
 
-    LessonRepository lessonRepository;
-    LessonFileRepository lessonFileRepository;
-    FileStorageRepository fileStorageRepository;
+  LessonRepository lessonRepository;
+  LessonFileRepository lessonFileRepository;
+  FileStorageRepository fileStorageRepository;
 
-    LessonFileService lessonFileService;
+  LessonFileService lessonFileService;
 
+  @NonFinal
+  @Value("${aws.s3.paths.lesson}")
+  String lessonPath;
 
-    @NonFinal
-    @Value("${aws.s3.paths.lesson}")
-    String lessonPath;
+  @NonFinal
+  @Value("${aws.s3.max-file-size}")
+  Long maxFileSize;
 
-    @NonFinal
-    @Value("${aws.s3.max-file-size}")
-    Long maxFileSize;
+  @Transactional
+  public void createLesson(LessonModel model, MultipartFile image, List<MultipartFile> files) {
+    LessonModel saved = lessonRepository.save(model);
+    Long lessonId = saved.getLessonId();
 
-    @Transactional
-    public void createLesson(LessonModel model, MultipartFile image, List<MultipartFile> files) {
-        LessonModel saved = lessonRepository.save(model);
-        Long lessonId = saved.getLessonId();
+    if (image != null && !image.isEmpty()) {
 
-        if (image != null && !image.isEmpty()) {
+      if (image.getSize() > maxFileSize) throw new RuntimeException();
 
-            if (image.getSize() > maxFileSize)
-                throw new RuntimeException();
+      String imageUrl = fileStorageRepository.uploadFile(image, lessonPath + lessonId + "/avatar");
 
-            String imageUrl = fileStorageRepository.uploadFile(
-                    image,
-                    lessonPath + lessonId + "/avatar"
-            );
-
-            saved.setLessonImageUrl(imageUrl);
-            lessonRepository.save(saved);
-        }
-
-        if (files != null && !files.isEmpty()) {
-            lessonFileService.uploadFiles(lessonId, files);
-        }
+      saved.setLessonImageUrl(imageUrl);
+      lessonRepository.save(saved);
     }
 
-    @Transactional
-    public void deleteLesson(Long lessonId) {
+    if (files != null && !files.isEmpty()) {
+      lessonFileService.uploadFiles(lessonId, files);
+    }
+  }
 
-        LessonModel lessonModel = lessonRepository
-                .findById(lessonId)
-                .orElse(null);
+  @Transactional
+  public void deleteLesson(Long lessonId) {
 
-        if (lessonModel == null)
-            throw new RuntimeException();
+    LessonModel lessonModel = lessonRepository.findById(lessonId).orElse(null);
 
-        List<LessonFileModel> lessonFileModels = lessonFileRepository
-                .findAllByLessonId(lessonId);
+    if (lessonModel == null) throw new RuntimeException();
 
-        lessonFileModels
-                .forEach(lessonFileModel -> lessonFileService
-                        .deleteFile(lessonFileModel.getLessonFileId()
-                        ));
+    List<LessonFileModel> lessonFileModels = lessonFileRepository.findAllByLessonId(lessonId);
 
-        if (lessonModel.getLessonImageUrl() != null && !lessonModel.getLessonImageUrl().isEmpty()) {
-            fileStorageRepository.deleteFile(lessonModel.getLessonImageUrl());
-        }
+    lessonFileModels.forEach(
+        lessonFileModel -> lessonFileService.deleteFile(lessonFileModel.getLessonFileId()));
 
-
-        lessonRepository.deleteById(lessonId);
+    if (lessonModel.getLessonImageUrl() != null && !lessonModel.getLessonImageUrl().isEmpty()) {
+      fileStorageRepository.deleteFile(lessonModel.getLessonImageUrl());
     }
 
+    lessonRepository.deleteById(lessonId);
+  }
 }
