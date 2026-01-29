@@ -18,6 +18,14 @@ spring:
     default-schema: schema_lms
     enabled: true
 
+aws:
+  s3:
+    access-key: ${S3_ACCESS_KEY}
+    secret-key: ${S3_SECRET_KEY}
+    region: ${S3_REGION}
+    end-point: ${S3_ENDPOINT}
+    bucket-name: ${S3_BUCKET_NAME}
+
 snowflake:
   worker-id: 10
   datacenter-id: 10
