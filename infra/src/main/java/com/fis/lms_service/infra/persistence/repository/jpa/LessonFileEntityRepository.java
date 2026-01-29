@@ -13,7 +13,7 @@ import java.util.List;
  * Admin 1/26/2026
  */
 @Repository
-public interface LessonFileJpaRepository
+public interface LessonFileEntityRepository
         extends JpaRepository<@NonNull LessonFileEntity, @NonNull Long> {
 
     @Query("SELECT SUM(f.fileSize) FROM LessonFileEntity f WHERE f.lessonEntity.lessonId = :lessonId")
