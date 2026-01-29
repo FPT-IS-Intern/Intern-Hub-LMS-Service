@@ -5,9 +5,6 @@ import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * Admin 1/26/2026
- */
+/** Admin 1/26/2026 */
 @Repository
-public interface LessonJpaRepository extends JpaRepository<@NonNull LessonEntity, @NonNull Long> {
-}
+public interface LessonJpaRepository extends JpaRepository<@NonNull LessonEntity, @NonNull Long> {}
