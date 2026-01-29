@@ -26,9 +26,9 @@ aws:
     end-point: ${S3_ENDPOINT}
     bucket-name: ${S3_BUCKET_NAME}
     paths:
-      lesson: /lessons/
-      course: /courses/
-      submission: /submissions/
+      lesson: lessons/
+      course: courses/
+      submission: submissions/
     max-file-size: 20971520
     allow-types:
       image: "image/(png|jpeg|jpg)"
