@@ -1,18 +1,21 @@
 package com.fis.lms_service.core.repository.lesson;
 
 import com.fis.lms_service.core.domain.model.lesson.LessonFileModel;
+
 import java.util.List;
 
-/** Admin 1/29/2026 */
+/**
+ * Admin 1/29/2026
+ */
 public interface LessonFileRepository {
 
-  void save(LessonFileModel model);
+    void save(LessonFileModel lessonFileModel);
 
-  Long getTotalSizeByLessonId(Long lessonId);
+    Long getTotalSizeByLessonId(Long lessonId);
 
-  List<LessonFileModel> findAllByLessonId(Long lessonId);
+    List<LessonFileModel> findAllByLessonId(Long lessonId);
 
-  LessonFileModel findByLessonFileId(Long lessonId);
+    LessonFileModel findByLessonFileId(Long lessonId);
 
-  void deleteById(Long lessonFileId);
+    void deleteById(Long lessonFileId);
 }
