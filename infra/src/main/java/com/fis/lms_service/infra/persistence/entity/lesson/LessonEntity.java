@@ -11,7 +11,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-/** Admin 1/26/2026 */
+/**
+ * Admin 1/26/2026
+ */
 @Entity
 @Table(name = "lessons")
 @Getter
@@ -19,23 +21,23 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LessonEntity extends AuditEntity {
 
-  @Id
-  @SnowflakeGenerated
-  @Column(name = "lesson_id", nullable = false, updatable = false)
-  Long lessonId;
+    @Id
+    @SnowflakeGenerated
+    @Column(name = "lesson_id", nullable = false, updatable = false)
+    Long lessonId;
 
-  @Column(name = "name", nullable = false, columnDefinition = "text")
-  String name;
+    @Column(name = "name", nullable = false, columnDefinition = "text", length = 255)
+    String name;
 
-  @Column(name = "introduction", nullable = false, columnDefinition = "text")
-  String introduction;
+    @Column(name = "introduction", nullable = false, columnDefinition = "text", length = 255)
+    String introduction;
 
-  @Column(name = "content", nullable = false, columnDefinition = "text")
-  String content;
+    @Column(name = "content", nullable = false, columnDefinition = "text", length = 255)
+    String content;
 
-  @Column(name = "requirements", nullable = false, columnDefinition = "text")
-  String requirements;
+    @Column(name = "requirements", nullable = false, columnDefinition = "text", length = 255)
+    String requirements;
 
-  @Column(name = "lesson_image_url", nullable = false, columnDefinition = "text")
-  String lessonImageUrl;
+    @Column(name = "lesson_image_url", nullable = false, columnDefinition = "text")
+    String lessonImageUrl;
 }
