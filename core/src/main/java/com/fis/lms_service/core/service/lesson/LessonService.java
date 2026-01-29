@@ -49,9 +49,7 @@ public class LessonService {
         Long lessonId = saved.getLessonId();
 
         if (image != null && !image.isEmpty()) {
-
-            if (image.getSize() > maxFileSize) throw new RuntimeException();
-
+            
             String imageUrl = fileStorageRepository.uploadFile(
                     image,
                     lessonPath + lessonId + "/avatar",

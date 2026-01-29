@@ -34,6 +34,10 @@ public class LessonFileService {
     @Value("${aws.s3.max-file-size}")
     Long maxFileSize;
 
+    @NonFinal
+    @Value("${aws.s3.allow-types.document}")
+    String allowTypesDocument;
+
     @Transactional
     public void uploadFiles(Long lessonId, List<MultipartFile> files) {
 
@@ -44,7 +48,12 @@ public class LessonFileService {
         if (currentTotalSize + uploadSize > maxFileSize) throw new RuntimeException();
 
         for (MultipartFile file : files) {
-            String s3Key = fileStorageRepository.uploadFile(file, lessonPath + lessonId);
+            String s3Key = fileStorageRepository.uploadFile(
+                    file,
+                    lessonPath + lessonId,
+                    maxFileSize,
+                    allowTypesDocument
+            );
 
             LessonFileModel model =
                     LessonFileModel.builder()
