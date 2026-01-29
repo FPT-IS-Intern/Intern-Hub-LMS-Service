@@ -4,8 +4,8 @@ import com.fis.lms_service.api.dto.request.LessonCreateRequest;
 import com.fis.lms_service.api.mapper.LessonRequestMapper;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import com.fis.lms_service.core.service.lesson.LessonService;
-import com.fis.lms_service.infra.persistence.mapper.LessonMapper;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,33 +19,27 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
-/**
- * Admin 1/29/2026
- *
- **/
+/** Admin 1/29/2026 */
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/api/v1/lessons")
 public class LessonController {
 
-    LessonService lessonService;
-    LessonRequestMapper lessonRequestMapper;
+  LessonService lessonService;
+  LessonRequestMapper lessonRequestMapper;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<@NonNull Void> createLesson(
-            @RequestPart("data") @Valid LessonCreateRequest request,
-            @RequestPart(value = "image", required = false) MultipartFile image,
-            @RequestPart(value = "lessonFiles", required = false) List<MultipartFile> lessonFiles,
-            @RequestPart(value = "assignmentFiles", required = false) List<MultipartFile> assignmentFiles
-    ) {
-        LessonModel model = lessonRequestMapper.toModel(request);
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<@NonNull Void> createLesson(
+      @RequestPart("data") @Valid LessonCreateRequest request,
+      @RequestPart(value = "image", required = false) MultipartFile image,
+      @RequestPart(value = "lessonFiles", required = false) List<MultipartFile> lessonFiles,
+      @RequestPart(value = "assignmentFiles", required = false)
+          List<MultipartFile> assignmentFiles) {
+    LessonModel model = lessonRequestMapper.toModel(request);
 
-        lessonService.createLesson(model, image, lessonFiles, assignmentFiles);
+    lessonService.createLesson(model, image, lessonFiles, assignmentFiles);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
+    return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
 }
