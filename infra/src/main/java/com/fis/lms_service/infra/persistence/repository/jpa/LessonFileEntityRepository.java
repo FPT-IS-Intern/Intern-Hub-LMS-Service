@@ -20,5 +20,5 @@ public interface LessonFileEntityRepository
     Long sumFileSizeByLessonId(@Param("lessonId") Long lessonId);
 
     List<LessonFileEntity> findAllByLessonEntity_LessonId(Long lessonEntityLessonId);
-
+    
 }
