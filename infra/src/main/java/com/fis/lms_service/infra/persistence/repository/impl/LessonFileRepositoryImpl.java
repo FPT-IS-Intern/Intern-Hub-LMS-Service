@@ -5,9 +5,8 @@ import com.fis.lms_service.core.repository.lesson.LessonFileRepository;
 import com.fis.lms_service.infra.persistence.entity.lesson.LessonEntity;
 import com.fis.lms_service.infra.persistence.entity.lesson.LessonFileEntity;
 import com.fis.lms_service.infra.persistence.mapper.LessonFileMapper;
-import com.fis.lms_service.infra.persistence.repository.jpa.LessonFileJpaRepository;
-import com.fis.lms_service.infra.persistence.repository.jpa.LessonJpaRepository;
-import com.fis.lms_service.infra.storage.S3StorageService;
+import com.fis.lms_service.infra.persistence.repository.jpa.LessonFileEntityRepository;
+import com.fis.lms_service.infra.persistence.repository.jpa.LessonEntityRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,33 +24,32 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LessonFileRepositoryImpl implements LessonFileRepository {
 
-    LessonFileJpaRepository lessonFileJpaRepository;
-    LessonJpaRepository lessonJpaRepository;
+    LessonFileEntityRepository lessonFileEntityRepository;
+    LessonEntityRepository lessonEntityRepository;
 
-    S3StorageService s3StorageService;
     LessonFileMapper lessonFileMapper;
 
     @Override
     public void save(LessonFileModel model) {
         LessonFileEntity lessonFileEntity = lessonFileMapper.toEntity(model);
 
-        LessonEntity lessonEntity = lessonJpaRepository
+        LessonEntity lessonEntity = lessonEntityRepository
                 .findById(model.getLessonId())
                 .orElseThrow(EntityNotFoundException::new);
 
         lessonFileEntity.setLessonEntity(lessonEntity);
-        lessonFileJpaRepository.save(lessonFileEntity);
+        lessonFileEntityRepository.save(lessonFileEntity);
     }
 
     @Override
     public Long getTotalSizeByLessonId(Long lessonId) {
-        Long total = lessonFileJpaRepository.sumFileSizeByLessonId(lessonId);
+        Long total = lessonFileEntityRepository.sumFileSizeByLessonId(lessonId);
         return total != null ? total : 0L;
     }
 
     @Override
     public List<LessonFileModel> findAllByLessonId(Long lessonId) {
-        List<LessonFileEntity> entities = lessonFileJpaRepository
+        List<LessonFileEntity> entities = lessonFileEntityRepository
                 .findAllByLessonEntity_LessonId(lessonId);
 
         return entities
@@ -61,12 +59,16 @@ public class LessonFileRepositoryImpl implements LessonFileRepository {
     }
 
     @Override
-    public void deleteById(Long lessonFileId) {
-        LessonFileEntity entity = lessonFileJpaRepository
-                .findById(lessonFileId)
+    public LessonFileModel findByLessonFileId(Long lessonId) {
+        LessonFileEntity lessonFileEntity = lessonFileEntityRepository
+                .findById(lessonId)
                 .orElseThrow(EntityNotFoundException::new);
 
-        s3StorageService.deleteFile(entity.getFileUrl());
-        lessonFileJpaRepository.delete(entity);
+        return lessonFileMapper.toModel(lessonFileEntity);
+    }
+
+    @Override
+    public void deleteById(Long lessonFileId) {
+        lessonFileEntityRepository.deleteById(lessonFileId);
     }
 }
