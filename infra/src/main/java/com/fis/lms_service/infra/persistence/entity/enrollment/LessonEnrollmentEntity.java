@@ -12,31 +12,32 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-/** Admin 1/27/2026 */
+/**
+ * Admin 1/27/2026
+ */
 @Entity
 @Table(
-    name = "lesson_enrollments",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"course_enrollment_id", "lesson_id"})})
+        name = "lesson_enrollments",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"course_enrollment_id", "lesson_id"})})
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LessonEnrollmentEntity extends AuditEntity {
 
-  @Id
-  @SnowflakeGenerated
-  @Column(name = "lesson_enrollment_id", nullable = false, updatable = false)
-  Long lessonEnrollmentId;
+    @Id
+    @SnowflakeGenerated
+    @Column(name = "lesson_enrollment_id", nullable = false, updatable = false)
+    Long lessonEnrollmentId;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "course_enrollment_id", nullable = false)
-  CourseEnrollmentEntity courseEnrollmentEntity;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "course_enrollment_id", nullable = false)
+    CourseEnrollmentEntity courseEnrollmentEntity;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "lesson_id", nullable = false)
-  LessonEntity lessonEntity;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "lesson_id", nullable = false)
+    LessonEntity lessonEntity;
 
-  @Enumerated(EnumType.STRING)
-  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-  @Column(name = "lesson_progress", nullable = false)
-  LessonProgress lessonProgress;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "lesson_progress", nullable = false)
+    LessonProgress lessonProgress;
 }
