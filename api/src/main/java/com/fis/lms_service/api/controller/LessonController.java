@@ -46,8 +46,8 @@ public class LessonController {
     }
 
     @DeleteMapping("/{lessonId}")
-    public ResponseApi<Boolean> deleteLesson(@PathVariable("lessonId") Long lessonId) {
-        lessonService.deleteLesson(lessonId);
+    public ResponseApi<Boolean> deleteLesson(@PathVariable("lessonId") String lessonId) {
+        lessonService.deleteLesson(Long.parseLong(lessonId));
         return ResponseApi.ok(true);
     }
 

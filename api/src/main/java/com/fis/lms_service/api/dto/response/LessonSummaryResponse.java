@@ -1,5 +1,7 @@
 package com.fis.lms_service.api.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Builder;
 
 /**
@@ -8,7 +10,8 @@ import lombok.Builder;
  **/
 @Builder
 public record LessonSummaryResponse(
-        Long lessonId,
+        @JsonSerialize(using = ToStringSerializer.class)
+        String lessonId,
         String name,
         String lessonImageUrl
 ) {
