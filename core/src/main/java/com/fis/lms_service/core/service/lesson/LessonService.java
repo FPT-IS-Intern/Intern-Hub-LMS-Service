@@ -83,8 +83,6 @@ public class LessonService {
                 .findById(lessonId)
                 .orElseThrow(() -> new NotFoundException("lesson.not.foud", "Không tìm thấy bài học id: " + lessonId));
 
-        if (lessonModel == null) throw new RuntimeException();
-
         List<LessonFileModel> lessonFileModels = lessonFileRepository.findAllByLessonId(lessonId);
 
         lessonFileModels.forEach(
