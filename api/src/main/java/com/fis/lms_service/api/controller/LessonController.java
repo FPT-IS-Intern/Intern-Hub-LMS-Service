@@ -33,22 +33,22 @@ public class LessonController {
     LessonRequestMapper lessonRequestMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseApi<Void> createLesson(
+    public ResponseApi<Boolean> createLesson(
             @RequestPart("data") @Valid LessonCreateRequest request,
-            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "image", required = true) MultipartFile image,
             @RequestPart(value = "lessonFiles", required = false) List<MultipartFile> lessonFiles,
             @RequestPart(value = "assignmentFiles", required = false) List<MultipartFile> assignmentFiles) {
 
         LessonModel model = lessonRequestMapper.toModel(request);
         lessonService.createLesson(model, image, lessonFiles, assignmentFiles);
 
-        return ResponseApi.ok(null);
+        return ResponseApi.ok(true);
     }
 
     @DeleteMapping("/{lessonId}")
-    public ResponseApi<Void> deleteLesson(@PathVariable("lessonId") Long lessonId) {
+    public ResponseApi<Boolean> deleteLesson(@PathVariable("lessonId") Long lessonId) {
         lessonService.deleteLesson(lessonId);
-        return ResponseApi.ok(null);
+        return ResponseApi.ok(true);
     }
 
     @GetMapping
@@ -57,7 +57,8 @@ public class LessonController {
 
         var lessonPage = lessonService.findAll(pageable);
 
-        var items = lessonPage.getContent()
+        var items = lessonPage
+                .getContent()
                 .stream()
                 .map(lessonRequestMapper::toDto)
                 .toList();

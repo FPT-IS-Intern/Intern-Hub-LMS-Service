@@ -8,8 +8,8 @@ import lombok.Builder;
  **/
 @Builder
 public record LessonSummaryResponse(
-        Long id,
-        String title,
-        String imageUrl
+        Long lessonId,
+        String name,
+        String lessonImageUrl
 ) {
 }
