@@ -8,60 +8,20 @@ databaseChangeLog:
             splitStatements: true
             stripComments: true
             sql: |
-              CREATE SCHEMA IF NOT EXISTS "schema_lms";
-              
-              -- ----------------------------
-              -- Type structure for courseprogress
-              -- ----------------------------
-              DROP TYPE IF EXISTS "schema_lms"."courseprogress";
-              CREATE TYPE "schema_lms"."courseprogress" AS ENUM (
-                'CANCELED',
-                'COMPLETED',
-                'IN_PROGRESS'
-              );
-              
-              -- ----------------------------
-              -- Type structure for lessonfiletype
-              -- ----------------------------
-              DROP TYPE IF EXISTS "schema_lms"."lessonfiletype";
-              CREATE TYPE "schema_lms"."lessonfiletype" AS ENUM (
-                'ASSIGNMENT',
-                'MATERIAL'
-              );
-              
-              -- ----------------------------
-              -- Type structure for lessonprogress
-              -- ----------------------------
-              DROP TYPE IF EXISTS "schema_lms"."lessonprogress";
-              CREATE TYPE "schema_lms"."lessonprogress" AS ENUM (
-                'CANCELED',
-                'COMPLETED',
-                'IN_PROGRESS'
-              );
-              
-              -- ----------------------------
-              -- Type structure for submissionstatus
-              -- ----------------------------
-              DROP TYPE IF EXISTS "schema_lms"."submissionstatus";
-              CREATE TYPE "schema_lms"."submissionstatus" AS ENUM (
-                'NOT_SUBMITTED',
-                'SUBMITTED'
-              );
-              
               -- ----------------------------
               -- Table structure for course_enrollments
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."course_enrollments";
               CREATE TABLE "schema_lms"."course_enrollments" (
-                "course_enrollment_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "course_progress" "schema_lms"."courseprogress" NOT NULL,
-                "user_id" int8 NOT NULL,
-                "course_id" int8 NOT NULL
+              "course_enrollment_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "course_progress" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+              "user_id" int8 NOT NULL,
+              "course_id" int8 NOT NULL
               )
               ;
               
@@ -70,14 +30,14 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."course_evaluators";
               CREATE TABLE "schema_lms"."course_evaluators" (
-                "course_evaluator_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "user_id" int8 NOT NULL,
-                "course_id" int8 NOT NULL
+              "course_evaluator_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "user_id" int8 NOT NULL,
+              "course_id" int8 NOT NULL
               )
               ;
               
@@ -86,15 +46,15 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."course_lessons";
               CREATE TABLE "schema_lms"."course_lessons" (
-                "course_lesson_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "order_index" int4 NOT NULL,
-                "course_id" int8 NOT NULL,
-                "lesson_id" int8 NOT NULL
+              "course_lesson_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "order_index" int4 NOT NULL,
+              "course_id" int8 NOT NULL,
+              "lesson_id" int8 NOT NULL
               )
               ;
               
@@ -103,14 +63,14 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."course_positions";
               CREATE TABLE "schema_lms"."course_positions" (
-                "course_position_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "position_id" int8 NOT NULL,
-                "course_id" int8 NOT NULL
+              "course_position_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "position_id" int8 NOT NULL,
+              "course_id" int8 NOT NULL
               )
               ;
               
@@ -119,15 +79,15 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."courses";
               CREATE TABLE "schema_lms"."courses" (
-                "course_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "course_image_url" text COLLATE "pg_catalog"."default" NOT NULL,
-                "description" text COLLATE "pg_catalog"."default" NOT NULL,
-                "name" varchar(128) COLLATE "pg_catalog"."default" NOT NULL
+              "course_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "course_image_url" text COLLATE "pg_catalog"."default" NOT NULL,
+              "description" text COLLATE "pg_catalog"."default" NOT NULL,
+              "name" varchar(128) COLLATE "pg_catalog"."default" NOT NULL
               )
               ;
               
@@ -136,15 +96,15 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."lesson_enrollments";
               CREATE TABLE "schema_lms"."lesson_enrollments" (
-                "lesson_enrollment_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "lesson_progress" "schema_lms"."lessonprogress" NOT NULL,
-                "course_enrollment_id" int8 NOT NULL,
-                "lesson_id" int8 NOT NULL
+              "lesson_enrollment_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "lesson_progress" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+              "course_enrollment_id" int8 NOT NULL,
+              "lesson_id" int8 NOT NULL
               )
               ;
               
@@ -153,17 +113,17 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."lesson_files";
               CREATE TABLE "schema_lms"."lesson_files" (
-                "lesson_file_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "file_name" text COLLATE "pg_catalog"."default" NOT NULL,
-                "file_size" int8 NOT NULL,
-                "file_url" text COLLATE "pg_catalog"."default" NOT NULL,
-                "lesson_file_type" "schema_lms"."lessonfiletype" NOT NULL,
-                "lesson_id" int8 NOT NULL
+              "lesson_file_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "file_name" text COLLATE "pg_catalog"."default" NOT NULL,
+              "file_size" int8 NOT NULL,
+              "file_url" text COLLATE "pg_catalog"."default" NOT NULL,
+              "lesson_file_type" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+              "lesson_id" int8 NOT NULL
               )
               ;
               
@@ -172,15 +132,15 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."lesson_submissions";
               CREATE TABLE "schema_lms"."lesson_submissions" (
-                "lesson_submission_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "last_submission_at" int8 NOT NULL,
-                "submission_status" "schema_lms"."submissionstatus" NOT NULL,
-                "lesson_enrollment_id" int8 NOT NULL
+              "lesson_submission_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "last_submission_at" int8 NOT NULL,
+              "submission_status" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+              "lesson_enrollment_id" int8 NOT NULL
               )
               ;
               
@@ -189,17 +149,17 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."lessons";
               CREATE TABLE "schema_lms"."lessons" (
-                "lesson_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "content" text COLLATE "pg_catalog"."default" NOT NULL,
-                "introduction" text COLLATE "pg_catalog"."default" NOT NULL,
-                "lesson_image_url" text COLLATE "pg_catalog"."default" NOT NULL,
-                "name" text COLLATE "pg_catalog"."default" NOT NULL,
-                "requirements" text COLLATE "pg_catalog"."default" NOT NULL
+              "lesson_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "content" text COLLATE "pg_catalog"."default" NOT NULL,
+              "introduction" text COLLATE "pg_catalog"."default" NOT NULL,
+              "lesson_image_url" text COLLATE "pg_catalog"."default",
+              "name" text COLLATE "pg_catalog"."default" NOT NULL,
+              "requirements" text COLLATE "pg_catalog"."default" NOT NULL
               )
               ;
               
@@ -208,16 +168,16 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."submission_attachments";
               CREATE TABLE "schema_lms"."submission_attachments" (
-                "submission_attachment_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "file_name" text COLLATE "pg_catalog"."default" NOT NULL,
-                "file_size" int8 NOT NULL,
-                "file_url" text COLLATE "pg_catalog"."default" NOT NULL,
-                "lesson_submission_id" int8 NOT NULL
+              "submission_attachment_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "file_name" text COLLATE "pg_catalog"."default" NOT NULL,
+              "file_size" int8 NOT NULL,
+              "file_url" text COLLATE "pg_catalog"."default" NOT NULL,
+              "lesson_submission_id" int8 NOT NULL
               )
               ;
               
@@ -226,16 +186,16 @@ databaseChangeLog:
               -- ----------------------------
               DROP TABLE IF EXISTS "schema_lms"."submission_comments";
               CREATE TABLE "schema_lms"."submission_comments" (
-                "submission_comment_id" int8 NOT NULL,
-                "created_at" int8 NOT NULL,
-                "created_by" varchar(50) COLLATE "pg_catalog"."default",
-                "updated_at" int8,
-                "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-                "version" int4,
-                "comment_at" int8 NOT NULL,
-                "content" text COLLATE "pg_catalog"."default" NOT NULL,
-                "user_id" int8 NOT NULL,
-                "lesson_submission_id" int8 NOT NULL
+              "submission_comment_id" int8 NOT NULL,
+              "created_at" int8 NOT NULL,
+              "created_by" varchar(50) COLLATE "pg_catalog"."default",
+              "updated_at" int8,
+              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
+              "version" int4,
+              "comment_at" int8 NOT NULL,
+              "content" text COLLATE "pg_catalog"."default" NOT NULL,
+              "user_id" int8 NOT NULL,
+              "lesson_submission_id" int8 NOT NULL
               )
               ;
               
@@ -243,6 +203,11 @@ databaseChangeLog:
               -- Uniques structure for table course_enrollments
               -- ----------------------------
               ALTER TABLE "schema_lms"."course_enrollments" ADD CONSTRAINT "uk2ikyy9u68ld3vnvq089m4j1xg" UNIQUE ("course_id", "user_id");
+              
+              -- ----------------------------
+              -- Checks structure for table course_enrollments
+              -- ----------------------------
+              ALTER TABLE "schema_lms"."course_enrollments" ADD CONSTRAINT "course_enrollments_course_progress_check" CHECK (course_progress::text = ANY (ARRAY['IN_PROGRESS'::character varying, 'COMPLETED'::character varying, 'CANCELED'::character varying]::text[]));
               
               -- ----------------------------
               -- Primary Key structure for table course_enrollments
@@ -290,9 +255,19 @@ databaseChangeLog:
               ALTER TABLE "schema_lms"."lesson_enrollments" ADD CONSTRAINT "uk5emtw1hiipbayayf5k6wy24u1" UNIQUE ("course_enrollment_id", "lesson_id");
               
               -- ----------------------------
+              -- Checks structure for table lesson_enrollments
+              -- ----------------------------
+              ALTER TABLE "schema_lms"."lesson_enrollments" ADD CONSTRAINT "lesson_enrollments_lesson_progress_check" CHECK (lesson_progress::text = ANY (ARRAY['IN_PROGRESS'::character varying, 'COMPLETED'::character varying, 'CANCELED'::character varying]::text[]));
+              
+              -- ----------------------------
               -- Primary Key structure for table lesson_enrollments
               -- ----------------------------
               ALTER TABLE "schema_lms"."lesson_enrollments" ADD CONSTRAINT "lesson_enrollments_pkey" PRIMARY KEY ("lesson_enrollment_id");
+              
+              -- ----------------------------
+              -- Checks structure for table lesson_files
+              -- ----------------------------
+              ALTER TABLE "schema_lms"."lesson_files" ADD CONSTRAINT "lesson_files_lesson_file_type_check" CHECK (lesson_file_type::text = ANY (ARRAY['MATERIAL'::character varying, 'ASSIGNMENT'::character varying]::text[]));
               
               -- ----------------------------
               -- Primary Key structure for table lesson_files
@@ -303,6 +278,11 @@ databaseChangeLog:
               -- Uniques structure for table lesson_submissions
               -- ----------------------------
               ALTER TABLE "schema_lms"."lesson_submissions" ADD CONSTRAINT "ukjifuuhkshudkdi53r8frp295q" UNIQUE ("lesson_enrollment_id");
+              
+              -- ----------------------------
+              -- Checks structure for table lesson_submissions
+              -- ----------------------------
+              ALTER TABLE "schema_lms"."lesson_submissions" ADD CONSTRAINT "lesson_submissions_submission_status_check" CHECK (submission_status::text = ANY (ARRAY['SUBMITTED'::character varying, 'NOT_SUBMITTED'::character varying]::text[]));
               
               -- ----------------------------
               -- Primary Key structure for table lesson_submissions
