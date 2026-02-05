@@ -13,7 +13,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,5 +93,11 @@ public class LessonService {
 
         lessonRepository.deleteById(lessonId);
     }
+
+    @Transactional(readOnly = true)
+    public Page<@NonNull LessonModel> findAll(Pageable pageable) {
+        return lessonRepository.findAll(pageable);
+    }
+
 
 }
