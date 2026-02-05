@@ -1,7 +1,10 @@
 package com.fis.lms_service.infra.storage;
 
 import com.fis.lms_service.core.repository.FileStorageRepository;
+
 import java.time.Duration;
+
+import com.intern.hub.library.common.exception.InternalErrorException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,71 +21,73 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
-/** Admin 1/29/2026 */
+/**
+ * Admin 1/29/2026
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class S3StorageService implements FileStorageRepository {
 
-  S3Client s3Client;
-  S3Presigner s3Presigner;
+    S3Client s3Client;
+    S3Presigner s3Presigner;
 
-  @NonFinal
-  @Value("${aws.s3.bucket-name}")
-  String bucketName;
+    @NonFinal
+    @Value("${aws.s3.bucket-name}")
+    String bucketName;
 
-  public String uploadFile(MultipartFile file, String keyPrefix) {
-    return uploadFile(file, keyPrefix, 20 * 1024 * 1024L, ".*");
-  }
-
-  public String uploadFile(
-      MultipartFile file, String keyPrefix, Long maxSizeBytes, String contentTypeRegex) {
-    if (file.getSize() > maxSizeBytes)
-      throw new RuntimeException(
-          "Dung lượng file vượt quá giới hạn " + (maxSizeBytes / 1024 / 1024) + "MB");
-
-    String contentType = file.getContentType();
-    if (contentType == null || !contentType.matches(contentTypeRegex)) {
-      throw new RuntimeException("Định dạng file không hợp lệ. Yêu cầu: " + contentTypeRegex);
+    public String uploadFile(MultipartFile file, String keyPrefix) {
+        return uploadFile(file, keyPrefix, 20 * 1024 * 1024L, ".*");
     }
 
-    String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-    String key = keyPrefix.endsWith("/") ? keyPrefix + fileName : keyPrefix + "/" + fileName;
+    public String uploadFile(
+            MultipartFile file, String keyPrefix, Long maxSizeBytes, String contentTypeRegex) {
+        if (file.getSize() > maxSizeBytes)
+            throw new RuntimeException(
+                    "Dung lượng file vượt quá giới hạn " + (maxSizeBytes / 1024 / 1024) + "MB");
 
-    try {
-      s3Client.putObject(
-          PutObjectRequest.builder()
-              .bucket(bucketName)
-              .key(key)
-              .contentType(file.getContentType())
-              .build(),
-          RequestBody.fromBytes(file.getBytes()));
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.matches(contentTypeRegex)) {
+            throw new RuntimeException("Định dạng file không hợp lệ. Yêu cầu: " + contentTypeRegex);
+        }
 
-      return key;
-    } catch (Exception e) {
-      throw new RuntimeException("Không thể upload file lên hệ thống lưu trữ");
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String key = keyPrefix.endsWith("/") ? keyPrefix + fileName : keyPrefix + "/" + fileName;
+
+        try {
+            s3Client.putObject(
+                    PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(key)
+                            .contentType(file.getContentType())
+                            .build(),
+                    RequestBody.fromBytes(file.getBytes()));
+
+            return key;
+        } catch (Exception e) {
+            throw new InternalErrorException("storage.upload.error", "Không thể upload file lên hệ thống lưu trữ");
+        }
     }
-  }
 
-  public void deleteFile(String key) {
-    try {
-      s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
-    } catch (Exception e) {
-      throw new RuntimeException("Không thể delete file trong hệ thống lưu trữ");
+    public void deleteFile(String key) {
+        try {
+            s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
+        } catch (Exception e) {
+            throw new RuntimeException("Không thể delete file trong hệ thống lưu trữ");
+        }
     }
-  }
 
-  public String getPrivateUrl(String key) {
-    GetObjectRequest getObjectRequest =
-        GetObjectRequest.builder().bucket(bucketName).key(key).build();
+    public String getPrivateUrl(String key) {
+        GetObjectRequest getObjectRequest =
+                GetObjectRequest.builder().bucket(bucketName).key(key).build();
 
-    GetObjectPresignRequest presignRequest =
-        GetObjectPresignRequest.builder()
-            .signatureDuration(Duration.ofMinutes(15))
-            .getObjectRequest(getObjectRequest)
-            .build();
+        GetObjectPresignRequest presignRequest =
+                GetObjectPresignRequest.builder()
+                        .signatureDuration(Duration.ofMinutes(15))
+                        .getObjectRequest(getObjectRequest)
+                        .build();
 
-    return s3Presigner.presignGetObject(presignRequest).url().toString();
-  }
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
 }

@@ -9,6 +9,7 @@ import com.fis.lms_service.core.repository.lesson.LessonRepository;
 
 import java.util.List;
 
+import com.intern.hub.library.common.exception.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -78,7 +79,9 @@ public class LessonService {
     @Transactional
     public void deleteLesson(Long lessonId) {
 
-        LessonModel lessonModel = lessonRepository.findById(lessonId).orElse(null);
+        LessonModel lessonModel = lessonRepository
+                .findById(lessonId)
+                .orElseThrow(() -> new NotFoundException("lesson.not.foud", "Không tìm thấy bài học id: " + lessonId));
 
         if (lessonModel == null) throw new RuntimeException();
 
