@@ -43,7 +43,7 @@ public class LessonFileService {
     @Transactional
     public void uploadFiles(Long lessonId, List<MultipartFile> files, LessonFileType lessonFileType) {
 
-        long currentTotalSize = lessonFileRepository.getTotalSizeByLessonId(lessonId);
+        long currentTotalSize = lessonFileRepository.getTotalSizeByLessonId(lessonId, lessonFileType);
 
         long uploadSize = files.stream().mapToLong(MultipartFile::getSize).sum();
 

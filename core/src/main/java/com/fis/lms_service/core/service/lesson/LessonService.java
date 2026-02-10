@@ -52,6 +52,7 @@ public class LessonService {
     @Value("${aws.s3.allow-types.image}")
     String allowTypesImage;
 
+
     @Transactional
     public void createLesson(
             LessonModel model,
@@ -80,6 +81,57 @@ public class LessonService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public Page<@NonNull LessonModel> findAll(Pageable pageable) {
+        var res = lessonRepository.findAll(pageable);
+
+        res.getContent().forEach(x -> {
+            if (x.getLessonImageUrl() != null && !x.getLessonImageUrl().isEmpty())
+                x.setLessonImageUrl(bucketUrl + x.getLessonImageUrl());
+        });
+        return res;
+    }
+
+    @Transactional
+    public void updateLesson(
+            Long lessonId,
+            LessonModel updateModel,
+            MultipartFile newImage,
+            List<MultipartFile> newLessonFiles,
+            List<MultipartFile> newAssignmentFiles,
+            List<Long> deleteFileIds) {
+
+        LessonModel existing = lessonRepository
+                .findById(lessonId)
+                .orElseThrow(() -> new NotFoundException("lesson.not.found", "Không tìm thấy bài học"));
+
+        existing.setName(updateModel.getName());
+        existing.setIntroduction(updateModel.getIntroduction());
+        existing.setRequirements(updateModel.getRequirements());
+        existing.setContent(updateModel.getContent());
+
+        if (newImage != null && !newImage.isEmpty()) {
+            if (existing.getLessonImageUrl() != null)
+                fileStorageRepository.deleteFile(existing.getLessonImageUrl());
+
+
+            String imageUrl = fileStorageRepository.uploadFile(
+                    newImage, lessonPath + lessonId + "/avatar", maxFileSize, allowTypesImage
+            );
+            existing.setLessonImageUrl(imageUrl);
+        }
+
+        if (deleteFileIds != null)
+            deleteFileIds.forEach(lessonFileService::deleteFile);
+
+
+        if (newLessonFiles != null)
+            lessonFileService.uploadFiles(lessonId, newLessonFiles, LessonFileType.MATERIAL);
+
+        if (newAssignmentFiles != null)
+            lessonFileService.uploadFiles(lessonId, newAssignmentFiles, LessonFileType.ASSIGNMENT);
+    }
+
     @Transactional
     public void deleteLesson(Long lessonId) {
 
@@ -97,17 +149,6 @@ public class LessonService {
         }
 
         lessonRepository.deleteById(lessonId);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<@NonNull LessonModel> findAll(Pageable pageable) {
-        var res = lessonRepository.findAll(pageable);
-
-        res.getContent().forEach(x -> {
-            if (x.getLessonImageUrl() != null && !x.getLessonImageUrl().isEmpty())
-                x.setLessonImageUrl(bucketUrl + x.getLessonImageUrl());
-        });
-        return res;
     }
 
 
