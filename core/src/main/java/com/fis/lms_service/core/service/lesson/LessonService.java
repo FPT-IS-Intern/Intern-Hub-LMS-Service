@@ -37,6 +37,10 @@ public class LessonService {
     LessonFileService lessonFileService;
 
     @NonFinal
+    @Value("${aws.s3.bucket-url}")
+    String bucketUrl;
+
+    @NonFinal
     @Value("${aws.s3.paths.lesson}")
     String lessonPath;
 
@@ -97,7 +101,13 @@ public class LessonService {
 
     @Transactional(readOnly = true)
     public Page<@NonNull LessonModel> findAll(Pageable pageable) {
-        return lessonRepository.findAll(pageable);
+        var res = lessonRepository.findAll(pageable);
+
+        res.getContent().forEach(x -> {
+            if (x.getLessonImageUrl() != null && !x.getLessonImageUrl().isEmpty())
+                x.setLessonImageUrl(bucketUrl + x.getLessonImageUrl());
+        });
+        return res;
     }
 
 

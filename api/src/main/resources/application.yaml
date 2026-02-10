@@ -25,6 +25,7 @@ aws:
     region: ${S3_REGION}
     end-point: ${S3_ENDPOINT}
     bucket-name: ${S3_BUCKET_NAME}
+    bucket-url: ${S3_BUCKET_URL}
     paths:
       lesson: lessons/
       course: courses/
