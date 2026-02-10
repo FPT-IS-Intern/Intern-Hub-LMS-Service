@@ -130,6 +130,8 @@ public class LessonService {
 
         if (newAssignmentFiles != null)
             lessonFileService.uploadFiles(lessonId, newAssignmentFiles, LessonFileType.ASSIGNMENT);
+
+        lessonRepository.save(existing);
     }
 
     @Transactional
