@@ -18,13 +18,12 @@ import org.springframework.stereotype.Repository;
 public interface LessonFileEntityRepository
         extends JpaRepository<@NonNull LessonFileEntity, @NonNull Long> {
 
-    @Query("SELECT SUM(f.fileSize) " +
-            "FROM LessonFileEntity f " +
+    @Query("SELECT SUM(f.fileSize) FROM LessonFileEntity f " +
             "WHERE f.lessonEntity.lessonId = :lessonId " +
             "AND f.lessonFileType = :lessonType")
     Long sumFileSizeByLessonId(
             @Param("lessonId") Long lessonId,
-            @Param("lessonFileType") LessonFileType lessonFileType
+            @Param("lessonType") LessonFileType lessonType
     );
 
     List<LessonFileEntity> findAllByLessonEntity_LessonId(Long lessonEntityLessonId);
