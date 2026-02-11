@@ -30,7 +30,11 @@ public class LessonRepositoryImpl implements LessonRepository {
 
     @Override
     public LessonModel save(LessonModel lessonModel) {
-        LessonEntity lessonEntity = lessonMapper.toEntity(lessonModel);
+        LessonEntity lessonEntity = lessonEntityRepository
+                .findById(lessonModel.getLessonId())
+                .orElse(new LessonEntity());
+
+        lessonMapper.updateEntityFromModel(lessonModel, lessonEntity);
 
         LessonEntity savedLessonEntity = lessonEntityRepository.save(lessonEntity);
 
@@ -54,5 +58,8 @@ public class LessonRepositoryImpl implements LessonRepository {
                 .map(lessonMapper::toModel);
     }
 
-
+    @Override
+    public void flush() {
+        lessonEntityRepository.flush();
+    }
 }

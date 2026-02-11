@@ -92,6 +92,19 @@ public class LessonService {
         return res;
     }
 
+    @Transactional(readOnly = true)
+    public LessonModel getLesson(Long lessonId) {
+        LessonModel model = lessonRepository
+                .findById(lessonId)
+                .orElseThrow(() -> new NotFoundException("lesson.not.found", "Không tìm thấy bài học"));
+
+        if (model.getLessonImageUrl() != null && !model.getLessonImageUrl().isEmpty()) {
+            model.setLessonImageUrl(bucketUrl + model.getLessonImageUrl());
+        }
+
+        return model;
+    }
+
     @Transactional
     public void updateLesson(
             Long lessonId,
@@ -111,27 +124,33 @@ public class LessonService {
         existing.setContent(updateModel.getContent());
 
         if (newImage != null && !newImage.isEmpty()) {
-            if (existing.getLessonImageUrl() != null)
+            if (existing.getLessonImageUrl() != null && !existing.getLessonImageUrl().isEmpty()) {
                 fileStorageRepository.deleteFile(existing.getLessonImageUrl());
-
+            }
 
             String imageUrl = fileStorageRepository.uploadFile(
-                    newImage, lessonPath + lessonId + "/avatar", maxFileSize, allowTypesImage
+                    newImage,
+                    lessonPath + lessonId + "/avatar",
+                    maxFileSize,
+                    allowTypesImage
             );
             existing.setLessonImageUrl(imageUrl);
         }
 
-        if (deleteFileIds != null)
-            deleteFileIds.forEach(lessonFileService::deleteFile);
-
-
-        if (newLessonFiles != null)
-            lessonFileService.uploadFiles(lessonId, newLessonFiles, LessonFileType.MATERIAL);
-
-        if (newAssignmentFiles != null)
-            lessonFileService.uploadFiles(lessonId, newAssignmentFiles, LessonFileType.ASSIGNMENT);
-
         lessonRepository.save(existing);
+        lessonRepository.flush();
+
+        if (deleteFileIds != null && !deleteFileIds.isEmpty()) {
+            deleteFileIds.forEach(lessonFileService::deleteFile);
+        }
+
+        if (newLessonFiles != null && !newLessonFiles.isEmpty()) {
+            lessonFileService.uploadFiles(lessonId, newLessonFiles, LessonFileType.MATERIAL);
+        }
+
+        if (newAssignmentFiles != null && !newAssignmentFiles.isEmpty()) {
+            lessonFileService.uploadFiles(lessonId, newAssignmentFiles, LessonFileType.ASSIGNMENT);
+        }
     }
 
     @Transactional

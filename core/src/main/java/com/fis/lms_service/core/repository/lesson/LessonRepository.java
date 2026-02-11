@@ -20,4 +20,5 @@ public interface LessonRepository {
 
     Page<@NonNull LessonModel> findAll(Pageable pageable);
 
+    void flush();
 }
