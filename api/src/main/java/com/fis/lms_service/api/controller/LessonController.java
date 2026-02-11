@@ -1,7 +1,7 @@
 package com.fis.lms_service.api.controller;
 
 import com.fis.lms_service.api.dto.request.LessonCreateRequest;
-import com.fis.lms_service.api.dto.response.LessonSummaryResponse;
+import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
 import com.fis.lms_service.api.mapper.LessonRequestMapper;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import com.fis.lms_service.core.service.lesson.LessonService;
