@@ -82,7 +82,7 @@ public class LessonService {
     }
 
     @Transactional(readOnly = true)
-    public Page<@NonNull LessonModel> findAll(Pageable pageable) {
+    public Page<@NonNull LessonModel> getLessons(Pageable pageable) {
         var res = lessonRepository.findAll(pageable);
 
         res.getContent().forEach(x -> {

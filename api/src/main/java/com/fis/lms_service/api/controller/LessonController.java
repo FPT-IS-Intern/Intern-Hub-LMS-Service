@@ -55,7 +55,7 @@ public class LessonController {
     public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
             @PageableDefault(size = 10) Pageable pageable) {
 
-        var lessonPage = lessonService.findAll(pageable);
+        var lessonPage = lessonService.getLessons(pageable);
 
         var items = lessonPage
                 .getContent()
