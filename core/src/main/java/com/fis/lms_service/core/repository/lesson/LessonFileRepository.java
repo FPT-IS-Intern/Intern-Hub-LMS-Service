@@ -16,7 +16,7 @@ public interface LessonFileRepository {
 
     List<LessonFileModel> findAllByLessonId(Long lessonId);
 
-    LessonFileModel findByLessonFileId(Long lessonFileId);
+    LessonFileModel findById(Long lessonFileId);
 
     void deleteById(Long lessonFileId);
 }

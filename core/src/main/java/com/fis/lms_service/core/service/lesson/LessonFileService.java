@@ -68,7 +68,9 @@ public class LessonFileService {
     }
 
     public List<LessonFileModel> getFiles(Long lessonId) {
-        return lessonFileRepository.findAllByLessonId(lessonId).stream()
+        return lessonFileRepository
+                .findAllByLessonId(lessonId)
+                .stream()
                 .peek(m -> m.setFileUrl(fileStorageRepository.getPrivateUrl(m.getFileUrl())))
                 .toList();
     }
@@ -76,7 +78,7 @@ public class LessonFileService {
     @Transactional
     public void deleteFile(Long lessonFileId) {
 
-        LessonFileModel lessonFileModel = lessonFileRepository.findByLessonFileId(lessonFileId);
+        LessonFileModel lessonFileModel = lessonFileRepository.findById(lessonFileId);
 
         fileStorageRepository.deleteFile(lessonFileModel.getFileUrl());
         lessonFileRepository.deleteById(lessonFileModel.getLessonFileId());

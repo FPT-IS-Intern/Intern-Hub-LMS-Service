@@ -21,7 +21,7 @@ public interface LessonFileEntityRepository
     @Query("SELECT SUM(f.fileSize) FROM LessonFileEntity f " +
             "WHERE f.lessonEntity.lessonId = :lessonId " +
             "AND f.lessonFileType = :lessonType")
-    Long sumFileSizeByLessonId(
+    Long getTotalSizeByLessonId(
             @Param("lessonId") Long lessonId,
             @Param("lessonType") LessonFileType lessonType
     );

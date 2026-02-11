@@ -54,5 +54,5 @@ public class LessonRepositoryImpl implements LessonRepository {
                 .map(lessonMapper::toModel);
     }
 
-    
+
 }

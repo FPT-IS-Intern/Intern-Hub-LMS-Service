@@ -45,22 +45,23 @@ public class LessonFileRepositoryImpl implements LessonFileRepository {
 
     @Override
     public Long getTotalSizeByLessonId(Long lessonId, LessonFileType lessonFileType) {
-        Long total = lessonFileEntityRepository.sumFileSizeByLessonId(lessonId, lessonFileType);
+        Long total = lessonFileEntityRepository.getTotalSizeByLessonId(lessonId, lessonFileType);
         return total != null ? total : 0L;
     }
 
     @Override
     public List<LessonFileModel> findAllByLessonId(Long lessonId) {
-        List<LessonFileEntity> entities =
-                lessonFileEntityRepository.findAllByLessonEntity_LessonId(lessonId);
+        List<LessonFileEntity> entities = lessonFileEntityRepository
+                .findAllByLessonEntity_LessonId(lessonId);
 
         return entities.stream().map(lessonFileMapper::toModel).toList();
     }
 
     @Override
-    public LessonFileModel findByLessonFileId(Long lessonId) {
-        LessonFileEntity lessonFileEntity =
-                lessonFileEntityRepository.findById(lessonId).orElseThrow(EntityNotFoundException::new);
+    public LessonFileModel findById(Long lessonFileId) {
+        LessonFileEntity lessonFileEntity = lessonFileEntityRepository
+                .findById(lessonFileId)
+                .orElseThrow(EntityNotFoundException::new);
 
         return lessonFileMapper.toModel(lessonFileEntity);
     }
