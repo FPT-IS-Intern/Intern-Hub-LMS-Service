@@ -8,12 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
-/**
- * Admin 1/26/2026
- */
+/** Admin 1/26/2026 */
 @Entity
 @Table(name = "lesson_files")
 @Getter
@@ -21,25 +17,25 @@ import org.hibernate.type.SqlTypes;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LessonFileEntity extends AuditEntity {
 
-    @Id
-    @SnowflakeGenerated
-    @Column(name = "lesson_file_id", nullable = false, updatable = false)
-    Long lessonFileId;
+  @Id
+  @SnowflakeGenerated
+  @Column(name = "lesson_file_id", nullable = false, updatable = false)
+  Long lessonFileId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "lesson_id", nullable = false)
-    LessonEntity lessonEntity;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "lesson_id", nullable = false)
+  LessonEntity lessonEntity;
 
-    @Column(name = "file_url", nullable = false, columnDefinition = "text")
-    String fileUrl;
+  @Column(name = "file_url", nullable = false, columnDefinition = "text")
+  String fileUrl;
 
-    @Column(name = "file_name", nullable = false, columnDefinition = "text")
-    String fileName;
+  @Column(name = "file_name", nullable = false, columnDefinition = "text")
+  String fileName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "lesson_file_type", nullable = false)
-    LessonFileType lessonFileType;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "lesson_file_type", nullable = false)
+  LessonFileType lessonFileType;
 
-    @Column(name = "file_size", nullable = false)
-    Long fileSize;
+  @Column(name = "file_size", nullable = false)
+  Long fileSize;
 }

@@ -7,15 +7,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-/**
- * Admin 1/29/2026
- */
+/** Admin 1/29/2026 */
 @Mapper(componentModel = "spring")
 public interface LessonMapper {
-    LessonEntity toEntity(LessonModel model);
+  LessonEntity toEntity(LessonModel model);
 
-    LessonModel toModel(LessonEntity entity);
+  LessonModel toModel(LessonEntity entity);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateEntityFromModel(LessonModel model, @MappingTarget LessonEntity entity);
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  void updateEntityFromModel(LessonModel model, @MappingTarget LessonEntity entity);
 }

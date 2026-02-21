@@ -9,34 +9,30 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
-/**
- * Admin 1/27/2026
- */
+/** Admin 1/27/2026 */
 @Entity
 @Table(
-        name = "lesson_submissions",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"lesson_enrollment_id"})})
+    name = "lesson_submissions",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"lesson_enrollment_id"})})
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LessonSubmissionEntity extends AuditEntity {
 
-    @Id
-    @SnowflakeGenerated
-    @Column(name = "lesson_submission_id", nullable = false, updatable = false)
-    Long lessonSubmissionId;
+  @Id
+  @SnowflakeGenerated
+  @Column(name = "lesson_submission_id", nullable = false, updatable = false)
+  Long lessonSubmissionId;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "lesson_enrollment_id", nullable = false)
-    LessonEnrollmentEntity lessonEnrollmentEntity;
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "lesson_enrollment_id", nullable = false)
+  LessonEnrollmentEntity lessonEnrollmentEntity;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "submission_status", nullable = false)
-    SubmissionStatus submissionStatus;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "submission_status", nullable = false)
+  SubmissionStatus submissionStatus;
 
-    @Column(name = "last_submission_at", nullable = false)
-    Long lastSubmissionAt;
+  @Column(name = "last_submission_at", nullable = false)
+  Long lastSubmissionAt;
 }
