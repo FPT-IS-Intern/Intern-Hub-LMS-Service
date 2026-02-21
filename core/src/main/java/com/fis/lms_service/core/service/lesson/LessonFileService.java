@@ -41,6 +41,9 @@ public class LessonFileService {
     String allowTypesDocument;
 
     @Transactional
+    /**
+     * Upload danh sách file cho bài học, kiểm tra tổng dung lượng không vượt quá giới hạn.
+     */
     public void uploadFiles(Long lessonId, List<MultipartFile> files, LessonFileType lessonFileType) {
         if (files == null || files.isEmpty()) {
             return;
@@ -71,6 +74,9 @@ public class LessonFileService {
         }
     }
 
+    /**
+     * Lấy danh sách file của bài học và gắn URL tải tạm thời.
+     */
     public List<LessonFileModel> getFiles(Long lessonId) {
         return lessonFileRepository.findAllByLessonId(lessonId).stream()
                 .peek(m -> m.setFileUrl(fileStorageRepository.getPrivateUrl(m.getFileUrl())))
@@ -78,6 +84,9 @@ public class LessonFileService {
     }
 
     @Transactional
+    /**
+     * Xóa file bài học theo id (xóa trên storage và trong DB).
+     */
     public void deleteFile(Long lessonFileId) {
 
         LessonFileModel lessonFileModel =

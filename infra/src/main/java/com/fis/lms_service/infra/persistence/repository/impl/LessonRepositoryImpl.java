@@ -28,6 +28,9 @@ public class LessonRepositoryImpl implements LessonRepository {
     LessonEntityMapper lessonMapper;
 
     @Override
+    /**
+     * Lưu hoặc cập nhật bài học: map model -> entity, sau đó persist và map ngược lại.
+     */
     public LessonModel save(LessonModel lessonModel) {
         LessonEntity lessonEntity =
                 lessonEntityRepository.findById(lessonModel.getLessonId()).orElse(new LessonEntity());
@@ -40,21 +43,33 @@ public class LessonRepositoryImpl implements LessonRepository {
     }
 
     @Override
+    /**
+     * Tìm bài học theo id (trả về Optional).
+     */
     public Optional<LessonModel> findById(Long lessonId) {
         return lessonEntityRepository.findById(lessonId).map(lessonMapper::toModel);
     }
 
     @Override
+    /**
+     * Xóa bài học theo id.
+     */
     public void deleteById(Long id) {
         lessonEntityRepository.deleteById(id);
     }
 
     @Override
+    /**
+     * Lấy danh sách bài học theo phân trang.
+     */
     public Page<@NonNull LessonModel> findAll(Pageable pageable) {
         return lessonEntityRepository.findAll(pageable).map(lessonMapper::toModel);
     }
 
     @Override
+    /**
+     * Flush để đảm bảo dữ liệu đã được ghi xuống DB ngay.
+     */
     public void flush() {
         lessonEntityRepository.flush();
     }

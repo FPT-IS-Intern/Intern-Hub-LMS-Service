@@ -31,6 +31,9 @@ public class LessonFileRepositoryImpl implements LessonFileRepository {
     LessonFileEntityMapper lessonFileMapper;
 
     @Override
+    /**
+     * Lưu file bài học: map model -> entity, gán quan hệ lesson, rồi persist.
+     */
     public void save(LessonFileModel lessonFileModel) {
         LessonFileEntity lessonFileEntity = lessonFileMapper.toEntity(lessonFileModel);
 
@@ -48,12 +51,18 @@ public class LessonFileRepositoryImpl implements LessonFileRepository {
     }
 
     @Override
+    /**
+     * Tính tổng dung lượng file theo bài học và loại file.
+     */
     public Long getTotalSizeByLessonId(Long lessonId, LessonFileType lessonFileType) {
         Long total = lessonFileEntityRepository.sumFileSizeByLessonId(lessonId, lessonFileType);
         return total != null ? total : 0L;
     }
 
     @Override
+    /**
+     * Lấy danh sách file theo lessonId.
+     */
     public List<LessonFileModel> findAllByLessonId(Long lessonId) {
         List<LessonFileEntity> entities = lessonFileEntityRepository.findAllByLessonId(lessonId);
 
@@ -61,11 +70,17 @@ public class LessonFileRepositoryImpl implements LessonFileRepository {
     }
 
     @Override
+    /**
+     * Tìm file theo id (trả về Optional).
+     */
     public Optional<LessonFileModel> findById(Long lessonFileId) {
         return lessonFileEntityRepository.findById(lessonFileId).map(lessonFileMapper::toModel);
     }
 
     @Override
+    /**
+     * Xóa file theo id.
+     */
     public void deleteById(Long lessonFileId) {
         lessonFileEntityRepository.deleteById(lessonFileId);
     }

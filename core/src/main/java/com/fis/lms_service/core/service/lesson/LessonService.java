@@ -70,6 +70,9 @@ public class LessonService {
     }
 
     @Transactional
+    /**
+     * Tạo bài học mới, upload ảnh đại diện và các file liên quan (tài liệu/bài tập) nếu có.
+     */
     public void createLesson(
             LessonModel model,
             MultipartFile image,
@@ -98,6 +101,9 @@ public class LessonService {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Lấy danh sách bài học theo phân trang và gắn URL đầy đủ cho ảnh bài học nếu có.
+     */
     public Page<@NonNull LessonModel> getLessons(Pageable pageable) {
         var res = lessonRepository.findAll(pageable);
 
@@ -106,6 +112,9 @@ public class LessonService {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Lấy chi tiết một bài học theo id và gắn URL đầy đủ cho ảnh nếu có.
+     */
     public LessonModel getLesson(Long lessonId) {
         LessonModel model =
                 lessonRepository
@@ -121,6 +130,9 @@ public class LessonService {
     }
 
     @Transactional
+    /**
+     * Cập nhật nội dung bài học, thay ảnh đại diện và thêm/xóa file tài liệu/bài tập nếu có.
+     */
     public void updateLesson(
             Long lessonId,
             LessonModel updateModel,
@@ -170,6 +182,9 @@ public class LessonService {
     }
 
     @Transactional
+    /**
+     * Xóa bài học và toàn bộ file liên quan (ảnh đại diện, tài liệu/bài tập) nếu có.
+     */
     public void deleteLesson(Long lessonId) {
 
         LessonModel lessonModel =
