@@ -110,7 +110,10 @@ public class LessonService {
         LessonModel model =
                 lessonRepository
                         .findById(lessonId)
-                        .orElseThrow(() -> new NotFoundException("lesson.not.found", "Không tìm thấy bài học"));
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "lesson.not.found", "Không tìm thấy bài học id: " + lessonId));
 
         applyBucketUrl(model);
 
@@ -129,7 +132,10 @@ public class LessonService {
         LessonModel existing =
                 lessonRepository
                         .findById(lessonId)
-                        .orElseThrow(() -> new NotFoundException("lesson.not.found", "Không tìm thấy bài học"));
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "lesson.not.found", "Không tìm thấy bài học id: " + lessonId));
 
         existing.setName(updateModel.getName());
         existing.setIntroduction(updateModel.getIntroduction());

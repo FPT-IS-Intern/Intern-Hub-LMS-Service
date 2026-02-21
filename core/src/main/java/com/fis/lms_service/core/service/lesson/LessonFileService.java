@@ -84,7 +84,10 @@ public class LessonFileService {
                 lessonFileRepository
                         .findById(lessonFileId)
                         .orElseThrow(
-                                () -> new NotFoundException("lesson.file.not.found", "Không tìm thấy file bài học"));
+                                () ->
+                                        new NotFoundException(
+                                                "lesson.file.not.found",
+                                                "Không tìm thấy file bài học id: " + lessonFileId));
 
         fileStorageRepository.deleteFile(lessonFileModel.getFileUrl());
         lessonFileRepository.deleteById(lessonFileModel.getLessonFileId());

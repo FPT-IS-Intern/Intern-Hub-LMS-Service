@@ -7,6 +7,7 @@ import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
 import com.fis.lms_service.core.domain.model.lesson.LessonFileModel;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -17,9 +18,14 @@ public interface LessonApiMapper {
 
   LessonSummaryResponse toSummaryResponse(LessonModel model);
 
+  @Mapping(target = "files", source = "files")
   LessonDetailResponse toDetailResponse(LessonModel model, List<LessonFileInfoResponse> files);
 
   LessonFileInfoResponse toFileResponse(LessonFileModel fileModel);
 
   List<LessonFileInfoResponse> toFileResponseList(List<LessonFileModel> fileModels);
+
+  default String map(Long value) {
+    return value == null ? null : value.toString();
+  }
 }

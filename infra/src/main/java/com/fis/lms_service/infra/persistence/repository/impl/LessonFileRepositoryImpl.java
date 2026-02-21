@@ -38,7 +38,10 @@ public class LessonFileRepositoryImpl implements LessonFileRepository {
                 lessonEntityRepository
                         .findById(lessonFileModel.getLessonId())
                         .orElseThrow(
-                                () -> new NotFoundException("lesson.not.found", "Không tìm thấy bài học"));
+                                () ->
+                                        new NotFoundException(
+                                                "lesson.not.found",
+                                                "Không tìm thấy bài học id: " + lessonFileModel.getLessonId()));
 
         lessonFileEntity.setLessonEntity(lessonEntity);
         lessonFileEntityRepository.save(lessonFileEntity);
