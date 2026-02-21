@@ -6,10 +6,9 @@ import com.fis.lms_service.api.dto.response.lesson.LessonFileInfoResponse;
 import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
 import com.fis.lms_service.core.domain.model.lesson.LessonFileModel;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 /** Admin 1/29/2026 */
 @Mapper(componentModel = "spring")
