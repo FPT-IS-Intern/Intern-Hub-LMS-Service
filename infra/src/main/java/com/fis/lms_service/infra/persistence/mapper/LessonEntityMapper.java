@@ -9,7 +9,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 /** Admin 1/29/2026 */
 @Mapper(componentModel = "spring")
-public interface LessonMapper {
+public interface LessonEntityMapper {
   LessonEntity toEntity(LessonModel model);
 
   LessonModel toModel(LessonEntity entity);

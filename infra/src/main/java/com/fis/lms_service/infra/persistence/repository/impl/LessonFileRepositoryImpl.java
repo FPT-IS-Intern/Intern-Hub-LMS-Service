@@ -5,16 +5,17 @@ import com.fis.lms_service.core.domain.model.lesson.constant.LessonFileType;
 import com.fis.lms_service.core.repository.lesson.LessonFileRepository;
 import com.fis.lms_service.infra.persistence.entity.lesson.LessonEntity;
 import com.fis.lms_service.infra.persistence.entity.lesson.LessonFileEntity;
-import com.fis.lms_service.infra.persistence.mapper.LessonFileMapper;
+import com.fis.lms_service.infra.persistence.mapper.LessonFileEntityMapper;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonEntityRepository;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonFileEntityRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.intern.hub.library.common.exception.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Admin 1/29/2026
@@ -27,7 +28,7 @@ public class LessonFileRepositoryImpl implements LessonFileRepository {
     LessonFileEntityRepository lessonFileEntityRepository;
     LessonEntityRepository lessonEntityRepository;
 
-    LessonFileMapper lessonFileMapper;
+    LessonFileEntityMapper lessonFileMapper;
 
     @Override
     public void save(LessonFileModel lessonFileModel) {
@@ -36,7 +37,8 @@ public class LessonFileRepositoryImpl implements LessonFileRepository {
         LessonEntity lessonEntity =
                 lessonEntityRepository
                         .findById(lessonFileModel.getLessonId())
-                        .orElseThrow(EntityNotFoundException::new);
+                        .orElseThrow(
+                                () -> new NotFoundException("lesson.not.found", "Không tìm thấy bài học"));
 
         lessonFileEntity.setLessonEntity(lessonEntity);
         lessonFileEntityRepository.save(lessonFileEntity);
@@ -56,11 +58,8 @@ public class LessonFileRepositoryImpl implements LessonFileRepository {
     }
 
     @Override
-    public LessonFileModel findById(Long lessonFileId) {
-        LessonFileEntity lessonFileEntity =
-                lessonFileEntityRepository.findById(lessonFileId).orElseThrow(EntityNotFoundException::new);
-
-        return lessonFileMapper.toModel(lessonFileEntity);
+    public Optional<LessonFileModel> findById(Long lessonFileId) {
+        return lessonFileEntityRepository.findById(lessonFileId).map(lessonFileMapper::toModel);
     }
 
     @Override

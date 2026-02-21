@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 /** Admin 1/29/2026 */
 @Mapper(componentModel = "spring")
-public interface LessonFileMapper {
+public interface LessonFileEntityMapper {
 
   @Mapping(target = "lessonEntity.lessonId", source = "lessonId")
   LessonFileEntity toEntity(LessonFileModel model);

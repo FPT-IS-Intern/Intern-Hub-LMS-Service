@@ -4,8 +4,7 @@ import com.fis.lms_service.api.dto.request.LessonCreateRequest;
 import com.fis.lms_service.api.dto.response.lesson.LessonDetailResponse;
 import com.fis.lms_service.api.dto.response.lesson.LessonFileInfoResponse;
 import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
-import com.fis.lms_service.api.mapper.LessonFileRequestMapper;
-import com.fis.lms_service.api.mapper.LessonRequestMapper;
+import com.fis.lms_service.api.mapper.LessonApiMapper;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import com.fis.lms_service.core.service.lesson.LessonFileService;
 import com.fis.lms_service.core.service.lesson.LessonService;
@@ -37,8 +36,7 @@ public class LessonController {
     LessonFileService lessonFileService;
 
     // Mapper
-    LessonRequestMapper lessonRequestMapper;
-    LessonFileRequestMapper lessonFileRequestMapper;
+    LessonApiMapper lessonApiMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseApi<Boolean> createLesson(
@@ -48,7 +46,7 @@ public class LessonController {
             @RequestPart(value = "assignmentFiles", required = false)
             List<MultipartFile> assignmentFiles) {
 
-        LessonModel model = lessonRequestMapper.toModel(request);
+        LessonModel model = lessonApiMapper.toModel(request);
         lessonService.createLesson(model, image, lessonFiles, assignmentFiles);
 
         return ResponseApi.ok(true);
@@ -60,7 +58,7 @@ public class LessonController {
 
         var lessonPage = lessonService.getLessons(pageable);
 
-        var items = lessonPage.getContent().stream().map(lessonRequestMapper::toDto).toList();
+        var items = lessonPage.getContent().stream().map(lessonApiMapper::toSummaryResponse).toList();
 
         var res =
                 PaginatedData.<LessonSummaryResponse>builder()
@@ -78,18 +76,8 @@ public class LessonController {
         LessonModel model = lessonService.getLesson(lessonId);
         var fileModels = lessonFileService.getFiles(lessonId);
 
-        LessonDetailResponse detailWithoutFiles = lessonRequestMapper.toDetailDto(model);
-        List<LessonFileInfoResponse> files = lessonFileRequestMapper.toFileDtoList(fileModels);
-
-        LessonDetailResponse res =
-                new LessonDetailResponse(
-                        detailWithoutFiles.lessonId(),
-                        detailWithoutFiles.name(),
-                        detailWithoutFiles.introduction(),
-                        detailWithoutFiles.content(),
-                        detailWithoutFiles.requirements(),
-                        detailWithoutFiles.lessonImageUrl(),
-                        files);
+        List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
+        LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files);
 
         return ResponseApi.ok(res);
     }
@@ -97,14 +85,13 @@ public class LessonController {
     @PutMapping(value = "/{lessonId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseApi<Boolean> updateLesson(
             @PathVariable("lessonId") Long lessonId,
-            @RequestPart("updateModel") @Valid LessonCreateRequest request,
-            @RequestPart(value = "newImage", required = false) MultipartFile image,
-            @RequestPart(value = "newLessonFiles", required = false) List<MultipartFile> lessonFiles,
-            @RequestPart(value = "newAssignmentFiles", required = false)
-            List<MultipartFile> assignmentFiles,
+            @RequestPart("data") @Valid LessonCreateRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "lessonFiles", required = false) List<MultipartFile> lessonFiles,
+            @RequestPart(value = "assignmentFiles", required = false) List<MultipartFile> assignmentFiles,
             @RequestParam(value = "deleteFileIds", required = false) List<Long> deleteFileIds) {
 
-        LessonModel updateModel = lessonRequestMapper.toModel(request);
+        LessonModel updateModel = lessonApiMapper.toModel(request);
 
         lessonService.updateLesson(
                 lessonId, updateModel, image, lessonFiles, assignmentFiles, deleteFileIds);

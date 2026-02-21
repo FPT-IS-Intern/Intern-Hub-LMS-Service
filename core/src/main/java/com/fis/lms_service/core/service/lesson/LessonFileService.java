@@ -80,10 +80,11 @@ public class LessonFileService {
     @Transactional
     public void deleteFile(Long lessonFileId) {
 
-        LessonFileModel lessonFileModel = lessonFileRepository.findById(lessonFileId);
-        if (lessonFileModel == null) {
-            throw new NotFoundException("lesson.file.not.found", "Không tìm thấy file bài học");
-        }
+        LessonFileModel lessonFileModel =
+                lessonFileRepository
+                        .findById(lessonFileId)
+                        .orElseThrow(
+                                () -> new NotFoundException("lesson.file.not.found", "Không tìm thấy file bài học"));
 
         fileStorageRepository.deleteFile(lessonFileModel.getFileUrl());
         lessonFileRepository.deleteById(lessonFileModel.getLessonFileId());

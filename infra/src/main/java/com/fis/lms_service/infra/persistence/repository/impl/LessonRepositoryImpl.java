@@ -3,7 +3,7 @@ package com.fis.lms_service.infra.persistence.repository.impl;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import com.fis.lms_service.core.repository.lesson.LessonRepository;
 import com.fis.lms_service.infra.persistence.entity.lesson.LessonEntity;
-import com.fis.lms_service.infra.persistence.mapper.LessonMapper;
+import com.fis.lms_service.infra.persistence.mapper.LessonEntityMapper;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonEntityRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class LessonRepositoryImpl implements LessonRepository {
 
     LessonEntityRepository lessonEntityRepository;
 
-    LessonMapper lessonMapper;
+    LessonEntityMapper lessonMapper;
 
     @Override
     public LessonModel save(LessonModel lessonModel) {
