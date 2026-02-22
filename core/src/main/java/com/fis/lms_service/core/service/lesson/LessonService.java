@@ -6,6 +6,7 @@ import com.fis.lms_service.core.domain.model.lesson.constant.LessonFileType;
 import com.fis.lms_service.core.repository.FileStorageRepository;
 import com.fis.lms_service.core.repository.lesson.LessonFileRepository;
 import com.fis.lms_service.core.repository.lesson.LessonRepository;
+import com.fis.lms_service.core.service.storage.StorageObjectLifecycleManager;
 import com.intern.hub.library.common.exception.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class LessonService {
     LessonRepository lessonRepository;
     LessonFileRepository lessonFileRepository;
     FileStorageRepository fileStorageRepository;
+    StorageObjectLifecycleManager storageObjectLifecycleManager;
 
     LessonFileService lessonFileService;
 
@@ -86,6 +88,7 @@ public class LessonService {
             String imageUrl =
                     fileStorageRepository.uploadFile(
                             image, buildLessonImagePath(lessonId), maxFileSize, allowTypesImage);
+            storageObjectLifecycleManager.cleanupOnRollback(imageUrl);
             saved.setLessonImageUrl(imageUrl);
 
             lessonRepository.save(saved);
@@ -155,14 +158,17 @@ public class LessonService {
         existing.setContent(updateModel.getContent());
 
         if (newImage != null && !newImage.isEmpty()) {
-            if (hasText(existing.getLessonImageUrl())) {
-                fileStorageRepository.deleteFile(existing.getLessonImageUrl());
-            }
+            String oldImageUrl = existing.getLessonImageUrl();
 
             String imageUrl =
                     fileStorageRepository.uploadFile(
                             newImage, buildLessonImagePath(lessonId), maxFileSize, allowTypesImage);
+            storageObjectLifecycleManager.cleanupOnRollback(imageUrl);
             existing.setLessonImageUrl(imageUrl);
+
+            if (hasText(oldImageUrl)) {
+                storageObjectLifecycleManager.deleteAfterCommit(oldImageUrl);
+            }
         }
 
         lessonRepository.save(existing);
@@ -201,7 +207,7 @@ public class LessonService {
                 lessonFileModel -> lessonFileService.deleteFile(lessonFileModel.getLessonFileId()));
 
         if (hasText(lessonModel.getLessonImageUrl())) {
-            fileStorageRepository.deleteFile(lessonModel.getLessonImageUrl());
+            storageObjectLifecycleManager.deleteAfterCommit(lessonModel.getLessonImageUrl());
         }
 
         lessonRepository.deleteById(lessonId);

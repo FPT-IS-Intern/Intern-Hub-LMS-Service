@@ -30,6 +30,6 @@ public class CourseEntity extends AuditEntity {
   @Column(name = "description", nullable = false, columnDefinition = "text")
   String description;
 
-  @Column(name = "course_image_url", nullable = false, columnDefinition = "text")
+  @Column(name = "course_image_url", nullable = true, columnDefinition = "text")
   String courseImageUrl;
 }

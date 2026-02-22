@@ -16,6 +16,8 @@ import java.util.List;
  */
 @Mapper(componentModel = "spring")
 public interface LessonApiMapper {
+    @Mapping(target = "lessonId", ignore = true)
+    @Mapping(target = "lessonImageUrl", ignore = true)
     LessonModel toModel(LessonCreateRequest request);
 
     LessonSummaryResponse toSummaryResponse(LessonModel model);

@@ -35,6 +35,12 @@ aws:
       image: "image/(png|jpeg|jpg)"
       document: "application/(pdf|msword|vnd.openxmlformats-officedocument.wordprocessingml.document|vnd.ms-excel|vnd.openxmlformats-officedocument.spreadsheetml.sheet)|image/(png|jpeg|jpg)"
 
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+
+security:
+  public-paths: ${SECURITY_PUBLIC_PATHS:/actuator/health,/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html}
+
 snowflake:
   worker-id: 10
   datacenter-id: 10

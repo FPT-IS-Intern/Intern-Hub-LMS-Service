@@ -23,15 +23,30 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${cors.allowed-origins}")
+    @Value("${cors.allowed-origins:http://localhost:3000}")
     private String allowedOrigins;
+
+    @Value(
+            "${security.public-paths:/actuator/health,/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html}")
+    private String publicPaths;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+        String[] whiteList =
+                Arrays.stream(publicPaths.split(","))
+                        .map(String::trim)
+                        .filter(path -> !path.isEmpty())
+                        .toArray(String[]::new);
+
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .authorizeHttpRequests(
+                        auth ->
+                                auth.requestMatchers(whiteList)
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .build();
@@ -41,7 +56,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        config.setAllowedOrigins(
+                Arrays.stream(allowedOrigins.split(","))
+                        .map(String::trim)
+                        .filter(origin -> !origin.isEmpty())
+                        .toList());
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

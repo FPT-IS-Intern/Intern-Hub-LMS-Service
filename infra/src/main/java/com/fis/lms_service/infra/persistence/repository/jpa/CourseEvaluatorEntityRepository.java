@@ -8,4 +8,7 @@ import org.springframework.stereotype.Repository;
 /** Admin 1/26/2026 */
 @Repository
 public interface CourseEvaluatorEntityRepository
-    extends JpaRepository<@NonNull CourseEvaluatorEntity, @NonNull Long> {}
+    extends JpaRepository<@NonNull CourseEvaluatorEntity, @NonNull Long> {
+
+  void deleteByCourseEntity_CourseId(Long courseId);
+}

@@ -4,6 +4,7 @@ import com.fis.lms_service.core.domain.model.lesson.LessonFileModel;
 import com.fis.lms_service.core.domain.model.lesson.constant.LessonFileType;
 import com.fis.lms_service.core.repository.FileStorageRepository;
 import com.fis.lms_service.core.repository.lesson.LessonFileRepository;
+import com.fis.lms_service.core.service.storage.StorageObjectLifecycleManager;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import lombok.AccessLevel;
@@ -27,6 +28,7 @@ public class LessonFileService {
 
     LessonFileRepository lessonFileRepository;
     FileStorageRepository fileStorageRepository;
+    StorageObjectLifecycleManager storageObjectLifecycleManager;
 
     @NonFinal
     @Value("${aws.s3.paths.lesson}")
@@ -61,6 +63,7 @@ public class LessonFileService {
             String s3Key =
                     fileStorageRepository.uploadFile(
                             file, lessonPath + lessonId, maxFileSize, allowTypesDocument);
+            storageObjectLifecycleManager.cleanupOnRollback(s3Key);
 
             LessonFileModel model =
                     LessonFileModel.builder()
@@ -98,7 +101,7 @@ public class LessonFileService {
                                                 "lesson.file.not.found",
                                                 "Không tìm thấy file bài học id: " + lessonFileId));
 
-        fileStorageRepository.deleteFile(lessonFileModel.getFileUrl());
         lessonFileRepository.deleteById(lessonFileModel.getLessonFileId());
+        storageObjectLifecycleManager.deleteAfterCommit(lessonFileModel.getFileUrl());
     }
 }

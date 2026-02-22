@@ -32,8 +32,13 @@ public class LessonRepositoryImpl implements LessonRepository {
      * Lưu hoặc cập nhật bài học: map model -> entity, sau đó persist và map ngược lại.
      */
     public LessonModel save(LessonModel lessonModel) {
-        LessonEntity lessonEntity =
-                lessonEntityRepository.findById(lessonModel.getLessonId()).orElse(new LessonEntity());
+        LessonEntity lessonEntity;
+        if (lessonModel.getLessonId() == null) {
+            lessonEntity = new LessonEntity();
+        } else {
+            lessonEntity =
+                    lessonEntityRepository.findById(lessonModel.getLessonId()).orElse(new LessonEntity());
+        }
 
         lessonMapper.updateEntityFromModel(lessonModel, lessonEntity);
 
