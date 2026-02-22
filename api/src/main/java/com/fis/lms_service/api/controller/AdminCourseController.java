@@ -14,14 +14,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -32,72 +25,72 @@ import java.util.List;
 @RequestMapping("/admin/courses")
 public class AdminCourseController {
 
-  CourseService courseService;
-  CourseApiMapper courseApiMapper;
+    CourseService courseService;
+    CourseApiMapper courseApiMapper;
 
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseApi<Boolean> createCourse(
-      @RequestPart("data") @Valid CourseCreateRequest request,
-      @RequestPart(value = "image", required = true) MultipartFile image) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseApi<Boolean> createCourse(
+            @RequestPart("data") @Valid CourseCreateRequest request,
+            @RequestPart(value = "image", required = true) MultipartFile image) {
 
-    courseService.createCourse(
-        courseApiMapper.toModel(request), image, parseLessonIds(request.lessonIds()));
-    return ResponseApi.ok(true);
-  }
-
-  private List<Long> parseLessonIds(List<String> lessonIds) {
-    if (lessonIds == null || lessonIds.isEmpty()) {
-      return null;
+        courseService.createCourse(
+                courseApiMapper.toModel(request), image, parseLessonIds(request.lessonIds()));
+        return ResponseApi.ok(true);
     }
-    return lessonIds.stream()
-        .filter(value -> value != null && !value.isBlank())
-        .map(value -> parseId(value, "lessonIds"))
-        .toList();
-  }
 
-  private Long parseId(String value, String field) {
-    try {
-      return Long.parseLong(value);
-    } catch (NumberFormatException ex) {
-      throw new com.intern.hub.library.common.exception.BadRequestException(
-          "id.invalid", field + " không hợp lệ");
+    private List<Long> parseLessonIds(List<String> lessonIds) {
+        if (lessonIds == null || lessonIds.isEmpty()) {
+            return null;
+        }
+        return lessonIds.stream()
+                .filter(value -> value != null && !value.isBlank())
+                .map(value -> parseId(value, "lessonIds"))
+                .toList();
     }
-  }
 
-  @GetMapping
-  public ResponseApi<PaginatedData<CourseSummaryResponse>> getCourses(
-      @PageableDefault(size = 10) Pageable pageable) {
-    var page = courseService.getCourses(pageable);
-    var items = page.getContent().stream().map(courseApiMapper::toSummaryResponse).toList();
+    private Long parseId(String value, String field) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ex) {
+            throw new com.intern.hub.library.common.exception.BadRequestException(
+                    "id.invalid", field + " không hợp lệ");
+        }
+    }
 
-    var res =
-        PaginatedData.<CourseSummaryResponse>builder()
-            .items(items)
-            .totalItems(page.getTotalElements())
-            .totalPages(page.getTotalPages())
-            .build();
-    return ResponseApi.ok(res);
-  }
+    @GetMapping
+    public ResponseApi<PaginatedData<CourseSummaryResponse>> getCourses(
+            @PageableDefault(size = 10) Pageable pageable) {
+        var page = courseService.getCourses(pageable);
+        var items = page.getContent().stream().map(courseApiMapper::toSummaryResponse).toList();
 
-  @GetMapping("/{courseId}")
-  public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
-    return ResponseApi.ok(
-        courseApiMapper.toDetailResponse(courseService.getCourse(parseId(courseId, "courseId"))));
-  }
+        var res =
+                PaginatedData.<CourseSummaryResponse>builder()
+                        .items(items)
+                        .totalItems(page.getTotalElements())
+                        .totalPages(page.getTotalPages())
+                        .build();
+        return ResponseApi.ok(res);
+    }
 
-  @PutMapping(value = "/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseApi<Boolean> updateCourse(
-      @PathVariable("courseId") String courseId,
-      @RequestPart("data") @Valid CourseCreateRequest request,
-      @RequestPart(value = "image", required = false) MultipartFile image) {
-    courseService.updateCourse(
-        parseId(courseId, "courseId"), courseApiMapper.toModel(request), image);
-    return ResponseApi.ok(true);
-  }
+    @GetMapping("/{courseId}")
+    public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
+        return ResponseApi.ok(
+                courseApiMapper.toDetailResponse(courseService.getCourse(parseId(courseId, "courseId"))));
+    }
 
-  @DeleteMapping("/{courseId}")
-  public ResponseApi<Boolean> deleteCourse(@PathVariable("courseId") String courseId) {
-    courseService.deleteCourse(parseId(courseId, "courseId"));
-    return ResponseApi.ok(true);
-  }
+    @PutMapping(value = "/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseApi<Boolean> updateCourse(
+            @PathVariable("courseId") String courseId,
+            @RequestPart("data") @Valid CourseCreateRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        courseService.updateCourse(
+                parseId(courseId, "courseId"), courseApiMapper.toModel(request), image);
+        return ResponseApi.ok(true);
+    }
+
+    @DeleteMapping("/{courseId}")
+    public ResponseApi<Boolean> deleteCourse(@PathVariable("courseId") String courseId) {
+        courseService.deleteCourse(parseId(courseId, "courseId"));
+        return ResponseApi.ok(true);
+    }
 }

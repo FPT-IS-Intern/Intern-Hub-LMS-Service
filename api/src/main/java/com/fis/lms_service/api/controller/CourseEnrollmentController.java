@@ -7,11 +7,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,21 +15,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/courses")
 public class CourseEnrollmentController {
 
-  CourseService courseService;
+    CourseService courseService;
 
-  @PostMapping("/{courseId}/enroll")
-  public ResponseApi<Boolean> enrollCourse(
-      @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
-    courseService.enrollCourse(parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
-    return ResponseApi.ok(true);
-  }
-
-  private Long parseId(String value, String field) {
-    try {
-      return Long.parseLong(value);
-    } catch (NumberFormatException ex) {
-      throw new com.intern.hub.library.common.exception.BadRequestException(
-          "id.invalid", field + " không hợp lệ");
+    @PostMapping("/{courseId}/enroll")
+    public ResponseApi<Boolean> enrollCourse(
+            @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
+        courseService.enrollCourse(parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
+        return ResponseApi.ok(true);
     }
-  }
+
+    private Long parseId(String value, String field) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ex) {
+            throw new com.intern.hub.library.common.exception.BadRequestException(
+                    "id.invalid", field + " không hợp lệ");
+        }
+    }
 }
