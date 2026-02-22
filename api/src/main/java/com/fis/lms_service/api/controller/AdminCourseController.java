@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/api/v1/admin/courses")
+@RequestMapping("/admin/courses")
 public class AdminCourseController {
 
   CourseService courseService;

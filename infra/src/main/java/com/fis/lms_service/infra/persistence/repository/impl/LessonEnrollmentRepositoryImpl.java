@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,6 +27,18 @@ public class LessonEnrollmentRepositoryImpl implements LessonEnrollmentRepositor
   @Override
   public List<Long> findLessonIdsByCourseEnrollmentId(Long courseEnrollmentId) {
     return lessonEnrollmentEntityRepository.findLessonIdsByCourseEnrollmentId(courseEnrollmentId);
+  }
+
+  @Override
+  public Optional<Long> findLessonEnrollmentId(Long courseEnrollmentId, Long lessonId) {
+    return Optional.ofNullable(
+        lessonEnrollmentEntityRepository.findLessonEnrollmentId(courseEnrollmentId, lessonId));
+  }
+
+  @Override
+  public Optional<Long> findUserIdByLessonEnrollmentId(Long lessonEnrollmentId) {
+    return Optional.ofNullable(
+        lessonEnrollmentEntityRepository.findUserIdByLessonEnrollmentId(lessonEnrollmentId));
   }
 
   @Override

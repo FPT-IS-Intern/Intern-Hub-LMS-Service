@@ -17,4 +17,15 @@ public interface LessonEnrollmentEntityRepository
       "select le.lessonEntity.lessonId from LessonEnrollmentEntity le "
           + "where le.courseEnrollmentEntity.courseEnrollmentId = :courseEnrollmentId")
   List<Long> findLessonIdsByCourseEnrollmentId(Long courseEnrollmentId);
+
+  @Query(
+      "select le.lessonEnrollmentId from LessonEnrollmentEntity le "
+          + "where le.courseEnrollmentEntity.courseEnrollmentId = :courseEnrollmentId "
+          + "and le.lessonEntity.lessonId = :lessonId")
+  Long findLessonEnrollmentId(Long courseEnrollmentId, Long lessonId);
+
+  @Query(
+      "select le.courseEnrollmentEntity.userId from LessonEnrollmentEntity le "
+          + "where le.lessonEnrollmentId = :lessonEnrollmentId")
+  Long findUserIdByLessonEnrollmentId(Long lessonEnrollmentId);
 }

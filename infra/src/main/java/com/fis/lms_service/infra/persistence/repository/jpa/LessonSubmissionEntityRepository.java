@@ -5,7 +5,13 @@ import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /** Admin 1/26/2026 */
 @Repository
 public interface LessonSubmissionEntityRepository
-    extends JpaRepository<@NonNull LessonSubmissionEntity, @NonNull Long> {}
+    extends JpaRepository<@NonNull LessonSubmissionEntity, @NonNull Long> {
+
+  Optional<LessonSubmissionEntity> findByLessonEnrollmentEntity_LessonEnrollmentId(
+      Long lessonEnrollmentId);
+}

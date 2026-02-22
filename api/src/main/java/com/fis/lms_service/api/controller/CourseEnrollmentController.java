@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/api/v1/courses")
+@RequestMapping("/courses")
 public class CourseEnrollmentController {
 
   CourseService courseService;
