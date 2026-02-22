@@ -28,6 +28,11 @@ public class CourseEnrollmentRepositoryImpl implements CourseEnrollmentRepositor
   }
 
   @Override
+  public Optional<CourseEnrollmentModel> findById(Long courseEnrollmentId) {
+    return courseEnrollmentEntityRepository.findById(courseEnrollmentId).map(this::toModel);
+  }
+
+  @Override
   public CourseEnrollmentModel save(CourseEnrollmentModel model) {
     CourseEnrollmentEntity entity;
     if (model.getCourseEnrollmentId() == null) {

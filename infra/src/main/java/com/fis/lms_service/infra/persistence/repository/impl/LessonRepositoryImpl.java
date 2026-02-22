@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -69,6 +71,25 @@ public class LessonRepositoryImpl implements LessonRepository {
      */
     public Page<@NonNull LessonModel> findAll(Pageable pageable) {
         return lessonEntityRepository.findAll(pageable).map(lessonMapper::toModel);
+    }
+
+    @Override
+    public List<LessonModel> findAllByIds(List<Long> lessonIds) {
+        if (lessonIds == null || lessonIds.isEmpty()) {
+            return List.of();
+        }
+
+        var entities = lessonEntityRepository.findAllById(lessonIds);
+        var byId = new HashMap<Long, LessonEntity>(entities.size());
+        for (LessonEntity entity : entities) {
+            byId.put(entity.getLessonId(), entity);
+        }
+
+        return lessonIds.stream()
+                .map(byId::get)
+                .filter(entity -> entity != null)
+                .map(lessonMapper::toModel)
+                .toList();
     }
 
     @Override

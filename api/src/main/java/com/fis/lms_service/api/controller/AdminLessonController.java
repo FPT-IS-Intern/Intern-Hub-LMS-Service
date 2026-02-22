@@ -58,7 +58,10 @@ public class AdminLessonController {
 
         var lessonPage = lessonService.getLessons(pageable);
 
-        var items = lessonPage.getContent().stream().map(lessonApiMapper::toSummaryResponse).toList();
+        var items =
+                lessonPage.getContent().stream()
+                        .map(model -> lessonApiMapper.toSummaryResponse(model, null))
+                        .toList();
 
         var res =
                 PaginatedData.<LessonSummaryResponse>builder()
@@ -72,36 +75,61 @@ public class AdminLessonController {
 
     @GetMapping("/{lessonId}")
     public ResponseApi<LessonDetailResponse> getLessonDetail(
-            @PathVariable("lessonId") Long lessonId) {
-        LessonModel model = lessonService.getLesson(lessonId);
-        var fileModels = lessonFileService.getFiles(lessonId);
+            @PathVariable("lessonId") String lessonId) {
+        Long lessonIdValue = parseId(lessonId, "lessonId");
+        LessonModel model = lessonService.getLesson(lessonIdValue);
+        var fileModels = lessonFileService.getFiles(lessonIdValue);
 
         List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
-        LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files);
+        LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files, null);
 
         return ResponseApi.ok(res);
     }
 
     @PutMapping(value = "/{lessonId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseApi<Boolean> updateLesson(
-            @PathVariable("lessonId") Long lessonId,
+            @PathVariable("lessonId") String lessonId,
             @RequestPart("data") @Valid LessonCreateRequest request,
             @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart(value = "lessonFiles", required = false) List<MultipartFile> lessonFiles,
             @RequestPart(value = "assignmentFiles", required = false) List<MultipartFile> assignmentFiles,
-            @RequestParam(value = "deleteFileIds", required = false) List<Long> deleteFileIds) {
+            @RequestParam(value = "deleteFileIds", required = false) List<String> deleteFileIds) {
 
         LessonModel updateModel = lessonApiMapper.toModel(request);
 
         lessonService.updateLesson(
-                lessonId, updateModel, image, lessonFiles, assignmentFiles, deleteFileIds);
+                parseId(lessonId, "lessonId"),
+                updateModel,
+                image,
+                lessonFiles,
+                assignmentFiles,
+                parseIds(deleteFileIds, "deleteFileIds"));
 
         return ResponseApi.ok(true);
     }
 
     @DeleteMapping("/{lessonId}")
-    public ResponseApi<Boolean> deleteLesson(@PathVariable("lessonId") Long lessonId) {
-        lessonService.deleteLesson(lessonId);
+    public ResponseApi<Boolean> deleteLesson(@PathVariable("lessonId") String lessonId) {
+        lessonService.deleteLesson(parseId(lessonId, "lessonId"));
         return ResponseApi.ok(true);
+    }
+
+    private Long parseId(String value, String field) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ex) {
+            throw new com.intern.hub.library.common.exception.BadRequestException(
+                    "id.invalid", field + " không hợp lệ");
+        }
+    }
+
+    private List<Long> parseIds(List<String> values, String field) {
+        if (values == null || values.isEmpty()) {
+            return null;
+        }
+        return values.stream()
+                .filter(value -> value != null && !value.isBlank())
+                .map(value -> parseId(value, field))
+                .toList();
     }
 }

@@ -1,7 +1,7 @@
 package com.fis.lms_service.api.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 public record LessonSubmissionRequest(
-    @NotNull(message = "userId là bắt buộc") Long userId,
+    @NotBlank(message = "userId là bắt buộc") String userId,
     String comment) {}

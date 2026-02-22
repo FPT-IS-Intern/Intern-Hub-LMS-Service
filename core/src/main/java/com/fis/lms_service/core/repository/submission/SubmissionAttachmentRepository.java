@@ -6,5 +6,9 @@ import java.util.List;
 
 public interface SubmissionAttachmentRepository {
 
+  List<SubmissionAttachmentModel> findByLessonSubmissionId(Long lessonSubmissionId);
+
+  void deleteByLessonSubmissionId(Long lessonSubmissionId);
+
   void saveAll(List<SubmissionAttachmentModel> models);
 }

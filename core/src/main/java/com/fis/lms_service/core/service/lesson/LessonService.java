@@ -32,10 +32,13 @@ public class LessonService {
 
     LessonRepository lessonRepository;
     LessonFileRepository lessonFileRepository;
+    com.fis.lms_service.core.repository.course.CourseLessonRepository courseLessonRepository;
     FileStorageRepository fileStorageRepository;
     StorageObjectLifecycleManager storageObjectLifecycleManager;
 
     LessonFileService lessonFileService;
+    com.fis.lms_service.core.repository.enrollment.LessonEnrollmentRepository
+            lessonEnrollmentRepository;
 
     @NonFinal
     @Value("${aws.s3.bucket-url}")
@@ -115,6 +118,14 @@ public class LessonService {
     }
 
     @Transactional(readOnly = true)
+    public List<LessonModel> getLessonsByCourse(Long courseId) {
+        List<Long> lessonIds = courseLessonRepository.findLessonIdsByCourseId(courseId);
+        List<LessonModel> lessons = lessonRepository.findAllByIds(lessonIds);
+        lessons.forEach(this::applyBucketUrl);
+        return lessons;
+    }
+
+    @Transactional(readOnly = true)
     /**
      * Lấy chi tiết một bài học theo id và gắn URL đầy đủ cho ảnh nếu có.
      */
@@ -130,6 +141,16 @@ public class LessonService {
         applyBucketUrl(model);
 
         return model;
+    }
+
+    @Transactional(readOnly = true)
+    public Long getLessonEnrollmentId(Long lessonId, Long userId) {
+        if (userId == null) {
+            return null;
+        }
+        return lessonEnrollmentRepository
+                .findLessonEnrollmentIdByLessonIdAndUserId(lessonId, userId)
+                .orElse(null);
     }
 
     @Transactional

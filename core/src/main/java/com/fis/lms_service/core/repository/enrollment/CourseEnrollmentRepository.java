@@ -8,5 +8,7 @@ public interface CourseEnrollmentRepository {
 
   Optional<CourseEnrollmentModel> findByCourseIdAndUserId(Long courseId, Long userId);
 
+  Optional<CourseEnrollmentModel> findById(Long courseEnrollmentId);
+
   CourseEnrollmentModel save(CourseEnrollmentModel model);
 }

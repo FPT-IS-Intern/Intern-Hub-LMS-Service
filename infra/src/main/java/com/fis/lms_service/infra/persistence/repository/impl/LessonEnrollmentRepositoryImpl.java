@@ -1,6 +1,7 @@
 package com.fis.lms_service.infra.persistence.repository.impl;
 
 import com.fis.lms_service.core.domain.model.enrollment.LessonEnrollmentModel;
+import com.fis.lms_service.core.domain.model.enrollment.constant.LessonProgress;
 import com.fis.lms_service.core.repository.enrollment.LessonEnrollmentRepository;
 import com.fis.lms_service.infra.persistence.entity.enrollment.LessonEnrollmentEntity;
 import com.fis.lms_service.infra.persistence.repository.jpa.CourseEnrollmentEntityRepository;
@@ -39,6 +40,47 @@ public class LessonEnrollmentRepositoryImpl implements LessonEnrollmentRepositor
   public Optional<Long> findUserIdByLessonEnrollmentId(Long lessonEnrollmentId) {
     return Optional.ofNullable(
         lessonEnrollmentEntityRepository.findUserIdByLessonEnrollmentId(lessonEnrollmentId));
+  }
+
+  @Override
+  public Optional<Long> findCourseEnrollmentIdByLessonEnrollmentId(Long lessonEnrollmentId) {
+    return Optional.ofNullable(
+        lessonEnrollmentEntityRepository.findCourseEnrollmentIdByLessonEnrollmentId(
+            lessonEnrollmentId));
+  }
+
+  @Override
+  public long countByCourseEnrollmentId(Long courseEnrollmentId) {
+    return lessonEnrollmentEntityRepository.countByCourseEnrollmentEntity_CourseEnrollmentId(
+        courseEnrollmentId);
+  }
+
+  @Override
+  public long countByCourseEnrollmentIdAndProgress(
+      Long courseEnrollmentId, LessonProgress progress) {
+    return lessonEnrollmentEntityRepository
+        .countByCourseEnrollmentEntity_CourseEnrollmentIdAndLessonProgress(
+            courseEnrollmentId, progress);
+  }
+
+  @Override
+  public void updateProgress(Long lessonEnrollmentId, LessonProgress progress) {
+    LessonEnrollmentEntity entity =
+        lessonEnrollmentEntityRepository
+            .findById(lessonEnrollmentId)
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException(
+                        "Lesson enrollment not found: " + lessonEnrollmentId));
+    entity.setLessonProgress(progress);
+    lessonEnrollmentEntityRepository.save(entity);
+  }
+
+  @Override
+  public Optional<Long> findLessonEnrollmentIdByLessonIdAndUserId(Long lessonId, Long userId) {
+    return Optional.ofNullable(
+        lessonEnrollmentEntityRepository.findLessonEnrollmentIdByLessonIdAndUserId(
+            lessonId, userId));
   }
 
   @Override

@@ -22,6 +22,29 @@ public class SubmissionAttachmentRepositoryImpl implements SubmissionAttachmentR
   LessonSubmissionEntityRepository lessonSubmissionEntityRepository;
 
   @Override
+  public List<SubmissionAttachmentModel> findByLessonSubmissionId(Long lessonSubmissionId) {
+    return submissionAttachmentEntityRepository
+        .findByLessonSubmissionEntity_LessonSubmissionId(lessonSubmissionId)
+        .stream()
+        .map(
+            entity ->
+                SubmissionAttachmentModel.builder()
+                    .submissionAttachmentId(entity.getSubmissionAttachmentId())
+                    .lessonSubmissionId(entity.getLessonSubmissionEntity().getLessonSubmissionId())
+                    .fileUrl(entity.getFileUrl())
+                    .fileName(entity.getFileName())
+                    .fileSize(entity.getFileSize())
+                    .build())
+        .toList();
+  }
+
+  @Override
+  public void deleteByLessonSubmissionId(Long lessonSubmissionId) {
+    submissionAttachmentEntityRepository.deleteByLessonSubmissionEntity_LessonSubmissionId(
+        lessonSubmissionId);
+  }
+
+  @Override
   public void saveAll(List<SubmissionAttachmentModel> models) {
     if (models == null || models.isEmpty()) {
       return;

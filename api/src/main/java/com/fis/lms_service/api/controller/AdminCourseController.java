@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -38,8 +40,28 @@ public class AdminCourseController {
       @RequestPart("data") @Valid CourseCreateRequest request,
       @RequestPart(value = "image", required = true) MultipartFile image) {
 
-    courseService.createCourse(courseApiMapper.toModel(request), image, request.lessonIds());
+    courseService.createCourse(
+        courseApiMapper.toModel(request), image, parseLessonIds(request.lessonIds()));
     return ResponseApi.ok(true);
+  }
+
+  private List<Long> parseLessonIds(List<String> lessonIds) {
+    if (lessonIds == null || lessonIds.isEmpty()) {
+      return null;
+    }
+    return lessonIds.stream()
+        .filter(value -> value != null && !value.isBlank())
+        .map(value -> parseId(value, "lessonIds"))
+        .toList();
+  }
+
+  private Long parseId(String value, String field) {
+    try {
+      return Long.parseLong(value);
+    } catch (NumberFormatException ex) {
+      throw new com.intern.hub.library.common.exception.BadRequestException(
+          "id.invalid", field + " không hợp lệ");
+    }
   }
 
   @GetMapping
@@ -58,22 +80,24 @@ public class AdminCourseController {
   }
 
   @GetMapping("/{courseId}")
-  public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") Long courseId) {
-    return ResponseApi.ok(courseApiMapper.toDetailResponse(courseService.getCourse(courseId)));
+  public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
+    return ResponseApi.ok(
+        courseApiMapper.toDetailResponse(courseService.getCourse(parseId(courseId, "courseId"))));
   }
 
   @PutMapping(value = "/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseApi<Boolean> updateCourse(
-      @PathVariable("courseId") Long courseId,
+      @PathVariable("courseId") String courseId,
       @RequestPart("data") @Valid CourseCreateRequest request,
       @RequestPart(value = "image", required = false) MultipartFile image) {
-    courseService.updateCourse(courseId, courseApiMapper.toModel(request), image);
+    courseService.updateCourse(
+        parseId(courseId, "courseId"), courseApiMapper.toModel(request), image);
     return ResponseApi.ok(true);
   }
 
   @DeleteMapping("/{courseId}")
-  public ResponseApi<Boolean> deleteCourse(@PathVariable("courseId") Long courseId) {
-    courseService.deleteCourse(courseId);
+  public ResponseApi<Boolean> deleteCourse(@PathVariable("courseId") String courseId) {
+    courseService.deleteCourse(parseId(courseId, "courseId"));
     return ResponseApi.ok(true);
   }
 }

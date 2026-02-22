@@ -1,10 +1,13 @@
 package com.fis.lms_service.core.service.submission;
 
+import com.fis.lms_service.core.domain.model.enrollment.constant.CourseProgress;
+import com.fis.lms_service.core.domain.model.enrollment.constant.LessonProgress;
 import com.fis.lms_service.core.domain.model.submission.LessonSubmissionModel;
 import com.fis.lms_service.core.domain.model.submission.SubmissionAttachmentModel;
 import com.fis.lms_service.core.domain.model.submission.SubmissionCommentModel;
 import com.fis.lms_service.core.domain.model.submission.constant.SubmissionStatus;
 import com.fis.lms_service.core.repository.FileStorageRepository;
+import com.fis.lms_service.core.repository.enrollment.CourseEnrollmentRepository;
 import com.fis.lms_service.core.repository.enrollment.LessonEnrollmentRepository;
 import com.fis.lms_service.core.repository.submission.LessonSubmissionRepository;
 import com.fis.lms_service.core.repository.submission.SubmissionAttachmentRepository;
@@ -28,6 +31,15 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LessonSubmissionService {
 
+  public record LessonSubmissionResult(
+      Long lessonSubmissionId,
+      Long lessonEnrollmentId,
+      SubmissionStatus submissionStatus,
+      Long lastSubmissionAt,
+      String comment,
+      List<SubmissionAttachmentModel> attachments) {}
+
+  CourseEnrollmentRepository courseEnrollmentRepository;
   LessonEnrollmentRepository lessonEnrollmentRepository;
   LessonSubmissionRepository lessonSubmissionRepository;
   SubmissionAttachmentRepository submissionAttachmentRepository;
@@ -48,8 +60,12 @@ public class LessonSubmissionService {
   String allowTypesDocument;
 
   @Transactional
-  public void submitLesson(
+  public LessonSubmissionResult submitLesson(
       Long lessonEnrollmentId, Long userId, String comment, List<MultipartFile> files) {
+    if (!hasItems(files)) {
+      throw new BadRequestException("submission.file.required", "Cần ít nhất 1 file để nộp bài");
+    }
+
     Long enrolledUserId =
         lessonEnrollmentRepository
             .findUserIdByLessonEnrollmentId(lessonEnrollmentId)
@@ -94,6 +110,25 @@ public class LessonSubmissionService {
     }
 
     if (hasItems(files)) {
+      boolean hasValidFile = files.stream().anyMatch(file -> file != null && !file.isEmpty());
+      if (!hasValidFile) {
+        throw new BadRequestException(
+            "submission.file.required", "Cần ít nhất 1 file để nộp bài");
+      }
+
+      List<SubmissionAttachmentModel> existing =
+          submissionAttachmentRepository.findByLessonSubmissionId(
+              submission.getLessonSubmissionId());
+      if (!existing.isEmpty()) {
+        submissionAttachmentRepository.deleteByLessonSubmissionId(
+            submission.getLessonSubmissionId());
+        for (SubmissionAttachmentModel attachment : existing) {
+          if (hasText(attachment.getFileUrl())) {
+            storageObjectLifecycleManager.deleteAfterCommit(attachment.getFileUrl());
+          }
+        }
+      }
+
       List<SubmissionAttachmentModel> attachments = new ArrayList<>(files.size());
       for (MultipartFile file : files) {
         if (file == null || file.isEmpty()) {
@@ -120,6 +155,47 @@ public class LessonSubmissionService {
         submissionAttachmentRepository.saveAll(attachments);
       }
     }
+
+    lessonEnrollmentRepository.updateProgress(lessonEnrollmentId, LessonProgress.COMPLETED);
+
+    Long courseEnrollmentId =
+        lessonEnrollmentRepository
+            .findCourseEnrollmentIdByLessonEnrollmentId(lessonEnrollmentId)
+            .orElseThrow(
+                () ->
+                    new BadRequestException(
+                        "course.enrollment.not.found", "Không tìm thấy course enrollment"));
+
+    long totalLessons = lessonEnrollmentRepository.countByCourseEnrollmentId(courseEnrollmentId);
+    long completedLessons =
+        lessonEnrollmentRepository.countByCourseEnrollmentIdAndProgress(
+            courseEnrollmentId, LessonProgress.COMPLETED);
+    CourseProgress courseProgress =
+        totalLessons > 0 && completedLessons == totalLessons
+            ? CourseProgress.COMPLETED
+            : CourseProgress.IN_PROGRESS;
+
+    courseEnrollmentRepository
+        .findById(courseEnrollmentId)
+        .ifPresent(
+            existing -> {
+              if (existing.getCourseProgress() != courseProgress) {
+                existing.setCourseProgress(courseProgress);
+                courseEnrollmentRepository.save(existing);
+              }
+            });
+
+    List<SubmissionAttachmentModel> attachments =
+        submissionAttachmentRepository.findByLessonSubmissionId(
+            submission.getLessonSubmissionId());
+
+    return new LessonSubmissionResult(
+        submission.getLessonSubmissionId(),
+        submission.getLessonEnrollmentId(),
+        submission.getSubmissionStatus(),
+        submission.getLastSubmissionAt(),
+        hasText(comment) ? comment.trim() : null,
+        attachments);
   }
 
   private String buildSubmissionPath(Long lessonSubmissionId) {

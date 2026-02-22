@@ -23,8 +23,17 @@ public class CourseEnrollmentController {
 
   @PostMapping("/{courseId}/enroll")
   public ResponseApi<Boolean> enrollCourse(
-      @PathVariable("courseId") Long courseId, @RequestBody @Valid CourseEnrollRequest request) {
-    courseService.enrollCourse(courseId, request.userId());
+      @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
+    courseService.enrollCourse(parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
     return ResponseApi.ok(true);
+  }
+
+  private Long parseId(String value, String field) {
+    try {
+      return Long.parseLong(value);
+    } catch (NumberFormatException ex) {
+      throw new com.intern.hub.library.common.exception.BadRequestException(
+          "id.invalid", field + " không hợp lệ");
+    }
   }
 }

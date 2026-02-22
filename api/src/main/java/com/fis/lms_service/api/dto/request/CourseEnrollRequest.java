@@ -1,5 +1,5 @@
 package com.fis.lms_service.api.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
-public record CourseEnrollRequest(@NotNull(message = "userId là bắt buộc") Long userId) {}
+public record CourseEnrollRequest(@NotBlank(message = "userId là bắt buộc") String userId) {}

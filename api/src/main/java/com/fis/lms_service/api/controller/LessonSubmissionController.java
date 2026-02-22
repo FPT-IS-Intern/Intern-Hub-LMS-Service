@@ -1,6 +1,8 @@
 package com.fis.lms_service.api.controller;
 
 import com.fis.lms_service.api.dto.request.LessonSubmissionRequest;
+import com.fis.lms_service.api.dto.response.submission.LessonSubmissionResponse;
+import com.fis.lms_service.api.dto.response.submission.SubmissionAttachmentResponse;
 import com.fis.lms_service.core.service.submission.LessonSubmissionService;
 import com.intern.hub.library.common.dto.ResponseApi;
 import jakarta.validation.Valid;
@@ -26,12 +28,43 @@ public class LessonSubmissionController {
   LessonSubmissionService lessonSubmissionService;
 
   @PostMapping(value = "/{lessonEnrollmentId}/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseApi<Boolean> submitLesson(
-      @PathVariable("lessonEnrollmentId") Long lessonEnrollmentId,
+  public ResponseApi<LessonSubmissionResponse> submitLesson(
+      @PathVariable("lessonEnrollmentId") String lessonEnrollmentId,
       @RequestPart("data") @Valid LessonSubmissionRequest request,
       @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-    lessonSubmissionService.submitLesson(
-        lessonEnrollmentId, request.userId(), request.comment(), files);
-    return ResponseApi.ok(true);
+    var result =
+        lessonSubmissionService.submitLesson(
+            parseId(lessonEnrollmentId, "lessonEnrollmentId"),
+            parseId(request.userId(), "userId"),
+            request.comment(),
+            files);
+
+    var attachments =
+        result.attachments().stream()
+            .map(
+                item ->
+                    new SubmissionAttachmentResponse(
+                        item.getFileName(), item.getFileUrl(), item.getFileSize()))
+            .toList();
+
+    LessonSubmissionResponse response =
+        new LessonSubmissionResponse(
+            result.lessonSubmissionId() == null ? null : result.lessonSubmissionId().toString(),
+            result.lessonEnrollmentId() == null ? null : result.lessonEnrollmentId().toString(),
+            result.submissionStatus().name(),
+            result.lastSubmissionAt(),
+            result.comment(),
+            attachments);
+
+    return ResponseApi.ok(response);
+  }
+
+  private Long parseId(String value, String field) {
+    try {
+      return Long.parseLong(value);
+    } catch (NumberFormatException ex) {
+      throw new com.intern.hub.library.common.exception.BadRequestException(
+          "id.invalid", field + " không hợp lệ");
+    }
   }
 }

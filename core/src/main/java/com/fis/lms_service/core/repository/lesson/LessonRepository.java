@@ -5,6 +5,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,6 +20,8 @@ public interface LessonRepository {
     void deleteById(Long lessonId);
 
     Page<@NonNull LessonModel> findAll(Pageable pageable);
+
+    List<LessonModel> findAllByIds(List<Long> lessonIds);
 
     void flush();
 }

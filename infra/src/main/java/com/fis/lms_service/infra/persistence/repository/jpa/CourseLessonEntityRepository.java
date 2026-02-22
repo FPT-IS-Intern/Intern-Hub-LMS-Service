@@ -17,6 +17,7 @@ public interface CourseLessonEntityRepository
 
   @Query(
       "select cl.lessonEntity.lessonId from CourseLessonEntity cl "
-          + "where cl.courseEntity.courseId = :courseId")
+          + "where cl.courseEntity.courseId = :courseId "
+          + "order by cl.orderIndex asc")
   List<Long> findLessonIdsByCourseId(Long courseId);
 }
