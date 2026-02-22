@@ -27,8 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/api/v1/courses")
-public class CourseController {
+@RequestMapping("/api/v1/admin/courses")
+public class AdminCourseController {
 
   CourseService courseService;
   CourseApiMapper courseApiMapper;
@@ -38,7 +38,7 @@ public class CourseController {
       @RequestPart("data") @Valid CourseCreateRequest request,
       @RequestPart(value = "image", required = true) MultipartFile image) {
 
-    courseService.createCourse(courseApiMapper.toModel(request), image);
+    courseService.createCourse(courseApiMapper.toModel(request), image, request.lessonIds());
     return ResponseApi.ok(true);
   }
 

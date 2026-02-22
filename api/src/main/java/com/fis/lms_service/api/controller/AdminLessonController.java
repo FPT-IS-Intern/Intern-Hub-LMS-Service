@@ -28,8 +28,8 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/api/v1/lessons")
-public class LessonController {
+@RequestMapping("/api/v1/admin/lessons")
+public class AdminLessonController {
 
     // Service
     LessonService lessonService;
