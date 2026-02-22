@@ -15,6 +15,7 @@ import lombok.experimental.NonFinal;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,6 +124,22 @@ public class LessonService {
         List<LessonModel> lessons = lessonRepository.findAllByIds(lessonIds);
         lessons.forEach(this::applyBucketUrl);
         return lessons;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<@NonNull LessonModel> getLessonsByCourse(Long courseId, Pageable pageable) {
+        List<Long> lessonIds = courseLessonRepository.findLessonIdsByCourseId(courseId);
+        int total = lessonIds.size();
+        int offset = (int) pageable.getOffset();
+        if (offset >= total) {
+            return new PageImpl<>(List.of(), pageable, total);
+        }
+        int end = Math.min(offset + pageable.getPageSize(), total);
+        List<Long> pageIds = lessonIds.subList(offset, end);
+
+        List<LessonModel> lessons = lessonRepository.findAllByIds(pageIds);
+        lessons.forEach(this::applyBucketUrl);
+        return new PageImpl<>(lessons, pageable, total);
     }
 
     @Transactional(readOnly = true)
