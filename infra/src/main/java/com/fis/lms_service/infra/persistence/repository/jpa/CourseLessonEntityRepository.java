@@ -4,6 +4,7 @@ import com.fis.lms_service.infra.persistence.entity.course.CourseLessonEntity;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,5 +22,5 @@ public interface CourseLessonEntityRepository
             "select cl.lessonEntity.lessonId from CourseLessonEntity cl "
                     + "where cl.courseEntity.courseId = :courseId "
                     + "order by cl.orderIndex asc")
-    List<Long> findLessonIdsByCourseId(Long courseId);
+    List<Long> findLessonIdsByCourseId(@Param("courseId") Long courseId);
 }
