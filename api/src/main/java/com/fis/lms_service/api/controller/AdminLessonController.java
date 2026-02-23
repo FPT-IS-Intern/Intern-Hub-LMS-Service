@@ -56,6 +56,7 @@ public class AdminLessonController {
     @GetMapping
     public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
             @PageableDefault(size = 10) Pageable pageable) {
+        System.out.println("test");
 
         var lessonPage = lessonService.getLessons(pageable);
         var res = PaginationUtils.toPaginatedData(

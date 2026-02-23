@@ -100,6 +100,11 @@ public class CourseService {
     return model;
   }
 
+  @Transactional(readOnly = true)
+  public List<Long> getCourseLessonIds(Long courseId) {
+    return courseLessonRepository.findLessonIdsByCourseId(courseId);
+  }
+
   @Transactional
   public void updateCourse(Long courseId, CourseModel updateModel, MultipartFile newImage) {
     CourseModel existing =
