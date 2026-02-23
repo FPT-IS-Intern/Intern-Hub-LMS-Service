@@ -5,6 +5,7 @@ import com.fis.lms_service.api.dto.response.lesson.LessonDetailResponse;
 import com.fis.lms_service.api.dto.response.lesson.LessonFileInfoResponse;
 import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
 import com.fis.lms_service.api.mapper.LessonApiMapper;
+import com.fis.lms_service.api.util.PaginationUtils;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import com.fis.lms_service.core.service.lesson.LessonFileService;
 import com.fis.lms_service.core.service.lesson.LessonService;
@@ -57,18 +58,9 @@ public class AdminLessonController {
             @PageableDefault(size = 10) Pageable pageable) {
 
         var lessonPage = lessonService.getLessons(pageable);
-
-        var items =
-                lessonPage.getContent().stream()
-                        .map(model -> lessonApiMapper.toSummaryResponse(model, null))
-                        .toList();
-
-        var res =
-                PaginatedData.<LessonSummaryResponse>builder()
-                        .items(items)
-                        .totalItems(lessonPage.getTotalElements())
-                        .totalPages(lessonPage.getTotalPages())
-                        .build();
+        var res = PaginationUtils.toPaginatedData(
+                lessonPage,
+                model -> lessonApiMapper.toSummaryResponse(model, null));
 
         return ResponseApi.ok(res);
     }

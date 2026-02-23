@@ -28,29 +28,24 @@ public class LessonSubmissionController {
             @PathVariable("lessonEnrollmentId") String lessonEnrollmentId,
             @RequestPart("data") @Valid LessonSubmissionRequest request,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        var result =
-                lessonSubmissionService.submitLesson(
-                        parseId(lessonEnrollmentId, "lessonEnrollmentId"),
-                        parseId(request.userId(), "userId"),
-                        request.comment(),
-                        files);
+        var result = lessonSubmissionService.submitLesson(
+                parseId(lessonEnrollmentId, "lessonEnrollmentId"),
+                parseId(request.userId(), "userId"),
+                request.comment(),
+                files);
 
-        var attachments =
-                result.attachments().stream()
-                        .map(
-                                item ->
-                                        new SubmissionAttachmentResponse(
-                                                item.getFileName(), item.getFileUrl(), item.getFileSize()))
-                        .toList();
+        var attachments = result.attachments().stream()
+                .map(item -> new SubmissionAttachmentResponse(
+                        item.getFileName(), item.getFileUrl(), item.getFileSize()))
+                .toList();
 
-        LessonSubmissionResponse response =
-                new LessonSubmissionResponse(
-                        result.lessonSubmissionId() == null ? null : result.lessonSubmissionId().toString(),
-                        result.lessonEnrollmentId() == null ? null : result.lessonEnrollmentId().toString(),
-                        result.submissionStatus().name(),
-                        result.lastSubmissionAt(),
-                        result.comment(),
-                        attachments);
+        LessonSubmissionResponse response = new LessonSubmissionResponse(
+                result.lessonSubmissionId() == null ? null : result.lessonSubmissionId().toString(),
+                result.lessonEnrollmentId() == null ? null : result.lessonEnrollmentId().toString(),
+                result.submissionStatus().name(),
+                result.lastSubmissionAt(),
+                result.comment(),
+                attachments);
 
         return ResponseApi.ok(response);
     }

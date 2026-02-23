@@ -4,6 +4,7 @@ import com.fis.lms_service.api.dto.response.lesson.LessonDetailResponse;
 import com.fis.lms_service.api.dto.response.lesson.LessonFileInfoResponse;
 import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
 import com.fis.lms_service.api.mapper.LessonApiMapper;
+import com.fis.lms_service.api.util.PaginationUtils;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import com.fis.lms_service.core.service.lesson.LessonFileService;
 import com.fis.lms_service.core.service.lesson.LessonService;
@@ -35,22 +36,12 @@ public class LessonQueryController {
         var lessonPage = lessonService.getLessons(pageable);
 
         Long userIdValue = parseOptionalId(userId, "userId");
-        var items =
-                lessonPage.getContent().stream()
-                        .map(
-                                model ->
-                                        lessonApiMapper.toSummaryResponse(
-                                                model,
-                                                lessonService.getLessonEnrollmentId(
-                                                        model.getLessonId(), userIdValue)))
-                        .toList();
-
-        var res =
-                PaginatedData.<LessonSummaryResponse>builder()
-                        .items(items)
-                        .totalItems(lessonPage.getTotalElements())
-                        .totalPages(lessonPage.getTotalPages())
-                        .build();
+        var res = PaginationUtils.toPaginatedData(
+                lessonPage,
+                model -> lessonApiMapper.toSummaryResponse(
+                        model,
+                        lessonService.getLessonEnrollmentId(
+                                model.getLessonId(), userIdValue)));
 
         return ResponseApi.ok(res);
     }
@@ -64,8 +55,8 @@ public class LessonQueryController {
         var fileModels = lessonFileService.getFiles(lessonIdValue);
 
         List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
-        Long lessonEnrollmentId =
-                lessonService.getLessonEnrollmentId(lessonIdValue, parseOptionalId(userId, "userId"));
+        Long lessonEnrollmentId = lessonService.getLessonEnrollmentId(
+                lessonIdValue, parseOptionalId(userId, "userId"));
         LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files, lessonEnrollmentId);
 
         return ResponseApi.ok(res);

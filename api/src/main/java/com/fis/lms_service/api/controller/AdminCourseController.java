@@ -4,6 +4,7 @@ import com.fis.lms_service.api.dto.request.CourseCreateRequest;
 import com.fis.lms_service.api.dto.response.course.CourseDetailResponse;
 import com.fis.lms_service.api.dto.response.course.CourseSummaryResponse;
 import com.fis.lms_service.api.mapper.CourseApiMapper;
+import com.fis.lms_service.api.util.PaginationUtils;
 import com.fis.lms_service.core.service.course.CourseService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
@@ -61,14 +62,7 @@ public class AdminCourseController {
     public ResponseApi<PaginatedData<CourseSummaryResponse>> getCourses(
             @PageableDefault(size = 10) Pageable pageable) {
         var page = courseService.getCourses(pageable);
-        var items = page.getContent().stream().map(courseApiMapper::toSummaryResponse).toList();
-
-        var res =
-                PaginatedData.<CourseSummaryResponse>builder()
-                        .items(items)
-                        .totalItems(page.getTotalElements())
-                        .totalPages(page.getTotalPages())
-                        .build();
+        var res = PaginationUtils.toPaginatedData(page, courseApiMapper::toSummaryResponse);
         return ResponseApi.ok(res);
     }
 

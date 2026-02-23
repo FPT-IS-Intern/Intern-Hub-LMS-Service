@@ -2,6 +2,7 @@ package com.fis.lms_service.api.controller;
 
 import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
 import com.fis.lms_service.api.mapper.LessonApiMapper;
+import com.fis.lms_service.api.util.PaginationUtils;
 import com.fis.lms_service.core.service.lesson.LessonService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
@@ -25,27 +26,17 @@ public class CourseLessonQueryController {
     public ResponseApi<PaginatedData<LessonSummaryResponse>> getCourseLessons(
             @PathVariable("courseId") String courseId,
             @RequestParam(value = "userId", required = false) String userId,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PageableDefault() Pageable pageable) {
         Long courseIdValue = parseId(courseId, "courseId");
-        Long userIdValue = parseOptionalId(userId, "userId");
+        Long userIdValue = parseOptionalId(userId);
 
         var page = lessonService.getLessonsByCourse(courseIdValue, pageable);
-        var items =
-                page.getContent().stream()
-                        .map(
-                                model ->
-                                        lessonApiMapper.toSummaryResponse(
-                                                model,
-                                                lessonService.getLessonEnrollmentId(
-                                                        model.getLessonId(), userIdValue)))
-                        .toList();
-
-        var res =
-                PaginatedData.<LessonSummaryResponse>builder()
-                        .items(items)
-                        .totalItems(page.getTotalElements())
-                        .totalPages(page.getTotalPages())
-                        .build();
+        var res = PaginationUtils.toPaginatedData(
+                page,
+                model -> lessonApiMapper.toSummaryResponse(
+                        model,
+                        lessonService.getLessonEnrollmentId(
+                                model.getLessonId(), userIdValue)));
 
         return ResponseApi.ok(res);
     }
@@ -59,10 +50,10 @@ public class CourseLessonQueryController {
         }
     }
 
-    private Long parseOptionalId(String value, String field) {
+    private Long parseOptionalId(String value) {
         if (value == null || value.isBlank()) {
             return null;
         }
-        return parseId(value, field);
+        return parseId(value, "userId");
     }
 }
