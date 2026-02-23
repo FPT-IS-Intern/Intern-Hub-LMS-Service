@@ -18,4 +18,6 @@ public class LessonModel {
   String content;
   String requirements;
   String lessonImageUrl;
+  Long createdAt;
+  Long updatedAt;
 }

@@ -16,4 +16,6 @@ public class CourseModel {
   String name;
   String description;
   String courseImageUrl;
+  Long createdAt;
+  Long updatedAt;
 }
