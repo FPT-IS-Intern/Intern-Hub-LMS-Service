@@ -1,7 +1,7 @@
 package com.fis.lms_service.api.controller;
 
 import com.fis.lms_service.api.dto.request.CourseEnrollRequest;
-import com.fis.lms_service.core.service.course.CourseService;
+import com.fis.lms_service.core.service.course.CourseEnrollmentService;
 import com.intern.hub.library.common.dto.ResponseApi;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/courses")
 public class CourseEnrollmentController {
 
-    CourseService courseService;
+    CourseEnrollmentService courseEnrollmentService;
 
     @PostMapping("/{courseId}/enroll")
     public ResponseApi<Boolean> enrollCourse(
             @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
-        courseService.enrollCourse(parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
+        courseEnrollmentService.enrollCourse(
+                parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
         return ResponseApi.ok(true);
     }
 

@@ -8,7 +8,7 @@ import com.fis.lms_service.api.mapper.LessonApiMapper;
 import com.fis.lms_service.api.util.PaginationUtils;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import com.fis.lms_service.core.service.lesson.LessonFileService;
-import com.fis.lms_service.core.service.lesson.LessonService;
+import com.fis.lms_service.core.service.lesson.AdminLessonService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ import java.util.List;
 public class AdminLessonController {
 
     // Service
-    LessonService lessonService;
+    AdminLessonService adminLessonService;
     LessonFileService lessonFileService;
 
     // Mapper
@@ -48,7 +48,7 @@ public class AdminLessonController {
             List<MultipartFile> assignmentFiles) {
 
         LessonModel model = lessonApiMapper.toModel(request);
-        lessonService.createLesson(model, image, lessonFiles, assignmentFiles);
+        adminLessonService.createLesson(model, image, lessonFiles, assignmentFiles);
 
         return ResponseApi.ok(true);
     }
@@ -57,7 +57,7 @@ public class AdminLessonController {
     public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
             @PageableDefault(size = 10) Pageable pageable) {
 
-        var lessonPage = lessonService.getLessons(pageable);
+        var lessonPage = adminLessonService.getLessons(pageable);
         var res = PaginationUtils.toPaginatedData(
                 lessonPage,
                 model -> lessonApiMapper.toSummaryResponse(model, null));
@@ -69,7 +69,7 @@ public class AdminLessonController {
     public ResponseApi<LessonDetailResponse> getLessonDetail(
             @PathVariable("lessonId") String lessonId) {
         Long lessonIdValue = parseId(lessonId, "lessonId");
-        LessonModel model = lessonService.getLesson(lessonIdValue);
+        LessonModel model = adminLessonService.getLesson(lessonIdValue);
         var fileModels = lessonFileService.getFiles(lessonIdValue);
 
         List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
@@ -89,7 +89,7 @@ public class AdminLessonController {
 
         LessonModel updateModel = lessonApiMapper.toModel(request);
 
-        lessonService.updateLesson(
+        adminLessonService.updateLesson(
                 parseId(lessonId, "lessonId"),
                 updateModel,
                 image,
@@ -102,7 +102,7 @@ public class AdminLessonController {
 
     @DeleteMapping("/{lessonId}")
     public ResponseApi<Boolean> deleteLesson(@PathVariable("lessonId") String lessonId) {
-        lessonService.deleteLesson(parseId(lessonId, "lessonId"));
+        adminLessonService.deleteLesson(parseId(lessonId, "lessonId"));
         return ResponseApi.ok(true);
     }
 

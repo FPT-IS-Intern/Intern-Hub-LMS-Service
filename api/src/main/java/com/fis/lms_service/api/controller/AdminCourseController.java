@@ -5,7 +5,7 @@ import com.fis.lms_service.api.dto.response.course.CourseDetailResponse;
 import com.fis.lms_service.api.dto.response.course.CourseSummaryResponse;
 import com.fis.lms_service.api.mapper.CourseApiMapper;
 import com.fis.lms_service.api.util.PaginationUtils;
-import com.fis.lms_service.core.service.course.CourseService;
+import com.fis.lms_service.core.service.course.AdminCourseService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequestMapping("/admin/courses")
 public class AdminCourseController {
 
-    CourseService courseService;
+    AdminCourseService adminCourseService;
     CourseApiMapper courseApiMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -34,7 +34,7 @@ public class AdminCourseController {
             @RequestPart("data") @Valid CourseCreateRequest request,
             @RequestPart(value = "image", required = true) MultipartFile image) {
 
-        courseService.createCourse(
+        adminCourseService.createCourse(
                 courseApiMapper.toModel(request), image, parseLessonIds(request.lessonIds()));
         return ResponseApi.ok(true);
     }
@@ -61,7 +61,7 @@ public class AdminCourseController {
     @GetMapping
     public ResponseApi<PaginatedData<CourseSummaryResponse>> getCourses(
             @PageableDefault(size = 10) Pageable pageable) {
-        var page = courseService.getCourses(pageable);
+        var page = adminCourseService.getCourses(pageable);
         var res = PaginationUtils.toPaginatedData(page, courseApiMapper::toSummaryResponse);
         return ResponseApi.ok(res);
     }
@@ -69,8 +69,8 @@ public class AdminCourseController {
     @GetMapping("/{courseId}")
     public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
         Long courseIdValue = parseId(courseId, "courseId");
-        var model = courseService.getCourse(courseIdValue);
-        var lessonIds = courseService.getCourseLessonIds(courseIdValue).stream()
+        var model = adminCourseService.getCourse(courseIdValue);
+        var lessonIds = adminCourseService.getCourseLessonIds(courseIdValue).stream()
                 .map(String::valueOf)
                 .toList();
         var courseIdString = model.getCourseId() == null ? null : model.getCourseId().toString();
@@ -88,14 +88,14 @@ public class AdminCourseController {
             @PathVariable("courseId") String courseId,
             @RequestPart("data") @Valid CourseCreateRequest request,
             @RequestPart(value = "image", required = false) MultipartFile image) {
-        courseService.updateCourse(
+        adminCourseService.updateCourse(
                 parseId(courseId, "courseId"), courseApiMapper.toModel(request), image);
         return ResponseApi.ok(true);
     }
 
     @DeleteMapping("/{courseId}")
     public ResponseApi<Boolean> deleteCourse(@PathVariable("courseId") String courseId) {
-        courseService.deleteCourse(parseId(courseId, "courseId"));
+        adminCourseService.deleteCourse(parseId(courseId, "courseId"));
         return ResponseApi.ok(true);
     }
 }

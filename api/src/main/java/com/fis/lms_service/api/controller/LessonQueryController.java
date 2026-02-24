@@ -7,7 +7,7 @@ import com.fis.lms_service.api.mapper.LessonApiMapper;
 import com.fis.lms_service.api.util.PaginationUtils;
 import com.fis.lms_service.core.domain.model.lesson.LessonModel;
 import com.fis.lms_service.core.service.lesson.LessonFileService;
-import com.fis.lms_service.core.service.lesson.LessonService;
+import com.fis.lms_service.core.service.lesson.LessonQueryService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import lombok.AccessLevel;
@@ -25,7 +25,7 @@ import java.util.List;
 @RequestMapping("/lessons")
 public class LessonQueryController {
 
-    LessonService lessonService;
+    LessonQueryService lessonQueryService;
     LessonFileService lessonFileService;
     LessonApiMapper lessonApiMapper;
 
@@ -33,14 +33,14 @@ public class LessonQueryController {
     public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(value = "userId", required = false) String userId) {
-        var lessonPage = lessonService.getLessons(pageable);
+        var lessonPage = lessonQueryService.getLessons(pageable);
 
         Long userIdValue = parseOptionalId(userId, "userId");
         var res = PaginationUtils.toPaginatedData(
                 lessonPage,
                 model -> lessonApiMapper.toSummaryResponse(
                         model,
-                        lessonService.getLessonEnrollmentId(
+                        lessonQueryService.getLessonEnrollmentId(
                                 model.getLessonId(), userIdValue)));
 
         return ResponseApi.ok(res);
@@ -51,11 +51,11 @@ public class LessonQueryController {
             @PathVariable("lessonId") String lessonId,
             @RequestParam(value = "userId", required = false) String userId) {
         Long lessonIdValue = parseId(lessonId, "lessonId");
-        LessonModel model = lessonService.getLesson(lessonIdValue);
+        LessonModel model = lessonQueryService.getLesson(lessonIdValue);
         var fileModels = lessonFileService.getFiles(lessonIdValue);
 
         List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
-        Long lessonEnrollmentId = lessonService.getLessonEnrollmentId(
+        Long lessonEnrollmentId = lessonQueryService.getLessonEnrollmentId(
                 lessonIdValue, parseOptionalId(userId, "userId"));
         LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files, lessonEnrollmentId);
 

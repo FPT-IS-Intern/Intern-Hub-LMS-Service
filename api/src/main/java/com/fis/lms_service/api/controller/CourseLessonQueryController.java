@@ -3,7 +3,7 @@ package com.fis.lms_service.api.controller;
 import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
 import com.fis.lms_service.api.mapper.LessonApiMapper;
 import com.fis.lms_service.api.util.PaginationUtils;
-import com.fis.lms_service.core.service.lesson.LessonService;
+import com.fis.lms_service.core.service.lesson.LessonQueryService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import lombok.AccessLevel;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/courses")
 public class CourseLessonQueryController {
 
-    LessonService lessonService;
+    LessonQueryService lessonQueryService;
     LessonApiMapper lessonApiMapper;
 
     @GetMapping("/{courseId}/lessons")
@@ -30,12 +30,12 @@ public class CourseLessonQueryController {
         Long courseIdValue = parseId(courseId, "courseId");
         Long userIdValue = parseOptionalId(userId);
 
-        var page = lessonService.getLessonsByCourse(courseIdValue, pageable);
+        var page = lessonQueryService.getLessonsByCourse(courseIdValue, pageable);
         var res = PaginationUtils.toPaginatedData(
                 page,
                 model -> lessonApiMapper.toSummaryResponse(
                         model,
-                        lessonService.getLessonEnrollmentId(
+                        lessonQueryService.getLessonEnrollmentId(
                                 model.getLessonId(), userIdValue)));
 
         return ResponseApi.ok(res);
