@@ -1,3 +1,7 @@
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.testing.Test
+
 plugins {
     alias(libs.plugins.springBoot) apply false
     alias(libs.plugins.dependencyManagement) apply false
@@ -16,19 +20,26 @@ allprojects {
 }
 
 subprojects {
-    plugins.withType<JavaPlugin> {
-        java {
+    plugins.withId("java") {
+        extensions.configure<JavaPluginExtension> {
             toolchain {
-                languageVersion.set(JavaLanguageVersion.of(21))
+                languageVersion.set(JavaLanguageVersion.of(25))
             }
         }
 
-        tasks.withType<JavaCompile>().configureEach {
-            options.encoding = "UTF-8"
+        dependencies {
+            "compileOnly"(libs.lombok)
+            "annotationProcessor"(libs.lombok)
+            "testCompileOnly"(libs.lombok)
+            "testAnnotationProcessor"(libs.lombok)
         }
+    }
 
-        tasks.withType<Test>().configureEach {
-            useJUnitPlatform()
-        }
+    tasks.withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
     }
 }

@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.common.library)
     implementation(project(":core"))
     implementation(project(":infra"))
 
@@ -14,6 +15,8 @@ dependencies {
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.spring.boot.starter.liquibase)
     implementation(libs.openapi.doc)
+    implementation(libs.mapstruct)
+    annotationProcessor(libs.mapstruct.processor)
 
     runtimeOnly(libs.postgresql)
 

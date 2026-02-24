@@ -1,15 +1,25 @@
 [versions]
+# Spring ecosystem
 springBoot = "4.0.2"
 springCloud = "2025.1.0"
+
+# Build and quality tools
 spotless = "8.1.0"
 googleJavaFormat = "1.33.0"
 sonar = "7.2.2.6593"
 jib = "3.5.2"
+
+# Runtime and integrations
 postgresql = "42.7.9"
 springDoc = "3.0.1"
 awsSdk = "2.41.15"
+commonLibrary = "2.0.3"
+lombok = "1.18.38"
+mapstruct = "1.6.3"
+hutool = "5.8.39"
 
 [libraries]
+# Spring Boot starters
 spring-boot-starter = { group = "org.springframework.boot", name = "spring-boot-starter", version.ref = "springBoot" }
 spring-boot-starter-webmvc = { group = "org.springframework.boot", name = "spring-boot-starter-webmvc", version.ref = "springBoot" }
 spring-boot-starter-security = { group = "org.springframework.boot", name = "spring-boot-starter-security", version.ref = "springBoot" }
@@ -20,16 +30,33 @@ spring-boot-starter-kafka = { group = "org.springframework.boot", name = "spring
 spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test", version.ref = "springBoot" }
 spring-boot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor", version.ref = "springBoot" }
 spring-boot-starter-webmvc-test = { group = "org.springframework.boot", name = "spring-boot-starter-webmvc-test", version.ref = "springBoot" }
-spring-security-test = { group = "org.springframework.security", name = "spring-security-test", version.ref = "springBoot" }
+spring-security-test = { group = "org.springframework.security", name = "spring-security-test" }
 spring-boot-starter-log4j2 = { group = "org.springframework.boot", name = "spring-boot-starter-log4j2", version.ref = "springBoot" }
 spring-boot-starter-liquibase = { group = "org.springframework.boot", name = "spring-boot-starter-liquibase", version.ref = "springBoot" }
-postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }
+
+# API and cloud
 openapi-doc = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springDoc" }
 aws-s3 = { group = "software.amazon.awssdk", name = "s3", version.ref = "awsSdk" }
+common-library = { group = "com.intern.hub.library", name = "common", version.ref = "commonLibrary" }
+
+# Database
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }
+
+# Code generation
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
+mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
+
+# Utility
+hutool-core = { group = "cn.hutool", name = "hutool-core", version.ref = "hutool" }
+hutool-extra = { group = "cn.hutool", name = "hutool-extra", version.ref = "hutool" }
 
 [plugins]
+# Core build plugins
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
 dependencyManagement = { id = "io.spring.dependency-management", version = "1.1.7" }
+
+# Quality and packaging
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 sonar = { id = "org.sonarqube", version.ref = "sonar" }
 jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }

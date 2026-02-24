@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.common.library)
     api(libs.spring.boot.starter.webmvc)
     api(libs.spring.boot.starter.data.jpa)
 }
