@@ -7,9 +7,9 @@ spring:
     password: ${DB_PASSWORD}
     driverClassName: org.postgresql.Driver
   jpa:
+    open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         default_schema: ih_lms
     hibernate:
       ddl-auto: validate
@@ -17,6 +17,18 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     default-schema: ih_lms
     enabled: true
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
 
 aws:
   s3:
@@ -39,7 +51,7 @@ cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
 
 security:
-  public-paths: ${SECURITY_PUBLIC_PATHS:/actuator/health,/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html}
+  public-paths: ${SECURITY_PUBLIC_PATHS:/actuator/health,/actuator/info}
 
 common:
   context:
