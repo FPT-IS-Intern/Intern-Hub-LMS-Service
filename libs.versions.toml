@@ -36,7 +36,7 @@ spring-boot-starter-liquibase = { group = "org.springframework.boot", name = "sp
 # API and cloud
 openapi-doc = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springDoc" }
 aws-s3 = { group = "software.amazon.awssdk", name = "s3", version.ref = "awsSdk" }
-common-library = { group = "com.intern.hub.library", name = "common", version.ref = "commonLibrary" }
+common-library = { group = "com.github.FPT-IS-Intern", name = "Intern-Hub-Common-Library", version.ref = "commonLibrary" }
 
 # Database
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }
