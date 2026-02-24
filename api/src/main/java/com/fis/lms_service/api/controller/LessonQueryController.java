@@ -10,6 +10,7 @@ import com.fis.lms_service.core.service.lesson.LessonFileService;
 import com.fis.lms_service.core.service.lesson.LessonQueryService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
+import com.intern.hub.library.common.exception.BadRequestException;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -69,15 +70,13 @@ public class LessonQueryController {
     try {
       return Long.parseLong(value);
     } catch (NumberFormatException ex) {
-      throw new com.intern.hub.library.common.exception.BadRequestException(
-          "id.invalid", field + " không hợp lệ");
+      throw new BadRequestException("id.invalid", field + " không hợp lệ");
     }
   }
 
   private Long parseId(String value, String field) {
     if (value == null || value.isBlank()) {
-      throw new com.intern.hub.library.common.exception.BadRequestException(
-          "id.invalid", field + " không hợp lệ");
+      throw new BadRequestException("id.invalid", field + " không hợp lệ");
     }
     return parseOptionalId(value, field);
   }

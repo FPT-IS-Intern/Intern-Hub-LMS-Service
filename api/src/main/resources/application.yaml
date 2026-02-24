@@ -42,5 +42,4 @@ security:
   public-paths: ${SECURITY_PUBLIC_PATHS:/actuator/health,/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html}
 
 snowflake:
-  worker-id: 10
-  datacenter-id: 10
+  machine-id: 10

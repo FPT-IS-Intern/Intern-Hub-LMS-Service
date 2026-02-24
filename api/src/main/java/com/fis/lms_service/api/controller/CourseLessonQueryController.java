@@ -6,6 +6,7 @@ import com.fis.lms_service.api.util.PaginationUtils;
 import com.fis.lms_service.core.service.lesson.LessonQueryService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
+import com.intern.hub.library.common.exception.BadRequestException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,11 +44,13 @@ public class CourseLessonQueryController {
   }
 
   private Long parseId(String value, String field) {
+    if (value == null || value.isBlank()) {
+      throw new BadRequestException("id.invalid", field + " không hợp lệ");
+    }
     try {
       return Long.parseLong(value);
     } catch (NumberFormatException ex) {
-      throw new com.intern.hub.library.common.exception.BadRequestException(
-          "id.invalid", field + " không hợp lệ");
+      throw new BadRequestException("id.invalid", field + " không hợp lệ");
     }
   }
 

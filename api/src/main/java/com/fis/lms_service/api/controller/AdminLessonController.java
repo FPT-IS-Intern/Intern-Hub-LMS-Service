@@ -11,6 +11,7 @@ import com.fis.lms_service.core.service.lesson.AdminLessonService;
 import com.fis.lms_service.core.service.lesson.LessonFileService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
+import com.intern.hub.library.common.exception.BadRequestException;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;
@@ -104,11 +105,13 @@ public class AdminLessonController {
   }
 
   private Long parseId(String value, String field) {
+    if (value == null || value.isBlank()) {
+      throw new BadRequestException("id.invalid", field + " không hợp lệ");
+    }
     try {
       return Long.parseLong(value);
     } catch (NumberFormatException ex) {
-      throw new com.intern.hub.library.common.exception.BadRequestException(
-          "id.invalid", field + " không hợp lệ");
+      throw new BadRequestException("id.invalid", field + " không hợp lệ");
     }
   }
 

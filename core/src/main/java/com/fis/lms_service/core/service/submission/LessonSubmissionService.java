@@ -14,6 +14,8 @@ import com.fis.lms_service.core.repository.submission.SubmissionAttachmentReposi
 import com.fis.lms_service.core.repository.submission.SubmissionCommentRepository;
 import com.fis.lms_service.core.service.storage.StorageObjectLifecycleManager;
 import com.intern.hub.library.common.exception.BadRequestException;
+import com.intern.hub.library.common.exception.ForbiddenException;
+import com.intern.hub.library.common.exception.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -71,11 +73,11 @@ public class LessonSubmissionService {
             .findUserIdByLessonEnrollmentId(lessonEnrollmentId)
             .orElseThrow(
                 () ->
-                    new BadRequestException(
+                    new NotFoundException(
                         "lesson.enrollment.not.found", "Không tìm thấy lesson enrollment"));
 
     if (!enrolledUserId.equals(userId)) {
-      throw new BadRequestException(
+      throw new ForbiddenException(
           "lesson.enrollment.invalid", "Lesson enrollment không thuộc user này");
     }
 
@@ -163,7 +165,7 @@ public class LessonSubmissionService {
             .findCourseEnrollmentIdByLessonEnrollmentId(lessonEnrollmentId)
             .orElseThrow(
                 () ->
-                    new BadRequestException(
+                    new NotFoundException(
                         "course.enrollment.not.found", "Không tìm thấy course enrollment"));
 
     long totalLessons = lessonEnrollmentRepository.countByCourseEnrollmentId(courseEnrollmentId);

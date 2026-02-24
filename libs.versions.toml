@@ -16,7 +16,6 @@ awsSdk = "2.41.15"
 commonLibrary = "2.0.3"
 lombok = "1.18.38"
 mapstruct = "1.6.3"
-hutool = "5.8.39"
 
 [libraries]
 # Spring Boot starters
@@ -46,10 +45,6 @@ postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "pos
 lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
-
-# Utility
-hutool-core = { group = "cn.hutool", name = "hutool-core", version.ref = "hutool" }
-hutool-extra = { group = "cn.hutool", name = "hutool-extra", version.ref = "hutool" }
 
 [plugins]
 # Core build plugins

@@ -5,6 +5,7 @@ import com.fis.lms_service.api.dto.response.submission.LessonSubmissionResponse;
 import com.fis.lms_service.api.dto.response.submission.SubmissionAttachmentResponse;
 import com.fis.lms_service.core.service.submission.LessonSubmissionService;
 import com.intern.hub.library.common.dto.ResponseApi;
+import com.intern.hub.library.common.exception.BadRequestException;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;
@@ -57,11 +58,13 @@ public class LessonSubmissionController {
   }
 
   private Long parseId(String value, String field) {
+    if (value == null || value.isBlank()) {
+      throw new BadRequestException("id.invalid", field + " không hợp lệ");
+    }
     try {
       return Long.parseLong(value);
     } catch (NumberFormatException ex) {
-      throw new com.intern.hub.library.common.exception.BadRequestException(
-          "id.invalid", field + " không hợp lệ");
+      throw new BadRequestException("id.invalid", field + " không hợp lệ");
     }
   }
 }

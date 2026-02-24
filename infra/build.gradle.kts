@@ -10,8 +10,6 @@ dependencies {
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.aws.s3)
-    implementation(libs.hutool.core)
-    implementation(libs.hutool.extra)
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
 
