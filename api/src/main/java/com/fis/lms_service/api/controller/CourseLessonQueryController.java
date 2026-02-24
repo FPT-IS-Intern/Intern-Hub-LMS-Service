@@ -19,41 +19,42 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/courses")
 public class CourseLessonQueryController {
 
-    LessonQueryService lessonQueryService;
-    LessonApiMapper lessonApiMapper;
+  LessonQueryService lessonQueryService;
+  LessonApiMapper lessonApiMapper;
 
-    @GetMapping("/{courseId}/lessons")
-    public ResponseApi<PaginatedData<LessonSummaryResponse>> getCourseLessons(
-            @PathVariable("courseId") String courseId,
-            @RequestParam(value = "userId", required = false) String userId,
-            @PageableDefault() Pageable pageable) {
-        Long courseIdValue = parseId(courseId, "courseId");
-        Long userIdValue = parseOptionalId(userId);
+  @GetMapping("/{courseId}/lessons")
+  public ResponseApi<PaginatedData<LessonSummaryResponse>> getCourseLessons(
+      @PathVariable("courseId") String courseId,
+      @RequestParam(value = "userId", required = false) String userId,
+      @PageableDefault() Pageable pageable) {
+    Long courseIdValue = parseId(courseId, "courseId");
+    Long userIdValue = parseOptionalId(userId);
 
-        var page = lessonQueryService.getLessonsByCourse(courseIdValue, pageable);
-        var res = PaginationUtils.toPaginatedData(
-                page,
-                model -> lessonApiMapper.toSummaryResponse(
-                        model,
-                        lessonQueryService.getLessonEnrollmentId(
-                                model.getLessonId(), userIdValue)));
+    var page = lessonQueryService.getLessonsByCourse(courseIdValue, pageable);
+    var res =
+        PaginationUtils.toPaginatedData(
+            page,
+            model ->
+                lessonApiMapper.toSummaryResponse(
+                    model,
+                    lessonQueryService.getLessonEnrollmentId(model.getLessonId(), userIdValue)));
 
-        return ResponseApi.ok(res);
+    return ResponseApi.ok(res);
+  }
+
+  private Long parseId(String value, String field) {
+    try {
+      return Long.parseLong(value);
+    } catch (NumberFormatException ex) {
+      throw new com.intern.hub.library.common.exception.BadRequestException(
+          "id.invalid", field + " không hợp lệ");
     }
+  }
 
-    private Long parseId(String value, String field) {
-        try {
-            return Long.parseLong(value);
-        } catch (NumberFormatException ex) {
-            throw new com.intern.hub.library.common.exception.BadRequestException(
-                    "id.invalid", field + " không hợp lệ");
-        }
+  private Long parseOptionalId(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
     }
-
-    private Long parseOptionalId(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        return parseId(value, "userId");
-    }
+    return parseId(value, "userId");
+  }
 }

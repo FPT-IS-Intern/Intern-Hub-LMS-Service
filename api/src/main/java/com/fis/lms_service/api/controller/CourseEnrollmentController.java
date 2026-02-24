@@ -15,22 +15,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/courses")
 public class CourseEnrollmentController {
 
-    CourseEnrollmentService courseEnrollmentService;
+  CourseEnrollmentService courseEnrollmentService;
 
-    @PostMapping("/{courseId}/enroll")
-    public ResponseApi<Boolean> enrollCourse(
-            @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
-        courseEnrollmentService.enrollCourse(
-                parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
-        return ResponseApi.ok(true);
-    }
+  @PostMapping("/{courseId}/enroll")
+  public ResponseApi<Boolean> enrollCourse(
+      @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
+    courseEnrollmentService.enrollCourse(
+        parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
+    return ResponseApi.ok(true);
+  }
 
-    private Long parseId(String value, String field) {
-        try {
-            return Long.parseLong(value);
-        } catch (NumberFormatException ex) {
-            throw new com.intern.hub.library.common.exception.BadRequestException(
-                    "id.invalid", field + " không hợp lệ");
-        }
+  private Long parseId(String value, String field) {
+    try {
+      return Long.parseLong(value);
+    } catch (NumberFormatException ex) {
+      throw new com.intern.hub.library.common.exception.BadRequestException(
+          "id.invalid", field + " không hợp lệ");
     }
+  }
 }

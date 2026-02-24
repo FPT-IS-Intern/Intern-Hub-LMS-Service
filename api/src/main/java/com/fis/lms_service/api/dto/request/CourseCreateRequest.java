@@ -2,7 +2,6 @@ package com.fis.lms_service.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-
 import java.util.List;
 
 public record CourseCreateRequest(

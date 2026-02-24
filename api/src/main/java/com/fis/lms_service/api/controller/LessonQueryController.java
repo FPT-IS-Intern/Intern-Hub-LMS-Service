@@ -10,6 +10,7 @@ import com.fis.lms_service.core.service.lesson.LessonFileService;
 import com.fis.lms_service.core.service.lesson.LessonQueryService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,68 +18,67 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/lessons")
 public class LessonQueryController {
 
-    LessonQueryService lessonQueryService;
-    LessonFileService lessonFileService;
-    LessonApiMapper lessonApiMapper;
+  LessonQueryService lessonQueryService;
+  LessonFileService lessonFileService;
+  LessonApiMapper lessonApiMapper;
 
-    @GetMapping
-    public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
-            @PageableDefault(size = 10) Pageable pageable,
-            @RequestParam(value = "userId", required = false) String userId) {
-        var lessonPage = lessonQueryService.getLessons(pageable);
+  @GetMapping
+  public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
+      @PageableDefault(size = 10) Pageable pageable,
+      @RequestParam(value = "userId", required = false) String userId) {
+    var lessonPage = lessonQueryService.getLessons(pageable);
 
-        Long userIdValue = parseOptionalId(userId, "userId");
-        var res = PaginationUtils.toPaginatedData(
-                lessonPage,
-                model -> lessonApiMapper.toSummaryResponse(
-                        model,
-                        lessonQueryService.getLessonEnrollmentId(
-                                model.getLessonId(), userIdValue)));
+    Long userIdValue = parseOptionalId(userId, "userId");
+    var res =
+        PaginationUtils.toPaginatedData(
+            lessonPage,
+            model ->
+                lessonApiMapper.toSummaryResponse(
+                    model,
+                    lessonQueryService.getLessonEnrollmentId(model.getLessonId(), userIdValue)));
 
-        return ResponseApi.ok(res);
+    return ResponseApi.ok(res);
+  }
+
+  @GetMapping("/{lessonId}")
+  public ResponseApi<LessonDetailResponse> getLessonDetail(
+      @PathVariable("lessonId") String lessonId,
+      @RequestParam(value = "userId", required = false) String userId) {
+    Long lessonIdValue = parseId(lessonId, "lessonId");
+    LessonModel model = lessonQueryService.getLesson(lessonIdValue);
+    var fileModels = lessonFileService.getFiles(lessonIdValue);
+
+    List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
+    Long lessonEnrollmentId =
+        lessonQueryService.getLessonEnrollmentId(lessonIdValue, parseOptionalId(userId, "userId"));
+    LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files, lessonEnrollmentId);
+
+    return ResponseApi.ok(res);
+  }
+
+  private Long parseOptionalId(String value, String field) {
+    if (value == null || value.isBlank()) {
+      return null;
     }
-
-    @GetMapping("/{lessonId}")
-    public ResponseApi<LessonDetailResponse> getLessonDetail(
-            @PathVariable("lessonId") String lessonId,
-            @RequestParam(value = "userId", required = false) String userId) {
-        Long lessonIdValue = parseId(lessonId, "lessonId");
-        LessonModel model = lessonQueryService.getLesson(lessonIdValue);
-        var fileModels = lessonFileService.getFiles(lessonIdValue);
-
-        List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
-        Long lessonEnrollmentId = lessonQueryService.getLessonEnrollmentId(
-                lessonIdValue, parseOptionalId(userId, "userId"));
-        LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files, lessonEnrollmentId);
-
-        return ResponseApi.ok(res);
+    try {
+      return Long.parseLong(value);
+    } catch (NumberFormatException ex) {
+      throw new com.intern.hub.library.common.exception.BadRequestException(
+          "id.invalid", field + " không hợp lệ");
     }
+  }
 
-    private Long parseOptionalId(String value, String field) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return Long.parseLong(value);
-        } catch (NumberFormatException ex) {
-            throw new com.intern.hub.library.common.exception.BadRequestException(
-                    "id.invalid", field + " không hợp lệ");
-        }
+  private Long parseId(String value, String field) {
+    if (value == null || value.isBlank()) {
+      throw new com.intern.hub.library.common.exception.BadRequestException(
+          "id.invalid", field + " không hợp lệ");
     }
-
-    private Long parseId(String value, String field) {
-        if (value == null || value.isBlank()) {
-            throw new com.intern.hub.library.common.exception.BadRequestException(
-                    "id.invalid", field + " không hợp lệ");
-        }
-        return parseOptionalId(value, field);
-    }
+    return parseOptionalId(value, field);
+  }
 }
