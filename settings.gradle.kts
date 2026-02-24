@@ -1,4 +1,4 @@
-rootProject.name = "intern-hub-lms-service"
+rootProject.name = "lms-service"
 
 include("api")
 include("core")
