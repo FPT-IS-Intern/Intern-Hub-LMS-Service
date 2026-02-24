@@ -10,12 +10,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        default_schema: schema_lms
+        default_schema: ih_lms
     hibernate:
       ddl-auto: validate
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
-    default-schema: schema_lms
+    default-schema: ih_lms
     enabled: true
 
 aws:
