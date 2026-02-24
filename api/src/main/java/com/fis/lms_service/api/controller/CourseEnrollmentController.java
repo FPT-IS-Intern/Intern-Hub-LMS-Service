@@ -19,11 +19,11 @@ public class CourseEnrollmentController {
   CourseEnrollmentService courseEnrollmentService;
 
   @PostMapping("/{courseId}/enroll")
-  public ResponseApi<Boolean> enrollCourse(
+  public ResponseApi<?> enrollCourse(
       @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
     courseEnrollmentService.enrollCourse(
         parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
-    return ResponseApi.ok(true);
+    return ResponseApi.noContent();
   }
 
   private Long parseId(String value, String field) {

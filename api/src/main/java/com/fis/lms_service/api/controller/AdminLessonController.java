@@ -38,7 +38,7 @@ public class AdminLessonController {
   LessonApiMapper lessonApiMapper;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseApi<Boolean> createLesson(
+  public ResponseApi<?> createLesson(
       @RequestPart("data") @Valid LessonCreateRequest request,
       @RequestPart(value = "image", required = true) MultipartFile image,
       @RequestPart(value = "lessonFiles", required = false) List<MultipartFile> lessonFiles,
@@ -48,7 +48,7 @@ public class AdminLessonController {
     LessonModel model = lessonApiMapper.toModel(request);
     adminLessonService.createLesson(model, image, lessonFiles, assignmentFiles);
 
-    return ResponseApi.ok(true);
+    return ResponseApi.noContent();
   }
 
   @GetMapping
@@ -77,7 +77,7 @@ public class AdminLessonController {
   }
 
   @PutMapping(value = "/{lessonId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseApi<Boolean> updateLesson(
+  public ResponseApi<?> updateLesson(
       @PathVariable("lessonId") String lessonId,
       @RequestPart("data") @Valid LessonCreateRequest request,
       @RequestPart(value = "image", required = false) MultipartFile image,
@@ -95,13 +95,13 @@ public class AdminLessonController {
         assignmentFiles,
         parseIds(deleteFileIds, "deleteFileIds"));
 
-    return ResponseApi.ok(true);
+    return ResponseApi.noContent();
   }
 
   @DeleteMapping("/{lessonId}")
-  public ResponseApi<Boolean> deleteLesson(@PathVariable("lessonId") String lessonId) {
+  public ResponseApi<?> deleteLesson(@PathVariable("lessonId") String lessonId) {
     adminLessonService.deleteLesson(parseId(lessonId, "lessonId"));
-    return ResponseApi.ok(true);
+    return ResponseApi.noContent();
   }
 
   private Long parseId(String value, String field) {

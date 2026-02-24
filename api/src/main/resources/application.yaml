@@ -41,5 +41,9 @@ cors:
 security:
   public-paths: ${SECURITY_PUBLIC_PATHS:/actuator/health,/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html}
 
+common:
+  context:
+    enabled: true
+
 snowflake:
   machine-id: 10
