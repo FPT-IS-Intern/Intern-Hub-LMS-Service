@@ -2,10 +2,9 @@
 # Java & Gradle
 # ====================
 .gradle/
+.gradle-local/
 **/build/
 !src/**/build/
-build.gradle.kts
-settings.gradle.kts
 gradle-app.setting
 .gradletasknamecache
 
@@ -61,3 +60,4 @@ api/src/main/resources/application-prod.properties
 # ====================
 *.sw?
 Desktop.ini
+INSTRUCTION.md
