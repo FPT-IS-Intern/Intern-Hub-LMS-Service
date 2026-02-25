@@ -70,3 +70,5 @@ common:
 
 snowflake:
   machine-id: 10
+
+gateway-url: ${GATEWAY_URL}
