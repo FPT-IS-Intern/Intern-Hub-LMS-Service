@@ -5,12 +5,11 @@ import com.fis.lms_service.core.repository.submission.LessonSubmissionRepository
 import com.fis.lms_service.infra.persistence.entity.submission.LessonSubmissionEntity;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonEnrollmentEntityRepository;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonSubmissionEntityRepository;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor

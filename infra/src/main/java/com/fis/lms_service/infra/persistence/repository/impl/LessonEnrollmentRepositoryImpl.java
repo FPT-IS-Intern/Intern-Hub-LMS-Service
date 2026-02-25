@@ -7,14 +7,13 @@ import com.fis.lms_service.infra.persistence.entity.enrollment.LessonEnrollmentE
 import com.fis.lms_service.infra.persistence.repository.jpa.CourseEnrollmentEntityRepository;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonEnrollmentEntityRepository;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonEntityRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor

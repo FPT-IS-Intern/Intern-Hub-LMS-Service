@@ -9,16 +9,15 @@ import com.fis.lms_service.core.repository.course.CourseRepository;
 import com.fis.lms_service.core.repository.enrollment.CourseEnrollmentRepository;
 import com.fis.lms_service.core.repository.enrollment.LessonEnrollmentRepository;
 import com.intern.hub.library.common.exception.NotFoundException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

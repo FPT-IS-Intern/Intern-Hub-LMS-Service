@@ -16,6 +16,8 @@ import com.fis.lms_service.core.service.storage.StorageObjectLifecycleManager;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.ForbiddenException;
 import com.intern.hub.library.common.exception.NotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,9 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -116,8 +115,7 @@ public class LessonSubmissionService {
     if (hasItems(files)) {
       boolean hasValidFile = files.stream().anyMatch(file -> file != null && !file.isEmpty());
       if (!hasValidFile) {
-        throw new BadRequestException(
-            "submission.file.required", "Cần ít nhất 1 file để nộp bài");
+        throw new BadRequestException("submission.file.required", "Cần ít nhất 1 file để nộp bài");
       }
 
       List<SubmissionAttachmentModel> existing =
@@ -190,8 +188,7 @@ public class LessonSubmissionService {
             });
 
     List<SubmissionAttachmentModel> attachments =
-        submissionAttachmentRepository.findByLessonSubmissionId(
-            submission.getLessonSubmissionId());
+        submissionAttachmentRepository.findByLessonSubmissionId(submission.getLessonSubmissionId());
 
     return new LessonSubmissionResult(
         submission.getLessonSubmissionId(),

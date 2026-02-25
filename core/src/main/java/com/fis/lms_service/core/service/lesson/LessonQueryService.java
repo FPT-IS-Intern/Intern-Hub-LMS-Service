@@ -5,6 +5,7 @@ import com.fis.lms_service.core.repository.course.CourseLessonRepository;
 import com.fis.lms_service.core.repository.enrollment.LessonEnrollmentRepository;
 import com.fis.lms_service.core.repository.lesson.LessonRepository;
 import com.intern.hub.library.common.exception.NotFoundException;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,8 +17,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

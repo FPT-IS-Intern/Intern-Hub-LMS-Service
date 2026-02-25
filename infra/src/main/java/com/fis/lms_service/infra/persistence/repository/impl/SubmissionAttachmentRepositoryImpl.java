@@ -5,13 +5,12 @@ import com.fis.lms_service.core.repository.submission.SubmissionAttachmentReposi
 import com.fis.lms_service.infra.persistence.entity.submission.SubmissionAttachmentEntity;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonSubmissionEntityRepository;
 import com.fis.lms_service.infra.persistence.repository.jpa.SubmissionAttachmentEntityRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor

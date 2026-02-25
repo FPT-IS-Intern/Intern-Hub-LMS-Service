@@ -1,3 +1,4 @@
+import com.diffplug.gradle.spotless.SpotlessExtension
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
@@ -22,9 +23,19 @@ allprojects {
 
 subprojects {
     plugins.withId("java") {
+        apply(plugin = "com.diffplug.spotless")
+
         extensions.configure<JavaPluginExtension> {
             toolchain {
                 languageVersion.set(JavaLanguageVersion.of(25))
+            }
+        }
+
+        extensions.configure<SpotlessExtension> {
+            java {
+                // Use Google Java Format to keep code style consistent across modules.
+                googleJavaFormat(libs.versions.googleJavaFormat.get())
+                target("src/**/*.java")
             }
         }
 
