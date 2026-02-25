@@ -1,8 +1,6 @@
 spring:
   application:
     name: inter-hub-lms-service
-  main:
-    lazy-initialization: true
   jmx:
     enabled: false
   datasource:
