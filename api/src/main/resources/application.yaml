@@ -1,11 +1,18 @@
 spring:
   application:
     name: inter-hub-lms-service
+  main:
+    lazy-initialization: true
+  jmx:
+    enabled: false
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driverClassName: org.postgresql.Driver
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 2
   jpa:
     open-in-view: false
     properties:
@@ -17,6 +24,12 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     default-schema: ih_lms
     enabled: true
+
+server:
+  tomcat:
+    threads:
+      max: 20
+      min-spare: 2
 
 springdoc:
   api-docs:
