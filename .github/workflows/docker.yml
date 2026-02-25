@@ -9,7 +9,7 @@ on:
       - 'infra/**'
       - 'core/**'
       - 'app/**'
-      - 'gradle/libs.versions.toml'
+      - 'libs.versions.toml'
       - 'build.gradle.kts'
       - 'Dockerfile'
       - '.github/workflows/docker.yml'
