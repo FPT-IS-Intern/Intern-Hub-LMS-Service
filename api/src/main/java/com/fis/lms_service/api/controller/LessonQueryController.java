@@ -11,6 +11,8 @@ import com.fis.lms_service.core.service.lesson.LessonQueryService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,8 +25,8 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/lessons")
-/** API user tra cứu bài học toàn hệ thống. */
+@RequestMapping("/lms/lessons")
+@Tag(name = "Lesson Query", description = "Tra cứu bài học toàn hệ thống.")
 public class LessonQueryController {
 
     LessonQueryService lessonQueryService;
@@ -32,7 +34,9 @@ public class LessonQueryController {
     LessonApiMapper lessonApiMapper;
 
     @GetMapping
-    /** Lấy danh sách bài học có phân trang, hỗ trợ userId để map lessonEnrollmentId. */
+    @Operation(
+            summary = "Danh sách bài học",
+            description = "Lấy danh sách bài học có phân trang, hỗ trợ userId để map lessonEnrollmentId.")
     public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(value = "userId", required = false) String userId) {
@@ -51,7 +55,9 @@ public class LessonQueryController {
     }
 
     @GetMapping("/{lessonId}")
-    /** Lấy chi tiết bài học theo id, kèm file và lessonEnrollmentId (nếu có userId). */
+    @Operation(
+            summary = "Chi tiết bài học",
+            description = "Lấy chi tiết bài học theo id, kèm file và lessonEnrollmentId (nếu có userId).")
     public ResponseApi<LessonDetailResponse> getLessonDetail(
             @PathVariable("lessonId") String lessonId,
             @RequestParam(value = "userId", required = false) String userId) {

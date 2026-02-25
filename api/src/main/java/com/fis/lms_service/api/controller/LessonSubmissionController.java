@@ -7,6 +7,8 @@ import com.fis.lms_service.core.service.submission.LessonSubmissionService;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,8 +21,8 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/lesson-enrollments")
-/** API nộp bài cho từng lesson enrollment. */
+@RequestMapping("/lms/lesson-enrollments")
+@Tag(name = "Lesson Submission", description = "Nộp bài cho từng lesson enrollment.")
 public class LessonSubmissionController {
 
     LessonSubmissionService lessonSubmissionService;
@@ -28,7 +30,9 @@ public class LessonSubmissionController {
     @PostMapping(
             value = "/{lessonEnrollmentId}/submit",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    /** Nộp/cập nhật bài nộp: thay toàn bộ file cũ bằng danh sách file mới. */
+    @Operation(
+            summary = "Nộp bài",
+            description = "Nộp/cập nhật bài nộp: thay toàn bộ file cũ bằng danh sách file mới.")
     public ResponseApi<LessonSubmissionResponse> submitLesson(
             @PathVariable("lessonEnrollmentId") String lessonEnrollmentId,
             @RequestPart("data") @Valid LessonSubmissionRequest request,

@@ -9,33 +9,38 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/courses")
-/** API user ghi danh khóa học. */
+@RequestMapping("/lms/courses")
+@Tag(name = "Course Enrollment", description = "Ghi danh khóa học cho user.")
 public class CourseEnrollmentController {
 
-  CourseEnrollmentService courseEnrollmentService;
+    CourseEnrollmentService courseEnrollmentService;
 
-  @PostMapping("/{courseId}/enroll")
-  /** Tạo/cập nhật trạng thái ghi danh của user vào khóa học. */
-  public ResponseApi<?> enrollCourse(
-      @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
-    courseEnrollmentService.enrollCourse(
-        parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
-    return ResponseApi.noContent();
-  }
+    @PostMapping("/{courseId}/enroll")
+    @Operation(
+            summary = "Ghi danh khóa học",
+            description = "Tạo/cập nhật trạng thái ghi danh của user vào khóa học.")
+    public ResponseApi<?> enrollCourse(
+            @PathVariable("courseId") String courseId,
+            @RequestBody @Valid CourseEnrollRequest request) {
+        courseEnrollmentService.enrollCourse(
+                parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
+        return ResponseApi.noContent();
+    }
 
-  private Long parseId(String value, String field) {
-    if (value == null || value.isBlank()) {
-      throw new BadRequestException("id.invalid", field + " không hợp lệ");
+    private Long parseId(String value, String field) {
+        if (value == null || value.isBlank()) {
+            throw new BadRequestException("id.invalid", field + " không hợp lệ");
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ex) {
+            throw new BadRequestException("id.invalid", field + " không hợp lệ");
+        }
     }
-    try {
-      return Long.parseLong(value);
-    } catch (NumberFormatException ex) {
-      throw new BadRequestException("id.invalid", field + " không hợp lệ");
-    }
-  }
 }

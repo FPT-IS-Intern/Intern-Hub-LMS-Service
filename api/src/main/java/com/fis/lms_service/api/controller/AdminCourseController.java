@@ -18,21 +18,23 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/admin/courses")
-/** API quản trị khóa học: CRUD khóa học và gắn lesson theo danh sách id. */
+@RequestMapping("/lms/admin/courses")
+@Tag(name = "Admin Course", description = "Quản trị khóa học: CRUD và gắn lesson theo danh sách id.")
 public class AdminCourseController {
 
     AdminCourseService adminCourseService;
     CourseApiMapper courseApiMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    /** Tạo khóa học mới (multipart: data + image). */
+    @Operation(summary = "Tạo khóa học", description = "Tạo khóa học mới (multipart: data + image).")
     public ResponseApi<?> createCourse(
             @RequestPart("data") @Valid CourseCreateRequest request,
             @RequestPart(value = "image", required = true) MultipartFile image) {
@@ -64,7 +66,7 @@ public class AdminCourseController {
     }
 
     @GetMapping
-    /** Lấy danh sách khóa học có phân trang. */
+    @Operation(summary = "Danh sách khóa học", description = "Lấy danh sách khóa học có phân trang.")
     public ResponseApi<PaginatedData<CourseSummaryResponse>> getCourses(
             @PageableDefault(size = 10) Pageable pageable) {
         var page = adminCourseService.getCourses(pageable);
@@ -73,7 +75,7 @@ public class AdminCourseController {
     }
 
     @GetMapping("/{courseId}")
-    /** Lấy chi tiết khóa học theo id. */
+    @Operation(summary = "Chi tiết khóa học", description = "Lấy chi tiết khóa học theo id.")
     public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
         Long courseIdValue = parseId(courseId, "courseId");
         var model = adminCourseService.getCourse(courseIdValue);
@@ -91,7 +93,7 @@ public class AdminCourseController {
     }
 
     @PutMapping(value = "/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    /** Cập nhật thông tin khóa học, có thể thay ảnh. */
+    @Operation(summary = "Cập nhật khóa học", description = "Cập nhật thông tin khóa học, có thể thay ảnh.")
     public ResponseApi<?> updateCourse(
             @PathVariable("courseId") String courseId,
             @RequestPart("data") @Valid CourseCreateRequest request,
@@ -102,7 +104,7 @@ public class AdminCourseController {
     }
 
     @DeleteMapping("/{courseId}")
-    /** Xóa khóa học theo id. */
+    @Operation(summary = "Xóa khóa học", description = "Xóa khóa học theo id.")
     public ResponseApi<?> deleteCourse(@PathVariable("courseId") String courseId) {
         adminCourseService.deleteCourse(parseId(courseId, "courseId"));
         return ResponseApi.noContent();

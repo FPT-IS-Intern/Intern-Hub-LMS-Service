@@ -13,6 +13,8 @@ import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,8 +32,10 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/admin/lessons")
-/** API quản trị bài học: CRUD bài học và quản lý file tài liệu/bài tập. */
+@RequestMapping("/lms/admin/lessons")
+@Tag(
+        name = "Admin Lesson",
+        description = "Quản trị bài học: CRUD và quản lý file tài liệu/bài tập.")
 public class AdminLessonController {
 
     // Service
@@ -42,7 +46,9 @@ public class AdminLessonController {
     LessonApiMapper lessonApiMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    /** Tạo bài học mới (multipart: data + image + file đính kèm). */
+    @Operation(
+            summary = "Tạo bài học",
+            description = "Tạo bài học mới (multipart: data + image + file đính kèm).")
     public ResponseApi<?> createLesson(
             @RequestPart("data") @Valid LessonCreateRequest request,
             @RequestPart(value = "image", required = true) MultipartFile image,
@@ -57,7 +63,7 @@ public class AdminLessonController {
     }
 
     @GetMapping
-    /** Lấy danh sách bài học có phân trang. */
+    @Operation(summary = "Danh sách bài học", description = "Lấy danh sách bài học có phân trang.")
     public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
             @PageableDefault(size = 10) Pageable pageable) {
 
@@ -70,7 +76,9 @@ public class AdminLessonController {
     }
 
     @GetMapping("/{lessonId}")
-    /** Lấy chi tiết bài học kèm danh sách file. */
+    @Operation(
+            summary = "Chi tiết bài học",
+            description = "Lấy chi tiết bài học kèm danh sách file.")
     public ResponseApi<LessonDetailResponse> getLessonDetail(
             @PathVariable("lessonId") String lessonId) {
         Long lessonIdValue = parseId(lessonId, "lessonId");
@@ -84,7 +92,9 @@ public class AdminLessonController {
     }
 
     @PutMapping(value = "/{lessonId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    /** Cập nhật bài học, hỗ trợ thêm/xóa file và thay ảnh. */
+    @Operation(
+            summary = "Cập nhật bài học",
+            description = "Cập nhật bài học, hỗ trợ thêm/xóa file và thay ảnh.")
     public ResponseApi<?> updateLesson(
             @PathVariable("lessonId") String lessonId,
             @RequestPart("data") @Valid LessonCreateRequest request,
@@ -107,7 +117,7 @@ public class AdminLessonController {
     }
 
     @DeleteMapping("/{lessonId}")
-    /** Xóa bài học theo id. */
+    @Operation(summary = "Xóa bài học", description = "Xóa bài học theo id.")
     public ResponseApi<?> deleteLesson(@PathVariable("lessonId") String lessonId) {
         adminLessonService.deleteLesson(parseId(lessonId, "lessonId"));
         return ResponseApi.noContent();
