@@ -21,7 +21,7 @@ public class SubmissionAttachmentEntity extends AuditEntity {
   @Column(name = "submission_attachment_id", nullable = false, updatable = false)
   Long submissionAttachmentId;
 
-  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "lesson_submission_id", nullable = false)
   LessonSubmissionEntity lessonSubmissionEntity;
 

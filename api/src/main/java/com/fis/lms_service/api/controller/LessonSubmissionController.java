@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/lesson-enrollments")
+/** API nộp bài cho từng lesson enrollment. */
 public class LessonSubmissionController {
 
   LessonSubmissionService lessonSubmissionService;
@@ -26,6 +27,7 @@ public class LessonSubmissionController {
   @PostMapping(
       value = "/{lessonEnrollmentId}/submit",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  /** Nộp/cập nhật bài nộp: thay toàn bộ file cũ bằng danh sách file mới. */
   public ResponseApi<LessonSubmissionResponse> submitLesson(
       @PathVariable("lessonEnrollmentId") String lessonEnrollmentId,
       @RequestPart("data") @Valid LessonSubmissionRequest request,

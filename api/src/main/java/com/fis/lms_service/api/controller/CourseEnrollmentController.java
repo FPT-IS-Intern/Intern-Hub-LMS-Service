@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/courses")
+/** API user ghi danh khóa học. */
 public class CourseEnrollmentController {
 
   CourseEnrollmentService courseEnrollmentService;
 
   @PostMapping("/{courseId}/enroll")
+  /** Tạo/cập nhật trạng thái ghi danh của user vào khóa học. */
   public ResponseApi<?> enrollCourse(
       @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
     courseEnrollmentService.enrollCourse(

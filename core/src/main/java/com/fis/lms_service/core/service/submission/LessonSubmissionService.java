@@ -31,6 +31,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+/** Nghiệp vụ nộp bài: kiểm tra quyền, thay file, cập nhật tiến độ lesson/course. */
 public class LessonSubmissionService {
 
   public record LessonSubmissionResult(
@@ -62,6 +63,7 @@ public class LessonSubmissionService {
   String allowTypesDocument;
 
   @Transactional
+  /** Nộp hoặc cập nhật bài nộp của một lesson enrollment. */
   public LessonSubmissionResult submitLesson(
       Long lessonEnrollmentId, Long userId, String comment, List<MultipartFile> files) {
     if (!hasItems(files)) {

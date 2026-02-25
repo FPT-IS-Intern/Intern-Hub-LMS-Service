@@ -18,12 +18,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/courses")
+/** API tra cứu danh sách bài học theo khóa học. */
 public class CourseLessonQueryController {
 
   LessonQueryService lessonQueryService;
   LessonApiMapper lessonApiMapper;
 
   @GetMapping("/{courseId}/lessons")
+  /** Trả danh sách lesson của course; có thể đính kèm lessonEnrollmentId theo userId. */
   public ResponseApi<PaginatedData<LessonSummaryResponse>> getCourseLessons(
       @PathVariable("courseId") String courseId,
       @RequestParam(value = "userId", required = false) String userId,

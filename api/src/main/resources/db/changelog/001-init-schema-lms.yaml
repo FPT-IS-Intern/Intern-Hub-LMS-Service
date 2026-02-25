@@ -295,11 +295,6 @@ databaseChangeLog:
               ALTER TABLE "schema_lms"."lessons" ADD CONSTRAINT "lessons_pkey" PRIMARY KEY ("lesson_id");
               
               -- ----------------------------
-              -- Uniques structure for table submission_attachments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."submission_attachments" ADD CONSTRAINT "uk99xstv1kdvq8257fqnhwhppra" UNIQUE ("lesson_submission_id");
-              
-              -- ----------------------------
               -- Primary Key structure for table submission_attachments
               -- ----------------------------
               ALTER TABLE "schema_lms"."submission_attachments" ADD CONSTRAINT "submission_attachments_pkey" PRIMARY KEY ("submission_attachment_id");

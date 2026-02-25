@@ -23,6 +23,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+/** Nghiệp vụ ghi danh khóa học và đồng bộ lesson enrollment cho user. */
 public class CourseEnrollmentService {
 
   CourseRepository courseRepository;
@@ -31,6 +32,7 @@ public class CourseEnrollmentService {
   LessonEnrollmentRepository lessonEnrollmentRepository;
 
   @Transactional
+  /** Ghi danh course cho user, tạo các lesson enrollment còn thiếu. */
   public void enrollCourse(Long courseId, Long userId) {
     courseRepository
         .findById(courseId)

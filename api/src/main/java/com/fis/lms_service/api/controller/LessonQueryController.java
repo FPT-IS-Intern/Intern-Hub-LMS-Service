@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/lessons")
+/** API user tra cứu bài học toàn hệ thống. */
 public class LessonQueryController {
 
   LessonQueryService lessonQueryService;
@@ -30,6 +31,7 @@ public class LessonQueryController {
   LessonApiMapper lessonApiMapper;
 
   @GetMapping
+  /** Lấy danh sách bài học có phân trang, hỗ trợ userId để map lessonEnrollmentId. */
   public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
       @PageableDefault(size = 10) Pageable pageable,
       @RequestParam(value = "userId", required = false) String userId) {
@@ -48,6 +50,7 @@ public class LessonQueryController {
   }
 
   @GetMapping("/{lessonId}")
+  /** Lấy chi tiết bài học theo id, kèm file và lessonEnrollmentId (nếu có userId). */
   public ResponseApi<LessonDetailResponse> getLessonDetail(
       @PathVariable("lessonId") String lessonId,
       @RequestParam(value = "userId", required = false) String userId) {

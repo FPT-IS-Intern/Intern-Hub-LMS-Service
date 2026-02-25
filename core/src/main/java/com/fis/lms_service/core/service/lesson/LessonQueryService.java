@@ -22,6 +22,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+/** Nghiệp vụ tra cứu bài học cho user/admin. */
 public class LessonQueryService {
 
   LessonRepository lessonRepository;
@@ -33,6 +34,7 @@ public class LessonQueryService {
   String bucketUrl;
 
   @Transactional(readOnly = true)
+  /** Lấy toàn bộ bài học có phân trang. */
   public Page<@NonNull LessonModel> getLessons(Pageable pageable) {
     var res = lessonRepository.findAll(pageable);
     res.getContent().forEach(this::applyBucketUrl);
@@ -40,6 +42,7 @@ public class LessonQueryService {
   }
 
   @Transactional(readOnly = true)
+  /** Lấy danh sách bài học của một course theo phân trang. */
   public Page<@NonNull LessonModel> getLessonsByCourse(Long courseId, Pageable pageable) {
     List<Long> lessonIds = courseLessonRepository.findLessonIdsByCourseId(courseId);
     int total = lessonIds.size();
@@ -56,6 +59,7 @@ public class LessonQueryService {
   }
 
   @Transactional(readOnly = true)
+  /** Lấy chi tiết bài học theo id. */
   public LessonModel getLesson(Long lessonId) {
     LessonModel model =
         lessonRepository
@@ -70,6 +74,7 @@ public class LessonQueryService {
   }
 
   @Transactional(readOnly = true)
+  /** Tìm lessonEnrollmentId theo lessonId + userId (trả null nếu không có). */
   public Long getLessonEnrollmentId(Long lessonId, Long userId) {
     if (userId == null) {
       return null;
