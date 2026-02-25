@@ -37,9 +37,9 @@ management:
 
 springdoc:
   api-docs:
-    enabled: false
+    enabled: true
   swagger-ui:
-    enabled: false
+    enabled: true
 
 security:
   public-paths: ${SECURITY_PUBLIC_PATHS:/actuator/health,/actuator/info}
