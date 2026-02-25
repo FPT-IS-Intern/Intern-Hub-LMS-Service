@@ -5,53 +5,54 @@ import com.fis.lms_service.core.repository.submission.LessonSubmissionRepository
 import com.fis.lms_service.infra.persistence.entity.submission.LessonSubmissionEntity;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonEnrollmentEntityRepository;
 import com.fis.lms_service.infra.persistence.repository.jpa.LessonSubmissionEntityRepository;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LessonSubmissionRepositoryImpl implements LessonSubmissionRepository {
 
-  LessonSubmissionEntityRepository lessonSubmissionEntityRepository;
-  LessonEnrollmentEntityRepository lessonEnrollmentEntityRepository;
+    LessonSubmissionEntityRepository lessonSubmissionEntityRepository;
+    LessonEnrollmentEntityRepository lessonEnrollmentEntityRepository;
 
-  @Override
-  public Optional<LessonSubmissionModel> findByLessonEnrollmentId(Long lessonEnrollmentId) {
-    return lessonSubmissionEntityRepository
-        .findByLessonEnrollmentEntity_LessonEnrollmentId(lessonEnrollmentId)
-        .map(this::toModel);
-  }
-
-  @Override
-  public LessonSubmissionModel save(LessonSubmissionModel model) {
-    LessonSubmissionEntity entity;
-    if (model.getLessonSubmissionId() == null) {
-      entity = new LessonSubmissionEntity();
-    } else {
-      entity =
-          lessonSubmissionEntityRepository
-              .findById(model.getLessonSubmissionId())
-              .orElse(new LessonSubmissionEntity());
+    @Override
+    public Optional<LessonSubmissionModel> findByLessonEnrollmentId(Long lessonEnrollmentId) {
+        return lessonSubmissionEntityRepository
+                .findByLessonEnrollmentEntity_LessonEnrollmentId(lessonEnrollmentId)
+                .map(this::toModel);
     }
 
-    entity.setLessonEnrollmentEntity(
-        lessonEnrollmentEntityRepository.getReferenceById(model.getLessonEnrollmentId()));
-    entity.setSubmissionStatus(model.getSubmissionStatus());
-    entity.setLastSubmissionAt(model.getLastSubmissionAt());
+    @Override
+    public LessonSubmissionModel save(LessonSubmissionModel model) {
+        LessonSubmissionEntity entity;
+        if (model.getLessonSubmissionId() == null) {
+            entity = new LessonSubmissionEntity();
+        } else {
+            entity =
+                    lessonSubmissionEntityRepository
+                            .findById(model.getLessonSubmissionId())
+                            .orElse(new LessonSubmissionEntity());
+        }
 
-    return toModel(lessonSubmissionEntityRepository.save(entity));
-  }
+        entity.setLessonEnrollmentEntity(
+                lessonEnrollmentEntityRepository.getReferenceById(model.getLessonEnrollmentId()));
+        entity.setSubmissionStatus(model.getSubmissionStatus());
+        entity.setLastSubmissionAt(model.getLastSubmissionAt());
 
-  private LessonSubmissionModel toModel(LessonSubmissionEntity entity) {
-    return LessonSubmissionModel.builder()
-        .lessonSubmissionId(entity.getLessonSubmissionId())
-        .lessonEnrollmentId(entity.getLessonEnrollmentEntity().getLessonEnrollmentId())
-        .submissionStatus(entity.getSubmissionStatus())
-        .lastSubmissionAt(entity.getLastSubmissionAt())
-        .build();
-  }
+        return toModel(lessonSubmissionEntityRepository.save(entity));
+    }
+
+    private LessonSubmissionModel toModel(LessonSubmissionEntity entity) {
+        return LessonSubmissionModel.builder()
+                .lessonSubmissionId(entity.getLessonSubmissionId())
+                .lessonEnrollmentId(entity.getLessonEnrollmentEntity().getLessonEnrollmentId())
+                .submissionStatus(entity.getSubmissionStatus())
+                .lastSubmissionAt(entity.getLastSubmissionAt())
+                .build();
+    }
 }

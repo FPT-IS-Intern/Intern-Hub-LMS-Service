@@ -1,7 +1,4 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.testing.Test
 
 plugins {
     alias(libs.plugins.springBoot) apply false
