@@ -9,6 +9,7 @@ dependencies {
 
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.spring.boot.starter.webmvc)
+    implementation(libs.spring.boot.starter.feign)
     implementation(libs.aws.s3)
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)

@@ -2,6 +2,7 @@
 # Spring ecosystem
 springBoot = "4.0.2"
 springCloud = "2025.1.0"
+feignVersion = "5.0.1"
 
 # Build and quality tools
 spotless = "8.1.0"
@@ -32,6 +33,7 @@ spring-boot-starter-webmvc-test = { group = "org.springframework.boot", name = "
 spring-security-test = { group = "org.springframework.security", name = "spring-security-test" }
 spring-boot-starter-log4j2 = { group = "org.springframework.boot", name = "spring-boot-starter-log4j2", version.ref = "springBoot" }
 spring-boot-starter-liquibase = { group = "org.springframework.boot", name = "spring-boot-starter-liquibase", version.ref = "springBoot" }
+spring-boot-starter-feign = { group = "org.springframework.cloud", name = "spring-cloud-starter-openfeign", version.ref = "feignVersion" }
 
 # API and cloud
 openapi-doc = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springDoc" }
