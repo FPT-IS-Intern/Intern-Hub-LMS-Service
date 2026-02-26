@@ -46,6 +46,7 @@ springdoc:
 security:
   public-paths: ${SECURITY_PUBLIC_PATHS:/actuator/health,/actuator/info}
   internal-secret: ${INTERNAL_SECRET_KEY:your-secure-secret-key}
+  internal-path-prefix: /lms/internal/
 
 feign:
   client:

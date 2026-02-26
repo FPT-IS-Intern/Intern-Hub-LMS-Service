@@ -6,6 +6,7 @@ import com.fis.lms_service.api.dto.response.submission.SubmissionAttachmentRespo
 import com.fis.lms_service.core.service.submission.LessonSubmissionService;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
+import com.intern.hub.starter.security.annotation.Authenticated;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +31,7 @@ public class LessonSubmissionController {
     @PostMapping(
             value = "/{lessonEnrollmentId}/submit",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Authenticated
     @Operation(
             summary = "Nộp bài",
             description = "Nộp/cập nhật bài nộp: thay toàn bộ file cũ bằng danh sách file mới.")

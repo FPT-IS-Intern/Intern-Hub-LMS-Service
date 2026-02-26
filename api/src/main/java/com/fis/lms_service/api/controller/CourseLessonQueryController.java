@@ -7,6 +7,7 @@ import com.fis.lms_service.core.service.lesson.LessonQueryService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
+import com.intern.hub.starter.security.annotation.Authenticated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -29,6 +30,7 @@ public class CourseLessonQueryController {
     LessonApiMapper lessonApiMapper;
 
     @GetMapping("/{courseId}/lessons")
+    @Authenticated
     @Operation(
             summary = "Danh sách lesson theo khóa học",
             description = "Trả danh sách lesson của course; có thể kèm lessonEnrollmentId theo userId.")

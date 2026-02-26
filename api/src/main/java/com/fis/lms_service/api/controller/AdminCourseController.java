@@ -9,6 +9,7 @@ import com.fis.lms_service.core.service.course.AdminCourseService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
+import com.intern.hub.starter.security.annotation.Authenticated;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class AdminCourseController {
     CourseApiMapper courseApiMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Authenticated
     @Operation(summary = "Tạo khóa học", description = "Tạo khóa học mới (multipart: data + image).")
     public ResponseApi<?> createCourse(
             @RequestPart("data") @Valid CourseCreateRequest request,
@@ -66,6 +68,7 @@ public class AdminCourseController {
     }
 
     @GetMapping
+    @Authenticated
     @Operation(summary = "Danh sách khóa học", description = "Lấy danh sách khóa học có phân trang.")
     public ResponseApi<PaginatedData<CourseSummaryResponse>> getCourses(
             @PageableDefault(size = 10) Pageable pageable) {
@@ -75,6 +78,7 @@ public class AdminCourseController {
     }
 
     @GetMapping("/{courseId}")
+    @Authenticated
     @Operation(summary = "Chi tiết khóa học", description = "Lấy chi tiết khóa học theo id.")
     public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
         Long courseIdValue = parseId(courseId, "courseId");
@@ -93,6 +97,7 @@ public class AdminCourseController {
     }
 
     @PutMapping(value = "/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Authenticated
     @Operation(summary = "Cập nhật khóa học", description = "Cập nhật thông tin khóa học, có thể thay ảnh.")
     public ResponseApi<?> updateCourse(
             @PathVariable("courseId") String courseId,
@@ -104,6 +109,7 @@ public class AdminCourseController {
     }
 
     @DeleteMapping("/{courseId}")
+    @Authenticated
     @Operation(summary = "Xóa khóa học", description = "Xóa khóa học theo id.")
     public ResponseApi<?> deleteCourse(@PathVariable("courseId") String courseId) {
         adminCourseService.deleteCourse(parseId(courseId, "courseId"));

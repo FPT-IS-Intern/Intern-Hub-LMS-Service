@@ -15,6 +15,7 @@ postgresql = "42.7.9"
 springDoc = "3.0.1"
 awsSdk = "2.41.15"
 commonLibrary = "2.0.3"
+securityStarter = "1.0.6"
 lombok = "1.18.38"
 mapstruct = "1.6.3"
 
@@ -39,6 +40,7 @@ spring-boot-starter-feign = { group = "org.springframework.cloud", name = "sprin
 openapi-doc = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springDoc" }
 aws-s3 = { group = "software.amazon.awssdk", name = "s3", version.ref = "awsSdk" }
 common-library = { group = "com.github.FPT-IS-Intern", name = "Intern-Hub-Common-Library", version.ref = "commonLibrary" }
+security-starter = { group = "com.github.FPT-IS-Intern", name = "Intern-Hub-Security-Starter", version.ref = "securityStarter" }
 
 # Database
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }

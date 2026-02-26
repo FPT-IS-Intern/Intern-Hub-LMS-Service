@@ -12,6 +12,7 @@ import com.fis.lms_service.core.service.lesson.LessonFileService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
+import com.intern.hub.starter.security.annotation.Authenticated;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +47,7 @@ public class AdminLessonController {
     LessonApiMapper lessonApiMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Authenticated
     @Operation(
             summary = "Tạo bài học",
             description = "Tạo bài học mới (multipart: data + image + file đính kèm).")
@@ -63,6 +65,7 @@ public class AdminLessonController {
     }
 
     @GetMapping
+    @Authenticated
     @Operation(summary = "Danh sách bài học", description = "Lấy danh sách bài học có phân trang.")
     public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
             @PageableDefault(size = 10) Pageable pageable) {
@@ -76,6 +79,7 @@ public class AdminLessonController {
     }
 
     @GetMapping("/{lessonId}")
+    @Authenticated
     @Operation(
             summary = "Chi tiết bài học",
             description = "Lấy chi tiết bài học kèm danh sách file.")
@@ -92,6 +96,7 @@ public class AdminLessonController {
     }
 
     @PutMapping(value = "/{lessonId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Authenticated
     @Operation(
             summary = "Cập nhật bài học",
             description = "Cập nhật bài học, hỗ trợ thêm/xóa file và thay ảnh.")
@@ -117,6 +122,7 @@ public class AdminLessonController {
     }
 
     @DeleteMapping("/{lessonId}")
+    @Authenticated
     @Operation(summary = "Xóa bài học", description = "Xóa bài học theo id.")
     public ResponseApi<?> deleteLesson(@PathVariable("lessonId") String lessonId) {
         adminLessonService.deleteLesson(parseId(lessonId, "lessonId"));

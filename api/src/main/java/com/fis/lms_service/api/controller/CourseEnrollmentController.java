@@ -4,6 +4,7 @@ import com.fis.lms_service.api.dto.request.CourseEnrollRequest;
 import com.fis.lms_service.core.service.course.CourseEnrollmentService;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
+import com.intern.hub.starter.security.annotation.Authenticated;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class CourseEnrollmentController {
     CourseEnrollmentService courseEnrollmentService;
 
     @PostMapping("/{courseId}/enroll")
+    @Authenticated
     @Operation(
             summary = "Ghi danh khóa học",
             description = "Tạo/cập nhật trạng thái ghi danh của user vào khóa học.")

@@ -6,6 +6,7 @@ plugins {
 
 dependencies {
     implementation(libs.common.library)
+    implementation(libs.security.starter)
     implementation(project(":core"))
     implementation(project(":infra"))
 
