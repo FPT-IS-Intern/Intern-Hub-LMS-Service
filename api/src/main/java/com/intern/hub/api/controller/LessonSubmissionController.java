@@ -1,9 +1,9 @@
-package com.fis.lms_service.api.controller;
+package com.intern.hub.api.controller;
 
-import com.fis.lms_service.api.dto.request.LessonSubmissionRequest;
-import com.fis.lms_service.api.dto.response.submission.LessonSubmissionResponse;
-import com.fis.lms_service.api.dto.response.submission.SubmissionAttachmentResponse;
-import com.fis.lms_service.core.service.submission.LessonSubmissionService;
+import com.intern.hub.api.dto.request.LessonSubmissionRequest;
+import com.intern.hub.api.dto.response.submission.LessonSubmissionResponse;
+import com.intern.hub.api.dto.response.submission.SubmissionAttachmentResponse;
+import com.intern.hub.core.service.submission.LessonSubmissionService;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;

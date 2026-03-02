@@ -1,11 +1,11 @@
-package com.fis.lms_service.api.mapper;
+package com.intern.hub.api.mapper;
 
-import com.fis.lms_service.api.dto.request.LessonCreateRequest;
-import com.fis.lms_service.api.dto.response.lesson.LessonDetailResponse;
-import com.fis.lms_service.api.dto.response.lesson.LessonFileInfoResponse;
-import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
-import com.fis.lms_service.core.domain.model.lesson.LessonFileModel;
-import com.fis.lms_service.core.domain.model.lesson.LessonModel;
+import com.intern.hub.api.dto.request.LessonCreateRequest;
+import com.intern.hub.api.dto.response.lesson.LessonDetailResponse;
+import com.intern.hub.api.dto.response.lesson.LessonFileInfoResponse;
+import com.intern.hub.api.dto.response.lesson.LessonSummaryResponse;
+import com.intern.hub.core.domain.model.lesson.LessonFileModel;
+import com.intern.hub.core.domain.model.lesson.LessonModel;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,6 +1,6 @@
-package com.fis.lms_service.core.repository.submission;
+package com.intern.hub.core.repository.submission;
 
-import com.fis.lms_service.core.domain.model.submission.SubmissionAttachmentModel;
+import com.intern.hub.core.domain.model.submission.SubmissionAttachmentModel;
 import java.util.List;
 
 public interface SubmissionAttachmentRepository {

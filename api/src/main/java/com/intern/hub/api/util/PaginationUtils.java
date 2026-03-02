@@ -1,4 +1,4 @@
-package com.fis.lms_service.api.util;
+package com.intern.hub.api.util;
 
 import com.intern.hub.library.common.dto.PaginatedData;
 import java.util.function.Function;

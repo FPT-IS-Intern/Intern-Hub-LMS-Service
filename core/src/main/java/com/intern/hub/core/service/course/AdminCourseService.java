@@ -1,10 +1,10 @@
-package com.fis.lms_service.core.service.course;
+package com.intern.hub.core.service.course;
 
-import com.fis.lms_service.core.domain.model.course.CourseModel;
-import com.fis.lms_service.core.repository.FileStorageRepository;
-import com.fis.lms_service.core.repository.course.CourseLessonRepository;
-import com.fis.lms_service.core.repository.course.CourseRepository;
-import com.fis.lms_service.core.service.storage.StorageObjectLifecycleManager;
+import com.intern.hub.core.domain.model.course.CourseModel;
+import com.intern.hub.core.repository.FileStorageRepository;
+import com.intern.hub.core.repository.course.CourseLessonRepository;
+import com.intern.hub.core.repository.course.CourseRepository;
+import com.intern.hub.core.service.storage.StorageObjectLifecycleManager;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import java.util.ArrayList;

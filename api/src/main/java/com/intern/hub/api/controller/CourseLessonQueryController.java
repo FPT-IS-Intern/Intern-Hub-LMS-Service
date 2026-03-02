@@ -1,9 +1,9 @@
-package com.fis.lms_service.api.controller;
+package com.intern.hub.api.controller;
 
-import com.fis.lms_service.api.dto.response.lesson.LessonSummaryResponse;
-import com.fis.lms_service.api.mapper.LessonApiMapper;
-import com.fis.lms_service.api.util.PaginationUtils;
-import com.fis.lms_service.core.service.lesson.LessonQueryService;
+import com.intern.hub.api.dto.response.lesson.LessonSummaryResponse;
+import com.intern.hub.api.mapper.LessonApiMapper;
+import com.intern.hub.api.util.PaginationUtils;
+import com.intern.hub.core.service.lesson.LessonQueryService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;

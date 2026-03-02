@@ -1,6 +1,6 @@
-package com.fis.lms_service.core.repository.lesson;
+package com.intern.hub.core.repository.lesson;
 
-import com.fis.lms_service.core.domain.model.lesson.LessonModel;
+import com.intern.hub.core.domain.model.lesson.LessonModel;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;

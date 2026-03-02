@@ -1,4 +1,4 @@
-package com.fis.lms_service.api.dto.request;
+package com.intern.hub.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

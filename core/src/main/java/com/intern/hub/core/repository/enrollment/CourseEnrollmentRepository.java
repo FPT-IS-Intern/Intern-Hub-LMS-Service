@@ -1,6 +1,6 @@
-package com.fis.lms_service.core.repository.enrollment;
+package com.intern.hub.core.repository.enrollment;
 
-import com.fis.lms_service.core.domain.model.enrollment.CourseEnrollmentModel;
+import com.intern.hub.core.domain.model.enrollment.CourseEnrollmentModel;
 import java.util.Optional;
 
 public interface CourseEnrollmentRepository {

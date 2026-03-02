@@ -1,9 +1,9 @@
-package com.fis.lms_service.core.service.lesson;
+package com.intern.hub.core.service.lesson;
 
-import com.fis.lms_service.core.domain.model.lesson.LessonModel;
-import com.fis.lms_service.core.repository.course.CourseLessonRepository;
-import com.fis.lms_service.core.repository.enrollment.LessonEnrollmentRepository;
-import com.fis.lms_service.core.repository.lesson.LessonRepository;
+import com.intern.hub.core.domain.model.lesson.LessonModel;
+import com.intern.hub.core.repository.course.CourseLessonRepository;
+import com.intern.hub.core.repository.enrollment.LessonEnrollmentRepository;
+import com.intern.hub.core.repository.lesson.LessonRepository;
 import com.intern.hub.library.common.exception.NotFoundException;
 import java.util.List;
 import lombok.AccessLevel;

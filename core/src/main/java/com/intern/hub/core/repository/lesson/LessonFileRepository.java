@@ -1,7 +1,7 @@
-package com.fis.lms_service.core.repository.lesson;
+package com.intern.hub.core.repository.lesson;
 
-import com.fis.lms_service.core.domain.model.lesson.LessonFileModel;
-import com.fis.lms_service.core.domain.model.lesson.constant.LessonFileType;
+import com.intern.hub.core.domain.model.lesson.LessonFileModel;
+import com.intern.hub.core.domain.model.lesson.constant.LessonFileType;
 import java.util.List;
 import java.util.Optional;
 

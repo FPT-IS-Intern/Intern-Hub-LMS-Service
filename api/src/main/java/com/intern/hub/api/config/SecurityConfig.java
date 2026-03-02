@@ -1,4 +1,4 @@
-package com.fis.lms_service.api.config;
+package com.intern.hub.api.config;
 
 import java.util.Arrays;
 import java.util.List;

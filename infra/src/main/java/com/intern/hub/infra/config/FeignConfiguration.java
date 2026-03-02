@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableFeignClients(basePackages = "com.fis.lms_service.infra.feign")
+@EnableFeignClients(basePackages = "com.intern.hub.infra.feign")
 public class FeignConfiguration {
 
     @Value("${security.internal-secret}")

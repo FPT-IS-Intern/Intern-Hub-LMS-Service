@@ -1,10 +1,10 @@
-package com.fis.lms_service.core.service.lesson;
+package com.intern.hub.core.service.lesson;
 
-import com.fis.lms_service.core.domain.model.lesson.LessonFileModel;
-import com.fis.lms_service.core.domain.model.lesson.constant.LessonFileType;
-import com.fis.lms_service.core.repository.FileStorageRepository;
-import com.fis.lms_service.core.repository.lesson.LessonFileRepository;
-import com.fis.lms_service.core.service.storage.StorageObjectLifecycleManager;
+import com.intern.hub.core.domain.model.lesson.LessonFileModel;
+import com.intern.hub.core.domain.model.lesson.constant.LessonFileType;
+import com.intern.hub.core.repository.FileStorageRepository;
+import com.intern.hub.core.repository.lesson.LessonFileRepository;
+import com.intern.hub.core.service.storage.StorageObjectLifecycleManager;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import java.util.List;

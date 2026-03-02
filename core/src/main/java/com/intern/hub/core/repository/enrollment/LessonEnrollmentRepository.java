@@ -1,7 +1,7 @@
-package com.fis.lms_service.core.repository.enrollment;
+package com.intern.hub.core.repository.enrollment;
 
-import com.fis.lms_service.core.domain.model.enrollment.LessonEnrollmentModel;
-import com.fis.lms_service.core.domain.model.enrollment.constant.LessonProgress;
+import com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel;
+import com.intern.hub.core.domain.model.enrollment.constant.LessonProgress;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,6 +1,6 @@
-package com.fis.lms_service.api.config;
+package com.intern.hub.api.config;
 
-import com.fis.lms_service.api.util.UserContext;
+import com.intern.hub.api.util.UserContext;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;

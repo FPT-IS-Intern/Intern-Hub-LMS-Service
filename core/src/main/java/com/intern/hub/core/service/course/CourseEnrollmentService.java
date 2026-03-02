@@ -1,13 +1,13 @@
-package com.fis.lms_service.core.service.course;
+package com.intern.hub.core.service.course;
 
-import com.fis.lms_service.core.domain.model.enrollment.CourseEnrollmentModel;
-import com.fis.lms_service.core.domain.model.enrollment.LessonEnrollmentModel;
-import com.fis.lms_service.core.domain.model.enrollment.constant.CourseProgress;
-import com.fis.lms_service.core.domain.model.enrollment.constant.LessonProgress;
-import com.fis.lms_service.core.repository.course.CourseLessonRepository;
-import com.fis.lms_service.core.repository.course.CourseRepository;
-import com.fis.lms_service.core.repository.enrollment.CourseEnrollmentRepository;
-import com.fis.lms_service.core.repository.enrollment.LessonEnrollmentRepository;
+import com.intern.hub.core.domain.model.enrollment.CourseEnrollmentModel;
+import com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel;
+import com.intern.hub.core.domain.model.enrollment.constant.CourseProgress;
+import com.intern.hub.core.domain.model.enrollment.constant.LessonProgress;
+import com.intern.hub.core.repository.course.CourseLessonRepository;
+import com.intern.hub.core.repository.course.CourseRepository;
+import com.intern.hub.core.repository.enrollment.CourseEnrollmentRepository;
+import com.intern.hub.core.repository.enrollment.LessonEnrollmentRepository;
 import com.intern.hub.library.common.exception.NotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
