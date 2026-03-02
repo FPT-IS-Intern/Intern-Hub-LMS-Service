@@ -1,3 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven(url = "https://repo.spring.io/release")
+    }
+}
+
 rootProject.name = "intern-hub-lms-service"
 
 include("api")

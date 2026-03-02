@@ -9,8 +9,8 @@ plugins {
 }
 
 allprojects {
-    group = "com.fis.lms_service"
-    version = "0.1.0-SNAPSHOT"
+    group = "com.intern.hub"
+    version = "1.0.0"
 
     repositories {
         mavenCentral()
