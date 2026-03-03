@@ -37,10 +37,6 @@ public class AdminLessonService {
   LessonFileService lessonFileService;
 
   @NonFinal
-  @Value("${aws.s3.bucket-url}")
-  String bucketUrl;
-
-  @NonFinal
   @Value("${aws.s3.paths.lesson}")
   String lessonPath;
 
@@ -86,23 +82,17 @@ public class AdminLessonService {
   /** Lấy danh sách bài học có phân trang cho màn admin. */
   @Transactional(readOnly = true)
   public Page<@NonNull LessonModel> getLessons(Pageable pageable) {
-    var res = lessonRepository.findAll(pageable);
-    res.getContent().forEach(this::applyBucketUrl);
-    return res;
+    return lessonRepository.findAll(pageable);
   }
 
   /** Lấy chi tiết một bài học theo id. */
   @Transactional(readOnly = true)
   public LessonModel getLesson(Long lessonId) {
-    LessonModel model =
-        lessonRepository
-            .findById(lessonId)
-            .orElseThrow(
-                () ->
-                    new NotFoundException(
-                        "lesson.not.found", "Không tìm thấy bài học id: " + lessonId));
-    applyBucketUrl(model);
-    return model;
+    return lessonRepository
+        .findById(lessonId)
+        .orElseThrow(
+            () ->
+                new NotFoundException("lesson.not.found", "Không tìm thấy bài học id: " + lessonId));
   }
 
   /**
@@ -194,11 +184,5 @@ public class AdminLessonService {
 
   private String buildLessonImagePath(Long lessonId) {
     return lessonPath + lessonId + "/avatar";
-  }
-
-  private void applyBucketUrl(LessonModel model) {
-    if (hasText(model.getLessonImageUrl())) {
-      model.setLessonImageUrl(bucketUrl + model.getLessonImageUrl());
-    }
   }
 }

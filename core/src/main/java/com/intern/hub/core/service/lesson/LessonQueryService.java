@@ -9,9 +9,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import org.jspecify.annotations.NonNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,16 +26,10 @@ public class LessonQueryService {
   CourseLessonRepository courseLessonRepository;
   LessonEnrollmentRepository lessonEnrollmentRepository;
 
-  @NonFinal
-  @Value("${aws.s3.bucket-url}")
-  String bucketUrl;
-
   @Transactional(readOnly = true)
   /** Lấy toàn bộ bài học có phân trang. */
   public Page<@NonNull LessonModel> getLessons(Pageable pageable) {
-    var res = lessonRepository.findAll(pageable);
-    res.getContent().forEach(this::applyBucketUrl);
-    return res;
+    return lessonRepository.findAll(pageable);
   }
 
   @Transactional(readOnly = true)
@@ -53,23 +45,17 @@ public class LessonQueryService {
     List<Long> pageIds = lessonIds.subList(offset, end);
 
     List<LessonModel> lessons = lessonRepository.findAllByIds(pageIds);
-    lessons.forEach(this::applyBucketUrl);
     return new PageImpl<>(lessons, pageable, total);
   }
 
   @Transactional(readOnly = true)
   /** Lấy chi tiết bài học theo id. */
   public LessonModel getLesson(Long lessonId) {
-    LessonModel model =
-        lessonRepository
-            .findById(lessonId)
-            .orElseThrow(
-                () ->
-                    new NotFoundException(
-                        "lesson.not.found", "Không tìm thấy bài học id: " + lessonId));
-
-    applyBucketUrl(model);
-    return model;
+    return lessonRepository
+        .findById(lessonId)
+        .orElseThrow(
+            () ->
+                new NotFoundException("lesson.not.found", "Không tìm thấy bài học id: " + lessonId));
   }
 
   @Transactional(readOnly = true)
@@ -83,13 +69,4 @@ public class LessonQueryService {
         .orElse(null);
   }
 
-  private void applyBucketUrl(LessonModel model) {
-    if (hasText(model.getLessonImageUrl())) {
-      model.setLessonImageUrl(bucketUrl + model.getLessonImageUrl());
-    }
-  }
-
-  private static boolean hasText(String value) {
-    return value != null && !value.isEmpty();
-  }
 }

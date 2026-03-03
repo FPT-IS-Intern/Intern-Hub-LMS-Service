@@ -37,10 +37,6 @@ public class AdminCourseService {
   StorageObjectLifecycleManager storageObjectLifecycleManager;
 
   @NonFinal
-  @Value("${aws.s3.bucket-url}")
-  String bucketUrl;
-
-  @NonFinal
   @Value("${aws.s3.paths.course}")
   String coursePath;
 
@@ -81,23 +77,17 @@ public class AdminCourseService {
   /** Lấy danh sách khóa học có phân trang cho màn admin. */
   @Transactional(readOnly = true)
   public Page<@NonNull CourseModel> getCourses(Pageable pageable) {
-    Page<@NonNull CourseModel> page = courseRepository.findAll(pageable);
-    page.getContent().forEach(this::applyBucketUrl);
-    return page;
+    return courseRepository.findAll(pageable);
   }
 
   /** Lấy chi tiết một khóa học theo id. */
   @Transactional(readOnly = true)
   public CourseModel getCourse(Long courseId) {
-    CourseModel model =
-        courseRepository
-            .findById(courseId)
-            .orElseThrow(
-                () ->
-                    new NotFoundException(
-                        "course.not.found", "Không tìm thấy khóa học id: " + courseId));
-    applyBucketUrl(model);
-    return model;
+    return courseRepository
+        .findById(courseId)
+        .orElseThrow(
+            () ->
+                new NotFoundException("course.not.found", "Không tìm thấy khóa học id: " + courseId));
   }
 
   /** Lấy danh sách lesson id đang gắn với khóa học. */
@@ -177,11 +167,5 @@ public class AdminCourseService {
 
   private String buildCourseImagePath(Long courseId) {
     return coursePath + courseId + "/avatar";
-  }
-
-  private void applyBucketUrl(CourseModel model) {
-    if (hasText(model.getCourseImageUrl())) {
-      model.setCourseImageUrl(bucketUrl + model.getCourseImageUrl());
-    }
   }
 }

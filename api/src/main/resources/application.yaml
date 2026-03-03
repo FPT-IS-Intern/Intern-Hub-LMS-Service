@@ -58,17 +58,16 @@ feign:
       hrm:
         url: ${HRM_INTERNAL_URL:http://localhost:8080}
 
+services:
+  dms:
+    url: ${DMS_SERVICE_URL:http://localhost:8084}
+    system-actor-id: ${DMS_SYSTEM_ACTOR_ID:0}
+
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
 
 aws:
   s3:
-    access-key: ${S3_ACCESS_KEY}
-    secret-key: ${S3_SECRET_KEY}
-    region: ${S3_REGION}
-    end-point: ${S3_ENDPOINT}
-    bucket-name: ${S3_BUCKET_NAME}
-    bucket-url: ${S3_BUCKET_URL}
     paths:
       lesson: lessons/
       course: courses/
