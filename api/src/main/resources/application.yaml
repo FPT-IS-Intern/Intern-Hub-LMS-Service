@@ -55,7 +55,7 @@ feign:
   client:
     config:
       hrm:
-        url: ${HRM_INTERNAL_URL}
+        url: ${HRM_SERVICE_URL}
 
 services:
   dms:

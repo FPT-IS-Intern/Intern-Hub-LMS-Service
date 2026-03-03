@@ -39,6 +39,7 @@ public class DmsStorageService implements FileStorageRepository {
             MultipartFile file, String keyPrefix,
             Long maxSizeBytes, String contentTypeRegex
     ) {
+
         if (file.getSize() > maxSizeBytes) {
             throw new BadRequestException(
                     "file.size.exceeded",
