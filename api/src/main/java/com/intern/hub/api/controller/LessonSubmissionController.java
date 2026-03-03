@@ -3,6 +3,7 @@ package com.intern.hub.api.controller;
 import com.intern.hub.api.dto.request.LessonSubmissionRequest;
 import com.intern.hub.api.dto.response.submission.LessonSubmissionResponse;
 import com.intern.hub.api.dto.response.submission.SubmissionAttachmentResponse;
+import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.service.submission.LessonSubmissionService;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
@@ -42,6 +43,7 @@ public class LessonSubmissionController {
         lessonSubmissionService.submitLesson(
             parseId(lessonEnrollmentId, "lessonEnrollmentId"),
             parseId(request.userId(), "userId"),
+            UserContext.requiredUserId(),
             request.comment(),
             files);
 

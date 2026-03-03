@@ -31,12 +31,12 @@ public class DmsStorageService implements FileStorageRepository {
     @Value("${services.dms.system-actor-id:0}")
     Long systemActorId;
 
-    public String uploadFile(MultipartFile file, String keyPrefix) {
-        return uploadFile(file, keyPrefix, 20 * 1024 * 1024L, ".*");
+    public String uploadFile(MultipartFile file, String keyPrefix, Long actorId) {
+        return uploadFile(file, keyPrefix, actorId, 20 * 1024 * 1024L, ".*");
     }
 
     public String uploadFile(
-            MultipartFile file, String keyPrefix,
+            MultipartFile file, String keyPrefix, Long actorId,
             Long maxSizeBytes, String contentTypeRegex
     ) {
 
@@ -53,8 +53,9 @@ public class DmsStorageService implements FileStorageRepository {
         }
 
         try {
+            Long requestActorId = actorId != null ? actorId : systemActorId;
             ResponseApi<DmsDocumentClientModel> response =
-                    dmsInternalFeignClient.uploadFile(file, keyPrefix, systemActorId, false);
+                    dmsInternalFeignClient.uploadFile(file, keyPrefix, requestActorId, false);
 
             if (response == null || response.data() == null || !hasText(response.data().objectKey())) {
                 throw new InternalErrorException(
@@ -69,9 +70,9 @@ public class DmsStorageService implements FileStorageRepository {
         }
     }
 
-    public void deleteFile(String key) {
+    public void deleteFile(String key, Long actorId) {
         try {
-            dmsInternalFeignClient.deleteFile(key, systemActorId);
+            dmsInternalFeignClient.deleteFile(key, actorId != null ? actorId : systemActorId);
         } catch (FeignException.NotFound ex) {
             log.warn("DMS document not found when deleting key {}", key);
         } catch (Exception e) {

@@ -20,7 +20,7 @@ public class StorageObjectLifecycleManager {
 
     FileStorageRepository fileStorageRepository;
 
-    public void cleanupOnRollback(String key) {
+    public void cleanupOnRollback(String key, Long actorId) {
         if (!hasText(key)) {
             return;
         }
@@ -34,19 +34,19 @@ public class StorageObjectLifecycleManager {
                     @Override
                     public void afterCompletion(int status) {
                         if (status == STATUS_ROLLED_BACK) {
-                            safeDelete(key);
+                            safeDelete(key, actorId);
                         }
                     }
                 });
     }
 
-    public void deleteAfterCommit(String key) {
+    public void deleteAfterCommit(String key, Long actorId) {
         if (!hasText(key)) {
             return;
         }
 
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            safeDelete(key);
+            safeDelete(key, actorId);
             return;
         }
 
@@ -54,14 +54,14 @@ public class StorageObjectLifecycleManager {
                 new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        safeDelete(key);
+                        safeDelete(key, actorId);
                     }
                 });
     }
 
-    private void safeDelete(String key) {
+    private void safeDelete(String key, Long actorId) {
         try {
-            fileStorageRepository.deleteFile(key);
+            fileStorageRepository.deleteFile(key, actorId);
         } catch (Exception ex) {
             log.error("Failed to delete storage object key {}", key, ex);
         }

@@ -57,25 +57,26 @@ public class AdminLessonService {
       LessonModel model,
       MultipartFile image,
       List<MultipartFile> lessonFiles,
-      List<MultipartFile> assignmentFiles) {
+      List<MultipartFile> assignmentFiles,
+      Long actorId) {
     LessonModel saved = lessonRepository.save(model);
     Long lessonId = saved.getLessonId();
 
     if (image != null && !image.isEmpty()) {
       String imageUrl =
           fileStorageRepository.uploadFile(
-              image, buildLessonImagePath(lessonId), maxFileSize, allowTypesImage);
-      storageObjectLifecycleManager.cleanupOnRollback(imageUrl);
+              image, buildLessonImagePath(lessonId), actorId, maxFileSize, allowTypesImage);
+      storageObjectLifecycleManager.cleanupOnRollback(imageUrl, actorId);
       saved.setLessonImageUrl(imageUrl);
       lessonRepository.save(saved);
     }
 
     if (hasItems(lessonFiles)) {
-      lessonFileService.uploadFiles(lessonId, lessonFiles, LessonFileType.MATERIAL);
+      lessonFileService.uploadFiles(lessonId, lessonFiles, LessonFileType.MATERIAL, actorId);
     }
 
     if (hasItems(assignmentFiles)) {
-      lessonFileService.uploadFiles(lessonId, assignmentFiles, LessonFileType.ASSIGNMENT);
+      lessonFileService.uploadFiles(lessonId, assignmentFiles, LessonFileType.ASSIGNMENT, actorId);
     }
   }
 
@@ -106,7 +107,8 @@ public class AdminLessonService {
       MultipartFile newImage,
       List<MultipartFile> newLessonFiles,
       List<MultipartFile> newAssignmentFiles,
-      List<Long> deleteFileIds) {
+      List<Long> deleteFileIds,
+      Long actorId) {
     LessonModel existing =
         lessonRepository
             .findById(lessonId)
@@ -124,12 +126,12 @@ public class AdminLessonService {
       String oldImageUrl = existing.getLessonImageUrl();
       String imageUrl =
           fileStorageRepository.uploadFile(
-              newImage, buildLessonImagePath(lessonId), maxFileSize, allowTypesImage);
-      storageObjectLifecycleManager.cleanupOnRollback(imageUrl);
+              newImage, buildLessonImagePath(lessonId), actorId, maxFileSize, allowTypesImage);
+      storageObjectLifecycleManager.cleanupOnRollback(imageUrl, actorId);
       existing.setLessonImageUrl(imageUrl);
 
       if (hasText(oldImageUrl)) {
-        storageObjectLifecycleManager.deleteAfterCommit(oldImageUrl);
+        storageObjectLifecycleManager.deleteAfterCommit(oldImageUrl, actorId);
       }
     }
 
@@ -137,15 +139,15 @@ public class AdminLessonService {
     lessonRepository.flush();
 
     if (hasItems(deleteFileIds)) {
-      deleteFileIds.forEach(lessonFileService::deleteFile);
+      deleteFileIds.forEach(id -> lessonFileService.deleteFile(id, actorId));
     }
 
     if (hasItems(newLessonFiles)) {
-      lessonFileService.uploadFiles(lessonId, newLessonFiles, LessonFileType.MATERIAL);
+      lessonFileService.uploadFiles(lessonId, newLessonFiles, LessonFileType.MATERIAL, actorId);
     }
 
     if (hasItems(newAssignmentFiles)) {
-      lessonFileService.uploadFiles(lessonId, newAssignmentFiles, LessonFileType.ASSIGNMENT);
+      lessonFileService.uploadFiles(lessonId, newAssignmentFiles, LessonFileType.ASSIGNMENT, actorId);
     }
   }
 
@@ -154,7 +156,7 @@ public class AdminLessonService {
    * commit.
    */
   @Transactional
-  public void deleteLesson(Long lessonId) {
+  public void deleteLesson(Long lessonId, Long actorId) {
     LessonModel lessonModel =
         lessonRepository
             .findById(lessonId)
@@ -164,10 +166,10 @@ public class AdminLessonService {
                         "lesson.not.found", "Không tìm thấy bài học id: " + lessonId));
 
     List<LessonFileModel> lessonFileModels = lessonFileRepository.findAllByLessonId(lessonId);
-    lessonFileModels.forEach(item -> lessonFileService.deleteFile(item.getLessonFileId()));
+    lessonFileModels.forEach(item -> lessonFileService.deleteFile(item.getLessonFileId(), actorId));
 
     if (hasText(lessonModel.getLessonImageUrl())) {
-      storageObjectLifecycleManager.deleteAfterCommit(lessonModel.getLessonImageUrl());
+      storageObjectLifecycleManager.deleteAfterCommit(lessonModel.getLessonImageUrl(), actorId);
     }
 
     lessonRepository.deleteById(lessonId);

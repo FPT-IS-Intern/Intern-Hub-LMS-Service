@@ -7,12 +7,12 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface FileStorageRepository {
 
-    String uploadFile(MultipartFile file, String keyPrefix);
+    String uploadFile(MultipartFile file, String keyPrefix, Long actorId);
 
     String uploadFile(
-            MultipartFile file, String keyPrefix, Long maxSizeBytes, String contentTypeRegex);
+            MultipartFile file, String keyPrefix, Long actorId, Long maxSizeBytes, String contentTypeRegex);
 
-    void deleteFile(String key);
+    void deleteFile(String key, Long actorId);
 
     String getPrivateUrl(String key);
 }

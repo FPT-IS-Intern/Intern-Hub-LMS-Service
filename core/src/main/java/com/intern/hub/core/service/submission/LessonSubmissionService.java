@@ -65,8 +65,8 @@ public class LessonSubmissionService {
 
     @Transactional
     /** Nộp hoặc cập nhật bài nộp của một lesson enrollment. */
-    public LessonSubmissionResult submitLesson(
-            Long lessonEnrollmentId, Long userId, String comment, List<MultipartFile> files) {
+  public LessonSubmissionResult submitLesson(
+            Long lessonEnrollmentId, Long userId, Long actorId, String comment, List<MultipartFile> files) {
         if (!hasItems(files)) {
             throw new BadRequestException("submission.file.required", "Cần ít nhất 1 file để nộp bài");
         }
@@ -124,11 +124,11 @@ public class LessonSubmissionService {
                     submissionAttachmentRepository.findByLessonSubmissionId(
                             submission.getLessonSubmissionId());
             if (!existing.isEmpty()) {
-                submissionAttachmentRepository.deleteByLessonSubmissionId(
+                    submissionAttachmentRepository.deleteByLessonSubmissionId(
                         submission.getLessonSubmissionId());
                 for (SubmissionAttachmentModel attachment : existing) {
                     if (hasText(attachment.getFileUrl())) {
-                        storageObjectLifecycleManager.deleteAfterCommit(attachment.getFileUrl());
+                        storageObjectLifecycleManager.deleteAfterCommit(attachment.getFileUrl(), actorId);
                     }
                 }
             }
@@ -142,9 +142,10 @@ public class LessonSubmissionService {
                         fileStorageRepository.uploadFile(
                                 file,
                                 buildSubmissionPath(submission.getLessonSubmissionId()),
+                                actorId,
                                 maxFileSize,
                                 allowTypesDocument);
-                storageObjectLifecycleManager.cleanupOnRollback(key);
+                storageObjectLifecycleManager.cleanupOnRollback(key, actorId);
 
                 attachments.add(
                         SubmissionAttachmentModel.builder()

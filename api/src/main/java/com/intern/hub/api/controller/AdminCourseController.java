@@ -5,6 +5,7 @@ import com.intern.hub.api.dto.response.course.CourseDetailResponse;
 import com.intern.hub.api.dto.response.course.CourseSummaryResponse;
 import com.intern.hub.api.mapper.CourseApiMapper;
 import com.intern.hub.api.util.PaginationUtils;
+import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.service.course.AdminCourseService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
@@ -45,7 +46,7 @@ public class AdminCourseController {
             @RequestPart(value = "image", required = true) MultipartFile image) {
 
         adminCourseService.createCourse(
-                courseApiMapper.toModel(request), image, parseLessonIds(request.lessonIds()));
+                courseApiMapper.toModel(request), image, parseLessonIds(request.lessonIds()), UserContext.requiredUserId());
         return ResponseApi.noContent();
     }
 
@@ -109,7 +110,11 @@ public class AdminCourseController {
             @RequestPart("data") @Valid CourseCreateRequest request,
             @RequestPart(value = "image", required = false) MultipartFile image) {
         adminCourseService.updateCourse(
-                parseId(courseId, "courseId"), courseApiMapper.toModel(request), image);
+                parseId(courseId, "courseId"),
+                courseApiMapper.toModel(request),
+                image,
+                parseLessonIdsForUpdate(request.lessonIds()),
+                UserContext.requiredUserId());
         return ResponseApi.noContent();
     }
 
@@ -117,7 +122,17 @@ public class AdminCourseController {
     @Authenticated
     @Operation(summary = "Xóa khóa học", description = "Xóa khóa học theo id.")
     public ResponseApi<?> deleteCourse(@PathVariable("courseId") String courseId) {
-        adminCourseService.deleteCourse(parseId(courseId, "courseId"));
+        adminCourseService.deleteCourse(parseId(courseId, "courseId"), UserContext.requiredUserId());
         return ResponseApi.noContent();
+    }
+
+    private List<Long> parseLessonIdsForUpdate(List<String> lessonIds) {
+        if (lessonIds == null) {
+            return null;
+        }
+        if (lessonIds.isEmpty()) {
+            return List.of();
+        }
+        return parseLessonIds(lessonIds);
     }
 }

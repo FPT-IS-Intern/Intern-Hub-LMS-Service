@@ -6,6 +6,7 @@ import com.intern.hub.api.dto.response.lesson.LessonFileInfoResponse;
 import com.intern.hub.api.dto.response.lesson.LessonSummaryResponse;
 import com.intern.hub.api.mapper.LessonApiMapper;
 import com.intern.hub.api.util.PaginationUtils;
+import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.domain.model.lesson.LessonModel;
 import com.intern.hub.core.service.lesson.AdminLessonService;
 import com.intern.hub.core.service.lesson.LessonFileService;
@@ -56,7 +57,8 @@ public class AdminLessonController {
           List<MultipartFile> assignmentFiles) {
 
     LessonModel model = lessonApiMapper.toModel(request);
-    adminLessonService.createLesson(model, image, lessonFiles, assignmentFiles);
+    adminLessonService.createLesson(
+        model, image, lessonFiles, assignmentFiles, UserContext.requiredUserId());
 
     return ResponseApi.noContent();
   }
@@ -111,7 +113,8 @@ public class AdminLessonController {
         image,
         lessonFiles,
         assignmentFiles,
-        parseIds(deleteFileIds, "deleteFileIds"));
+        parseIds(deleteFileIds, "deleteFileIds"),
+        UserContext.requiredUserId());
 
     return ResponseApi.noContent();
   }
@@ -120,7 +123,7 @@ public class AdminLessonController {
   @Authenticated
   @Operation(summary = "Xóa bài học", description = "Xóa bài học theo id.")
   public ResponseApi<?> deleteLesson(@PathVariable("lessonId") String lessonId) {
-    adminLessonService.deleteLesson(parseId(lessonId, "lessonId"));
+    adminLessonService.deleteLesson(parseId(lessonId, "lessonId"), UserContext.requiredUserId());
     return ResponseApi.noContent();
   }
 

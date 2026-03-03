@@ -53,7 +53,7 @@ public class AdminCourseService {
    * thứ tự đã truyền.
    */
   @Transactional
-  public void createCourse(CourseModel model, MultipartFile image, List<Long> lessonIds) {
+  public void createCourse(CourseModel model, MultipartFile image, List<Long> lessonIds, Long actorId) {
     if (image == null || image.isEmpty()) {
       throw new BadRequestException("course.image.required", "Ảnh khóa học là bắt buộc");
     }
@@ -67,8 +67,8 @@ public class AdminCourseService {
 
     String imageUrl =
         fileStorageRepository.uploadFile(
-            image, buildCourseImagePath(courseId), maxFileSize, allowTypesImage);
-    storageObjectLifecycleManager.cleanupOnRollback(imageUrl);
+            image, buildCourseImagePath(courseId), actorId, maxFileSize, allowTypesImage);
+    storageObjectLifecycleManager.cleanupOnRollback(imageUrl, actorId);
 
     saved.setCourseImageUrl(imageUrl);
     courseRepository.save(saved);
@@ -98,7 +98,8 @@ public class AdminCourseService {
 
   /** Cập nhật thông tin khóa học và thay ảnh đại diện nếu có ảnh mới. */
   @Transactional
-  public void updateCourse(Long courseId, CourseModel updateModel, MultipartFile newImage) {
+  public void updateCourse(
+      Long courseId, CourseModel updateModel, MultipartFile newImage, List<Long> lessonIds, Long actorId) {
     CourseModel existing =
         courseRepository
             .findById(courseId)
@@ -110,16 +111,20 @@ public class AdminCourseService {
     existing.setName(updateModel.getName());
     existing.setDescription(updateModel.getDescription());
 
+    if (lessonIds != null) {
+      courseLessonRepository.replaceCourseLessons(courseId, distinctOrdered(lessonIds));
+    }
+
     if (newImage != null && !newImage.isEmpty()) {
       String oldImageUrl = existing.getCourseImageUrl();
       String newImageUrl =
           fileStorageRepository.uploadFile(
-              newImage, buildCourseImagePath(courseId), maxFileSize, allowTypesImage);
-      storageObjectLifecycleManager.cleanupOnRollback(newImageUrl);
+              newImage, buildCourseImagePath(courseId), actorId, maxFileSize, allowTypesImage);
+      storageObjectLifecycleManager.cleanupOnRollback(newImageUrl, actorId);
 
       existing.setCourseImageUrl(newImageUrl);
       if (hasText(oldImageUrl)) {
-        storageObjectLifecycleManager.deleteAfterCommit(oldImageUrl);
+        storageObjectLifecycleManager.deleteAfterCommit(oldImageUrl, actorId);
       }
     }
 
@@ -131,7 +136,7 @@ public class AdminCourseService {
    * transaction commit thành công.
    */
   @Transactional
-  public void deleteCourse(Long courseId) {
+  public void deleteCourse(Long courseId, Long actorId) {
     CourseModel courseModel =
         courseRepository
             .findById(courseId)
@@ -142,7 +147,7 @@ public class AdminCourseService {
 
     courseRepository.deleteWithRelationsById(courseId);
     if (hasText(courseModel.getCourseImageUrl())) {
-      storageObjectLifecycleManager.deleteAfterCommit(courseModel.getCourseImageUrl());
+      storageObjectLifecycleManager.deleteAfterCommit(courseModel.getCourseImageUrl(), actorId);
     }
   }
 
@@ -156,6 +161,9 @@ public class AdminCourseService {
   }
 
   private static List<Long> distinctOrdered(List<Long> lessonIds) {
+    if (lessonIds == null || lessonIds.isEmpty()) {
+      return List.of();
+    }
     Set<Long> unique = new java.util.LinkedHashSet<>();
     for (Long lessonId : lessonIds) {
       if (lessonId != null) {

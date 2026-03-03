@@ -42,7 +42,8 @@ public class LessonFileService {
 
   @Transactional
   /** Upload danh sách file cho bài học, kiểm tra tổng dung lượng không vượt quá giới hạn. */
-  public void uploadFiles(Long lessonId, List<MultipartFile> files, LessonFileType lessonFileType) {
+  public void uploadFiles(
+      Long lessonId, List<MultipartFile> files, LessonFileType lessonFileType, Long actorId) {
     if (files == null || files.isEmpty()) {
       return;
     }
@@ -58,8 +59,8 @@ public class LessonFileService {
     for (MultipartFile file : files) {
       String s3Key =
           fileStorageRepository.uploadFile(
-              file, lessonPath + lessonId, maxFileSize, allowTypesDocument);
-      storageObjectLifecycleManager.cleanupOnRollback(s3Key);
+              file, lessonPath + lessonId, actorId, maxFileSize, allowTypesDocument);
+      storageObjectLifecycleManager.cleanupOnRollback(s3Key, actorId);
 
       LessonFileModel model =
           LessonFileModel.builder()
@@ -82,7 +83,7 @@ public class LessonFileService {
 
   @Transactional
   /** Xóa file bài học theo id (xóa trên storage và trong DB). */
-  public void deleteFile(Long lessonFileId) {
+  public void deleteFile(Long lessonFileId, Long actorId) {
 
     LessonFileModel lessonFileModel =
         lessonFileRepository
@@ -94,6 +95,6 @@ public class LessonFileService {
                         "Không tìm thấy file bài học id: " + lessonFileId));
 
     lessonFileRepository.deleteById(lessonFileModel.getLessonFileId());
-    storageObjectLifecycleManager.deleteAfterCommit(lessonFileModel.getFileUrl());
+    storageObjectLifecycleManager.deleteAfterCommit(lessonFileModel.getFileUrl(), actorId);
   }
 }

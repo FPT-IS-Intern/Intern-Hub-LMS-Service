@@ -52,4 +52,11 @@ public class CourseLessonRepositoryImpl implements CourseLessonRepository {
             courseLessonEntityRepository.saveAll(entities);
         }
     }
+
+    @Override
+    public void replaceCourseLessons(Long courseId, List<Long> lessonIds) {
+        courseLessonEntityRepository.deleteByCourseEntity_CourseId(courseId);
+        courseLessonEntityRepository.flush();
+        saveCourseLessons(courseId, lessonIds);
+    }
 }
