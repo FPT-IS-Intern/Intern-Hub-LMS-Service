@@ -23,5 +23,7 @@ public interface LessonEnrollmentRepository {
 
   Optional<Long> findLessonEnrollmentIdByLessonIdAndUserId(Long lessonId, Long userId);
 
+  Optional<LessonEnrollmentModel> findByLessonIdAndUserId(Long lessonId, Long userId);
+
   void saveAll(List<LessonEnrollmentModel> models);
 }

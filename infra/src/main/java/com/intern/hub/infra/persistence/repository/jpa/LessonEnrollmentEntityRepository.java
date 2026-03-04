@@ -52,4 +52,7 @@ public interface LessonEnrollmentEntityRepository
                     + "and le.courseEnrollmentEntity.userId = :userId")
     Long findLessonEnrollmentIdByLessonIdAndUserId(
             @Param("lessonId") Long lessonId, @Param("userId") Long userId);
+
+    java.util.Optional<LessonEnrollmentEntity> findByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserId(
+            Long lessonId, Long userId);
 }

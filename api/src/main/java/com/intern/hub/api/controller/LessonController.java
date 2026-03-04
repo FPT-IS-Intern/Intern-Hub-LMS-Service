@@ -1,11 +1,14 @@
 package com.intern.hub.api.controller;
 
-import com.intern.hub.api.dto.response.lesson.LessonDetailResponse;
 import com.intern.hub.api.dto.response.lesson.LessonFileInfoResponse;
-import com.intern.hub.api.dto.response.lesson.LessonSummaryResponse;
+import com.intern.hub.api.dto.response.lesson.LessonUserDetailResponse;
+import com.intern.hub.api.dto.response.lesson.LessonUserSummaryResponse;
 import com.intern.hub.api.mapper.LessonApiMapper;
 import com.intern.hub.api.util.PaginationUtils;
+import com.intern.hub.api.util.UserContext;
+import com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel;
 import com.intern.hub.core.domain.model.lesson.LessonModel;
+import com.intern.hub.core.service.enrollment.EnrollmentService;
 import com.intern.hub.core.service.lesson.LessonService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
@@ -33,6 +36,7 @@ import java.util.List;
 @Tag(name = "Lesson", description = "Tra cứu bài học toàn hệ thống.")
 public class LessonController {
 
+    EnrollmentService enrollmentService;
     LessonService lessonService;
     LessonApiMapper lessonApiMapper;
 
@@ -41,19 +45,17 @@ public class LessonController {
     @Operation(
             summary = "Danh sách bài học",
             description = "Lấy danh sách bài học có phân trang, hỗ trợ userId để map lessonEnrollmentId.")
-    public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
-            @PageableDefault(size = 10) Pageable pageable,
-            @RequestParam(value = "userId", required = false) String userId) {
+    public ResponseApi<PaginatedData<LessonUserSummaryResponse>> getLessons(
+            @PageableDefault(size = 10) Pageable pageable) {
         var lessonPage = lessonService.getLessons(pageable);
-        Long userIdValue = parseOptionalId(userId, "userId");
+        Long userIdValue = UserContext.requiredUserId();
 
         var res =
                 PaginationUtils.toPaginatedData(
                         lessonPage,
-                        model ->
-                                lessonApiMapper.toSummaryResponse(
-                                        model,
-                                        lessonService.getLessonEnrollmentId(model.getLessonId(), userIdValue)));
+                        model -> toLessonUserSummaryResponse(model, enrollmentService
+                                .getLessonEnrollment(model.getLessonId(), userIdValue)
+                                .orElse(null)));
 
         return ResponseApi.ok(res);
     }
@@ -63,24 +65,24 @@ public class LessonController {
     @Operation(
             summary = "Chi tiết bài học",
             description = "Lấy chi tiết bài học theo id, kèm file và lessonEnrollmentId (nếu có userId).")
-    public ResponseApi<LessonDetailResponse> getLessonDetail(
-            @PathVariable("lessonId") String lessonId,
-            @RequestParam(value = "userId", required = false) String userId) {
+    public ResponseApi<LessonUserDetailResponse> getLessonDetail(
+            @PathVariable("lessonId") String lessonId) {
         Long lessonIdValue = parseId(lessonId, "lessonId");
+        Long userIdValue = UserContext.requiredUserId();
         LessonModel model = lessonService.getLesson(lessonIdValue);
         var fileModels = lessonService.getLessonFiles(lessonIdValue);
+        LessonEnrollmentModel enrollment =
+                enrollmentService.getLessonEnrollment(lessonIdValue, userIdValue).orElse(null);
 
         List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
-        Long lessonEnrollmentId =
-                lessonService.getLessonEnrollmentId(lessonIdValue, parseOptionalId(userId, "userId"));
-        LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files, lessonEnrollmentId);
+        LessonUserDetailResponse res = toLessonUserDetailResponse(model, files, enrollment);
 
         return ResponseApi.ok(res);
     }
 
-    private Long parseOptionalId(String value, String field) {
+    private Long parseId(String value, String field) {
         if (value == null || value.isBlank()) {
-            return null;
+            throw new BadRequestException("id.invalid", field + " không hợp lệ");
         }
         try {
             return Long.parseLong(value);
@@ -89,10 +91,43 @@ public class LessonController {
         }
     }
 
-    private Long parseId(String value, String field) {
-        if (value == null || value.isBlank()) {
-            throw new BadRequestException("id.invalid", field + " không hợp lệ");
-        }
-        return parseOptionalId(value, field);
+    private LessonUserSummaryResponse toLessonUserSummaryResponse(
+            LessonModel model, LessonEnrollmentModel enrollment) {
+        return new LessonUserSummaryResponse(
+                model.getLessonId() == null ? null : model.getLessonId().toString(),
+                model.getName(),
+                model.getLessonImageUrl(),
+                enrollment == null || enrollment.getLessonEnrollmentId() == null
+                        ? null
+                        : enrollment.getLessonEnrollmentId().toString(),
+                enrollment == null || enrollment.getCourseEnrollmentId() == null
+                        ? null
+                        : enrollment.getCourseEnrollmentId().toString(),
+                enrollment == null || enrollment.getLessonProgress() == null
+                        ? null
+                        : enrollment.getLessonProgress().name(),
+                model.getCreatedAt(),
+                model.getUpdatedAt());
+    }
+
+    private LessonUserDetailResponse toLessonUserDetailResponse(
+            LessonModel model, List<LessonFileInfoResponse> files, LessonEnrollmentModel enrollment) {
+        return new LessonUserDetailResponse(
+                model.getLessonId() == null ? null : model.getLessonId().toString(),
+                model.getName(),
+                model.getIntroduction(),
+                model.getContent(),
+                model.getRequirements(),
+                model.getLessonImageUrl(),
+                files,
+                enrollment == null || enrollment.getLessonEnrollmentId() == null
+                        ? null
+                        : enrollment.getLessonEnrollmentId().toString(),
+                enrollment == null || enrollment.getCourseEnrollmentId() == null
+                        ? null
+                        : enrollment.getCourseEnrollmentId().toString(),
+                enrollment == null || enrollment.getLessonProgress() == null
+                        ? null
+                        : enrollment.getLessonProgress().name());
     }
 }

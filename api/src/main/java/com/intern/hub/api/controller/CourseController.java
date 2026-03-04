@@ -1,12 +1,13 @@
 package com.intern.hub.api.controller;
 
-import com.intern.hub.api.dto.response.course.CourseDetailResponse;
-import com.intern.hub.api.dto.response.course.CourseSummaryResponse;
+import com.intern.hub.api.dto.response.course.CourseUserDetailResponse;
+import com.intern.hub.api.dto.response.course.CourseUserSummaryResponse;
 import com.intern.hub.api.dto.response.lesson.LessonSummaryResponse;
-import com.intern.hub.api.mapper.CourseApiMapper;
 import com.intern.hub.api.mapper.LessonApiMapper;
 import com.intern.hub.api.util.PaginationUtils;
+import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.service.course.CourseService;
+import com.intern.hub.core.service.enrollment.EnrollmentService;
 import com.intern.hub.core.service.lesson.LessonService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
@@ -33,37 +34,54 @@ import org.springframework.web.bind.annotation.RestController;
 public class CourseController {
 
     CourseService courseService;
+    EnrollmentService enrollmentService;
     LessonService lessonService;
-    CourseApiMapper courseApiMapper;
     LessonApiMapper lessonApiMapper;
 
     @GetMapping
     @Authenticated
     @Operation(summary = "Danh sách khóa học", description = "Lấy danh sách khóa học có phân trang.")
-    public ResponseApi<PaginatedData<CourseSummaryResponse>> getCourses(
+    public ResponseApi<PaginatedData<CourseUserSummaryResponse>> getCourses(
             @PageableDefault(size = 10) Pageable pageable) {
+        Long userId = UserContext.requiredUserId();
         var page = courseService.getCourses(pageable);
-        var res = PaginationUtils.toPaginatedData(page, courseApiMapper::toSummaryResponse);
+        var res = PaginationUtils.toPaginatedData(
+                page,
+                model -> toCourseUserSummaryResponse(
+                        model, enrollmentService
+                                .getCourseEnrollment(model.getCourseId(), userId)
+                                .orElse(null)
+                ));
+
         return ResponseApi.ok(res);
     }
 
     @GetMapping("/{courseId}")
     @Authenticated
     @Operation(summary = "Chi tiết khóa học", description = "Lấy chi tiết khóa học theo id.")
-    public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
+    public ResponseApi<CourseUserDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
         Long courseIdValue = parseId(courseId, "courseId");
+        Long userId = UserContext.requiredUserId();
         var model = courseService.getCourse(courseIdValue);
+        var enrollment = enrollmentService.getCourseEnrollment(courseIdValue, userId).orElse(null);
         var lessons =
                 courseService.getCourseLessons(courseIdValue).stream()
                         .map(item -> lessonApiMapper.toSummaryResponse(item, null))
                         .toList();
         var courseIdString = model.getCourseId() == null ? null : model.getCourseId().toString();
         var res =
-                new CourseDetailResponse(
+                new CourseUserDetailResponse(
                         courseIdString,
                         model.getName(),
                         model.getDescription(),
                         model.getCourseImageUrl(),
+                        enrollment != null,
+                        enrollment == null || enrollment.getCourseEnrollmentId() == null
+                                ? null
+                                : enrollment.getCourseEnrollmentId().toString(),
+                        enrollment == null || enrollment.getCourseProgress() == null
+                                ? null
+                                : enrollment.getCourseProgress().name(),
                         lessons);
         return ResponseApi.ok(res);
     }
@@ -108,5 +126,23 @@ public class CourseController {
         } catch (NumberFormatException ex) {
             throw new BadRequestException("id.invalid", field + " không hợp lệ");
         }
+    }
+
+    private CourseUserSummaryResponse toCourseUserSummaryResponse(
+            com.intern.hub.core.domain.model.course.CourseModel model,
+            com.intern.hub.core.domain.model.enrollment.CourseEnrollmentModel enrollment) {
+        return new CourseUserSummaryResponse(
+                model.getCourseId() == null ? null : model.getCourseId().toString(),
+                model.getName(),
+                model.getCourseImageUrl(),
+                model.getCreatedAt(),
+                model.getUpdatedAt(),
+                enrollment != null,
+                enrollment == null || enrollment.getCourseEnrollmentId() == null
+                        ? null
+                        : enrollment.getCourseEnrollmentId().toString(),
+                enrollment == null || enrollment.getCourseProgress() == null
+                        ? null
+                        : enrollment.getCourseProgress().name());
     }
 }

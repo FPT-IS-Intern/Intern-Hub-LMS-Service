@@ -1,6 +1,9 @@
 package com.intern.hub.api.controller;
 
 import com.intern.hub.api.dto.request.CourseEnrollRequest;
+import com.intern.hub.api.dto.response.enrollment.CourseEnrollmentResponse;
+import com.intern.hub.api.dto.response.enrollment.LessonEnrollmentResponse;
+import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.service.enrollment.EnrollmentService;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
@@ -11,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,13 +24,39 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/lms/courses")
+@RequestMapping
 @Tag(name = "Enrollment", description = "Ghi danh khóa học cho user.")
 public class EnrollmentController {
 
     EnrollmentService enrollmentService;
 
-    @PostMapping("/{courseId}/enroll")
+    @GetMapping("/lms/courses/{courseId}/enrollment")
+    @Authenticated
+    @Operation(
+            summary = "Enrollment của tôi theo khóa học",
+            description = "Lấy course enrollment theo courseId và user hiện tại.")
+    public ResponseApi<CourseEnrollmentResponse> getCourseEnrollment(
+            @PathVariable("courseId") String courseId) {
+        var enrollment =
+                enrollmentService.getCourseEnrollment(
+                        parseId(courseId, "courseId"), UserContext.requiredUserId());
+        return ResponseApi.ok(enrollment.map(this::toCourseEnrollmentResponse).orElse(null));
+    }
+
+    @GetMapping("/lms/lessons/{lessonId}/enrollment")
+    @Authenticated
+    @Operation(
+            summary = "Enrollment của tôi theo bài học",
+            description = "Lấy lesson enrollment theo lessonId và user hiện tại.")
+    public ResponseApi<LessonEnrollmentResponse> getLessonEnrollment(
+            @PathVariable("lessonId") String lessonId) {
+        var enrollment =
+                enrollmentService.getLessonEnrollment(
+                        parseId(lessonId, "lessonId"), UserContext.requiredUserId());
+        return ResponseApi.ok(enrollment.map(this::toLessonEnrollmentResponse).orElse(null));
+    }
+
+    @PostMapping("/lms/courses/{courseId}/enroll")
     @Authenticated
     @Operation(
             summary = "Ghi danh khóa học",
@@ -47,5 +77,23 @@ public class EnrollmentController {
         } catch (NumberFormatException ex) {
             throw new BadRequestException("id.invalid", field + " không hợp lệ");
         }
+    }
+
+    private CourseEnrollmentResponse toCourseEnrollmentResponse(
+            com.intern.hub.core.domain.model.enrollment.CourseEnrollmentModel model) {
+        return new CourseEnrollmentResponse(
+                model.getCourseEnrollmentId() == null ? null : model.getCourseEnrollmentId().toString(),
+                model.getCourseId() == null ? null : model.getCourseId().toString(),
+                model.getUserId() == null ? null : model.getUserId().toString(),
+                model.getCourseProgress() == null ? null : model.getCourseProgress().name());
+    }
+
+    private LessonEnrollmentResponse toLessonEnrollmentResponse(
+            com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel model) {
+        return new LessonEnrollmentResponse(
+                model.getLessonEnrollmentId() == null ? null : model.getLessonEnrollmentId().toString(),
+                model.getCourseEnrollmentId() == null ? null : model.getCourseEnrollmentId().toString(),
+                model.getLessonId() == null ? null : model.getLessonId().toString(),
+                model.getLessonProgress() == null ? null : model.getLessonProgress().name());
     }
 }

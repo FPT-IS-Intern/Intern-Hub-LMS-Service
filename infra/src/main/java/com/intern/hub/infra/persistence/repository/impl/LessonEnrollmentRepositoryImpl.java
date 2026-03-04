@@ -84,6 +84,13 @@ public class LessonEnrollmentRepositoryImpl implements LessonEnrollmentRepositor
     }
 
     @Override
+    public Optional<LessonEnrollmentModel> findByLessonIdAndUserId(Long lessonId, Long userId) {
+        return lessonEnrollmentEntityRepository
+                .findByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserId(lessonId, userId)
+                .map(this::toModel);
+    }
+
+    @Override
     public void saveAll(List<LessonEnrollmentModel> models) {
         if (models == null || models.isEmpty()) {
             return;
@@ -102,5 +109,14 @@ public class LessonEnrollmentRepositoryImpl implements LessonEnrollmentRepositor
         }
 
         lessonEnrollmentEntityRepository.saveAll(entities);
+    }
+
+    private LessonEnrollmentModel toModel(LessonEnrollmentEntity entity) {
+        return LessonEnrollmentModel.builder()
+                .lessonEnrollmentId(entity.getLessonEnrollmentId())
+                .courseEnrollmentId(entity.getCourseEnrollmentEntity().getCourseEnrollmentId())
+                .lessonId(entity.getLessonEntity().getLessonId())
+                .lessonProgress(entity.getLessonProgress())
+                .build();
     }
 }
