@@ -33,8 +33,8 @@ public class LessonFileService {
   String lessonPath;
 
   @NonFinal
-  @Value("${aws.s3.max-file-size}")
-  Long maxFileSize;
+  @Value("${aws.s3.max-total-size}")
+  Long maxTotalSize;
 
   @NonFinal
   @Value("${aws.s3.allow-types.document}")
@@ -52,14 +52,14 @@ public class LessonFileService {
 
     long uploadSize = files.stream().mapToLong(MultipartFile::getSize).sum();
 
-    if (currentTotalSize + uploadSize > maxFileSize)
+    if (currentTotalSize + uploadSize > maxTotalSize)
       throw new BadRequestException(
           "file.size.exceeded", "Tổng dung lượng file vượt quá giới hạn cho phép");
 
     for (MultipartFile file : files) {
       String s3Key =
           fileStorageRepository.uploadFile(
-              file, lessonPath + lessonId, actorId, maxFileSize, allowTypesDocument);
+              file, lessonPath + lessonId, actorId, maxTotalSize, allowTypesDocument);
       storageObjectLifecycleManager.cleanupOnRollback(s3Key, actorId);
 
       LessonFileModel model =

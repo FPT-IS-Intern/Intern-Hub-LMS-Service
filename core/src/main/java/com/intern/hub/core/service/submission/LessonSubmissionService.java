@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -56,8 +57,8 @@ public class LessonSubmissionService {
     String submissionPath;
 
     @NonFinal
-    @Value("${aws.s3.max-file-size}")
-    Long maxFileSize;
+    @Value("${aws.s3.max-total-size}")
+    Long maxTotalSize;
 
     @NonFinal
     @Value("${aws.s3.allow-types.document}")
@@ -108,6 +109,7 @@ public class LessonSubmissionService {
         List<SubmissionAttachmentModel> existingAttachments =
                 submissionAttachmentRepository.findByLessonSubmissionId(submission.getLessonSubmissionId());
         boolean hasValidFile = hasValidFiles(files);
+        List<SubmissionAttachmentModel> attachmentsToDelete = List.of();
         if (existingAttachments.isEmpty() && !hasValidFile) {
             throw new BadRequestException("submission.file.required", "Cần ít nhất 1 file để nộp bài");
         }
@@ -123,7 +125,7 @@ public class LessonSubmissionService {
         }
 
         if (hasItems(deleteAttachmentIds)) {
-            List<SubmissionAttachmentModel> attachmentsToDelete =
+            attachmentsToDelete =
                     existingAttachments.stream()
                             .filter(
                                     attachment ->
@@ -145,6 +147,33 @@ public class LessonSubmissionService {
                 }
             }
         }
+        final Set<Long> deletedAttachmentIds =
+                attachmentsToDelete.stream()
+                        .map(SubmissionAttachmentModel::getSubmissionAttachmentId)
+                        .collect(java.util.stream.Collectors.toSet());
+
+        long totalRemainingSize =
+                existingAttachments.stream()
+                        .filter(
+                                attachment ->
+                                        attachment.getSubmissionAttachmentId() == null
+                                                || !deletedAttachmentIds.contains(
+                                                        attachment.getSubmissionAttachmentId()))
+                        .map(SubmissionAttachmentModel::getFileSize)
+                        .filter(size -> size != null && size > 0)
+                        .reduce(0L, Long::sum);
+        long totalNewFileSize =
+                files == null
+                        ? 0L
+                        : files.stream()
+                                .filter(file -> file != null && !file.isEmpty())
+                                .map(MultipartFile::getSize)
+                                .reduce(0L, Long::sum);
+        if (totalRemainingSize + totalNewFileSize > maxTotalSize) {
+            throw new BadRequestException(
+                    "submission.total.size.exceeded",
+                    "Tổng dung lượng bài nộp không được vượt quá " + (maxTotalSize / (1024 * 1024)) + "MB");
+        }
 
         if (hasValidFile) {
             List<SubmissionAttachmentModel> attachments = new ArrayList<>(files.size());
@@ -157,7 +186,7 @@ public class LessonSubmissionService {
                                 file,
                                 buildSubmissionPath(submission.getLessonSubmissionId()),
                                 actorId,
-                                maxFileSize,
+                                maxTotalSize,
                                 allowTypesDocument);
                 storageObjectLifecycleManager.cleanupOnRollback(key, actorId);
 

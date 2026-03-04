@@ -20,7 +20,7 @@ Chi tiết: yêu cầu ít nhất 1 file; comment tùy chọn; thay thế toàn 
 
 **Quy tắc nghiệp vụ & ràng buộc**
 - Ảnh khóa học bắt buộc khi tạo; ảnh bài học tùy chọn.
-- Tài liệu bài học có giới hạn tổng dung lượng (theo `aws.s3.max-file-size`).
+- Tài liệu bài học có giới hạn tổng dung lượng (theo `aws.s3.max-total-size`).
 - Kiểu file cho ảnh: `image/(png|jpeg|jpg)`.
 - Kiểu file tài liệu: PDF/DOC/DOCX/XLS/XLSX và ảnh.
 - Ảnh và file được lưu S3; URL ảnh được ghép thêm `bucket-url`, file bài học dùng URL private.
@@ -60,4 +60,4 @@ Chi tiết: yêu cầu ít nhất 1 file; comment tùy chọn; thay thế toàn 
 **Cấu hình liên quan nghiệp vụ**
 - DB schema: `schema_lms` (Liquibase tạo bảng và ràng buộc).
 - S3 paths: `lessons/`, `courses/`, `submissions/`.
-- Giới hạn file: `aws.s3.max-file-size` (mặc định 20MB).
+- Giới hạn dung lượng: `aws.s3.max-total-size` (mặc định 20MB).

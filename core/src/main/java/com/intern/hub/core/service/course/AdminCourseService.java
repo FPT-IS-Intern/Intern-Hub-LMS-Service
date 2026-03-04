@@ -41,8 +41,8 @@ public class AdminCourseService {
   String coursePath;
 
   @NonFinal
-  @Value("${aws.s3.max-file-size}")
-  Long maxFileSize;
+  @Value("${aws.s3.max-total-size}")
+  Long maxTotalSize;
 
   @NonFinal
   @Value("${aws.s3.allow-types.image}")
@@ -67,7 +67,7 @@ public class AdminCourseService {
 
     String imageUrl =
         fileStorageRepository.uploadFile(
-            image, buildCourseImagePath(courseId), actorId, maxFileSize, allowTypesImage);
+            image, buildCourseImagePath(courseId), actorId, maxTotalSize, allowTypesImage);
     storageObjectLifecycleManager.cleanupOnRollback(imageUrl, actorId);
 
     saved.setCourseImageUrl(imageUrl);
@@ -119,7 +119,7 @@ public class AdminCourseService {
       String oldImageUrl = existing.getCourseImageUrl();
       String newImageUrl =
           fileStorageRepository.uploadFile(
-              newImage, buildCourseImagePath(courseId), actorId, maxFileSize, allowTypesImage);
+              newImage, buildCourseImagePath(courseId), actorId, maxTotalSize, allowTypesImage);
       storageObjectLifecycleManager.cleanupOnRollback(newImageUrl, actorId);
 
       existing.setCourseImageUrl(newImageUrl);
