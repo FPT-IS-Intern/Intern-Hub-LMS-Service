@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SubmissionCommentEntityRepository
         extends JpaRepository<@NonNull SubmissionCommentEntity, @NonNull Long> {
+
+    java.util.Optional<SubmissionCommentEntity> findFirstByLessonSubmissionEntity_LessonSubmissionIdOrderByCommentAtDesc(
+            Long lessonSubmissionId);
 }

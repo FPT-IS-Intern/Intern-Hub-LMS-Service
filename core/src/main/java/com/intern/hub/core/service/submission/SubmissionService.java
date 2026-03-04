@@ -21,4 +21,9 @@ public class SubmissionService {
             Long lessonEnrollmentId, Long userId, Long actorId, String comment, List<MultipartFile> files) {
         return lessonSubmissionService.submitLesson(lessonEnrollmentId, userId, actorId, comment, files);
     }
+
+    @Transactional(readOnly = true)
+    public LessonSubmissionService.LessonSubmissionResult getSubmission(Long lessonEnrollmentId) {
+        return lessonSubmissionService.getSubmission(lessonEnrollmentId);
+    }
 }

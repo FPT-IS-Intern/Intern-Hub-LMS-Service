@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -35,6 +37,23 @@ public class SubmissionCommentRepositoryImpl implements SubmissionCommentReposit
                 .userId(saved.getUserId())
                 .content(saved.getContent())
                 .commentAt(saved.getCommentAt())
+                .build();
+    }
+
+    @Override
+    public Optional<SubmissionCommentModel> findLatestByLessonSubmissionId(Long lessonSubmissionId) {
+        return submissionCommentEntityRepository
+                .findFirstByLessonSubmissionEntity_LessonSubmissionIdOrderByCommentAtDesc(lessonSubmissionId)
+                .map(this::toModel);
+    }
+
+    private SubmissionCommentModel toModel(SubmissionCommentEntity entity) {
+        return SubmissionCommentModel.builder()
+                .submissionCommentId(entity.getSubmissionCommentId())
+                .lessonSubmissionId(entity.getLessonSubmissionEntity().getLessonSubmissionId())
+                .userId(entity.getUserId())
+                .content(entity.getContent())
+                .commentAt(entity.getCommentAt())
                 .build();
     }
 }

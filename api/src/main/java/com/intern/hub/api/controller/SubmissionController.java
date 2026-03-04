@@ -4,6 +4,7 @@ import com.intern.hub.api.dto.request.LessonSubmissionRequest;
 import com.intern.hub.api.dto.response.submission.LessonSubmissionResponse;
 import com.intern.hub.api.dto.response.submission.SubmissionAttachmentResponse;
 import com.intern.hub.api.util.UserContext;
+import com.intern.hub.core.service.submission.LessonSubmissionService;
 import com.intern.hub.core.service.submission.SubmissionService;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
@@ -15,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +34,17 @@ import java.util.List;
 public class SubmissionController {
 
     SubmissionService submissionService;
+
+    @GetMapping("/{lessonEnrollmentId}/submissions")
+    @Authenticated
+    @Operation(
+            summary = "Chi tiết bài nộp",
+            description = "Lấy bài nộp hiện tại theo lesson enrollment id.")
+    public ResponseApi<LessonSubmissionResponse> getSubmission(
+            @PathVariable("lessonEnrollmentId") String lessonEnrollmentId) {
+        var result = submissionService.getSubmission(parseId(lessonEnrollmentId, "lessonEnrollmentId"));
+        return ResponseApi.ok(toResponse(result));
+    }
 
     @PostMapping(
             value = "/{lessonEnrollmentId}/submit",
@@ -51,25 +64,7 @@ public class SubmissionController {
                         UserContext.requiredUserId(),
                         request.comment(),
                         files);
-
-        var attachments =
-                result.attachments().stream()
-                        .map(
-                                item ->
-                                        new SubmissionAttachmentResponse(
-                                                item.getFileName(), item.getFileUrl(), item.getFileSize()))
-                        .toList();
-
-        LessonSubmissionResponse response =
-                new LessonSubmissionResponse(
-                        result.lessonSubmissionId() == null ? null : result.lessonSubmissionId().toString(),
-                        result.lessonEnrollmentId() == null ? null : result.lessonEnrollmentId().toString(),
-                        result.submissionStatus().name(),
-                        result.lastSubmissionAt(),
-                        result.comment(),
-                        attachments);
-
-        return ResponseApi.ok(response);
+        return ResponseApi.ok(toResponse(result));
     }
 
     private Long parseId(String value, String field) {
@@ -81,5 +76,23 @@ public class SubmissionController {
         } catch (NumberFormatException ex) {
             throw new BadRequestException("id.invalid", field + " không hợp lệ");
         }
+    }
+
+    private LessonSubmissionResponse toResponse(LessonSubmissionService.LessonSubmissionResult result) {
+        var attachments =
+                result.attachments().stream()
+                        .map(
+                                item ->
+                                        new SubmissionAttachmentResponse(
+                                                item.getFileName(), item.getFileUrl(), item.getFileSize()))
+                        .toList();
+
+        return new LessonSubmissionResponse(
+                result.lessonSubmissionId() == null ? null : result.lessonSubmissionId().toString(),
+                result.lessonEnrollmentId() == null ? null : result.lessonEnrollmentId().toString(),
+                result.submissionStatus().name(),
+                result.lastSubmissionAt(),
+                result.comment(),
+                attachments);
     }
 }

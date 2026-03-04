@@ -65,7 +65,7 @@ public class LessonSubmissionService {
 
     @Transactional
     /** Nộp hoặc cập nhật bài nộp của một lesson enrollment. */
-  public LessonSubmissionResult submitLesson(
+    public LessonSubmissionResult submitLesson(
             Long lessonEnrollmentId, Long userId, Long actorId, String comment, List<MultipartFile> files) {
         if (!hasItems(files)) {
             throw new BadRequestException("submission.file.required", "Cần ít nhất 1 file để nộp bài");
@@ -199,6 +199,35 @@ public class LessonSubmissionService {
                 submission.getSubmissionStatus(),
                 submission.getLastSubmissionAt(),
                 hasText(comment) ? comment.trim() : null,
+                attachments);
+    }
+
+    @Transactional(readOnly = true)
+    /** Lấy bài nộp hiện tại của một lesson enrollment. */
+    public LessonSubmissionResult getSubmission(Long lessonEnrollmentId) {
+        LessonSubmissionModel submission =
+                lessonSubmissionRepository
+                        .findByLessonEnrollmentId(lessonEnrollmentId)
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "lesson.submission.not.found", "Không tìm thấy bài nộp"));
+
+        List<SubmissionAttachmentModel> attachments =
+                submissionAttachmentRepository.findByLessonSubmissionId(submission.getLessonSubmissionId());
+
+        String latestComment =
+                submissionCommentRepository
+                        .findLatestByLessonSubmissionId(submission.getLessonSubmissionId())
+                        .map(SubmissionCommentModel::getContent)
+                        .orElse(null);
+
+        return new LessonSubmissionResult(
+                submission.getLessonSubmissionId(),
+                submission.getLessonEnrollmentId(),
+                submission.getSubmissionStatus(),
+                submission.getLastSubmissionAt(),
+                latestComment,
                 attachments);
     }
 
