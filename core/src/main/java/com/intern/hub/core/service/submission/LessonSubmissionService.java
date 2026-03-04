@@ -66,11 +66,12 @@ public class LessonSubmissionService {
     @Transactional
     /** Nộp hoặc cập nhật bài nộp của một lesson enrollment. */
     public LessonSubmissionResult submitLesson(
-            Long lessonEnrollmentId, Long userId, Long actorId, String comment, List<MultipartFile> files) {
-        if (!hasItems(files)) {
-            throw new BadRequestException("submission.file.required", "Cần ít nhất 1 file để nộp bài");
-        }
-
+            Long lessonEnrollmentId,
+            Long userId,
+            Long actorId,
+            String comment,
+            List<Long> deleteAttachmentIds,
+            List<MultipartFile> files) {
         Long enrolledUserId =
                 lessonEnrollmentRepository
                         .findUserIdByLessonEnrollmentId(lessonEnrollmentId)
@@ -104,6 +105,13 @@ public class LessonSubmissionService {
                                                         .lastSubmissionAt(now)
                                                         .build()));
 
+        List<SubmissionAttachmentModel> existingAttachments =
+                submissionAttachmentRepository.findByLessonSubmissionId(submission.getLessonSubmissionId());
+        boolean hasValidFile = hasValidFiles(files);
+        if (existingAttachments.isEmpty() && !hasValidFile) {
+            throw new BadRequestException("submission.file.required", "Cần ít nhất 1 file để nộp bài");
+        }
+
         if (hasText(comment)) {
             submissionCommentRepository.save(
                     SubmissionCommentModel.builder()
@@ -114,25 +122,31 @@ public class LessonSubmissionService {
                             .build());
         }
 
-        if (hasItems(files)) {
-            boolean hasValidFile = files.stream().anyMatch(file -> file != null && !file.isEmpty());
-            if (!hasValidFile) {
-                throw new BadRequestException("submission.file.required", "Cần ít nhất 1 file để nộp bài");
-            }
+        if (hasItems(deleteAttachmentIds)) {
+            List<SubmissionAttachmentModel> attachmentsToDelete =
+                    existingAttachments.stream()
+                            .filter(
+                                    attachment ->
+                                            attachment.getSubmissionAttachmentId() != null
+                                                    && deleteAttachmentIds.contains(
+                                                            attachment.getSubmissionAttachmentId()))
+                            .toList();
 
-            List<SubmissionAttachmentModel> existing =
-                    submissionAttachmentRepository.findByLessonSubmissionId(
-                            submission.getLessonSubmissionId());
-            if (!existing.isEmpty()) {
-                    submissionAttachmentRepository.deleteByLessonSubmissionId(
-                        submission.getLessonSubmissionId());
-                for (SubmissionAttachmentModel attachment : existing) {
+            if (!attachmentsToDelete.isEmpty()) {
+                submissionAttachmentRepository.deleteByIds(
+                        attachmentsToDelete.stream()
+                                .map(SubmissionAttachmentModel::getSubmissionAttachmentId)
+                                .toList());
+
+                for (SubmissionAttachmentModel attachment : attachmentsToDelete) {
                     if (hasText(attachment.getFileUrl())) {
                         storageObjectLifecycleManager.deleteAfterCommit(attachment.getFileUrl(), actorId);
                     }
                 }
             }
+        }
 
+        if (hasValidFile) {
             List<SubmissionAttachmentModel> attachments = new ArrayList<>(files.size());
             for (MultipartFile file : files) {
                 if (file == null || file.isEmpty()) {
@@ -159,6 +173,13 @@ public class LessonSubmissionService {
             if (!attachments.isEmpty()) {
                 submissionAttachmentRepository.saveAll(attachments);
             }
+        }
+
+        List<SubmissionAttachmentModel> attachments =
+                submissionAttachmentRepository.findByLessonSubmissionId(submission.getLessonSubmissionId());
+        if (attachments.isEmpty()) {
+            throw new BadRequestException(
+                    "submission.file.required", "Bài nộp phải còn ít nhất 1 file đính kèm");
         }
 
         lessonEnrollmentRepository.updateProgress(lessonEnrollmentId, LessonProgress.COMPLETED);
@@ -189,9 +210,6 @@ public class LessonSubmissionService {
                                 courseEnrollmentRepository.save(existing);
                             }
                         });
-
-        List<SubmissionAttachmentModel> attachments =
-                submissionAttachmentRepository.findByLessonSubmissionId(submission.getLessonSubmissionId());
 
         return new LessonSubmissionResult(
                 submission.getLessonSubmissionId(),
@@ -237,6 +255,10 @@ public class LessonSubmissionService {
 
     private static boolean hasItems(List<?> items) {
         return items != null && !items.isEmpty();
+    }
+
+    private static boolean hasValidFiles(List<MultipartFile> files) {
+        return files != null && files.stream().anyMatch(file -> file != null && !file.isEmpty());
     }
 
     private static boolean hasText(String value) {

@@ -45,6 +45,14 @@ public class SubmissionAttachmentRepositoryImpl implements SubmissionAttachmentR
     }
 
     @Override
+    public void deleteByIds(List<Long> submissionAttachmentIds) {
+        if (submissionAttachmentIds == null || submissionAttachmentIds.isEmpty()) {
+            return;
+        }
+        submissionAttachmentEntityRepository.deleteBySubmissionAttachmentIdIn(submissionAttachmentIds);
+    }
+
+    @Override
     public void saveAll(List<SubmissionAttachmentModel> models) {
         if (models == null || models.isEmpty()) {
             return;

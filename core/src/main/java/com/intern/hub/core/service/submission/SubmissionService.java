@@ -18,8 +18,14 @@ public class SubmissionService {
 
     @Transactional
     public LessonSubmissionService.LessonSubmissionResult submitLesson(
-            Long lessonEnrollmentId, Long userId, Long actorId, String comment, List<MultipartFile> files) {
-        return lessonSubmissionService.submitLesson(lessonEnrollmentId, userId, actorId, comment, files);
+            Long lessonEnrollmentId,
+            Long userId,
+            Long actorId,
+            String comment,
+            List<Long> deleteAttachmentIds,
+            List<MultipartFile> files) {
+        return lessonSubmissionService.submitLesson(
+                lessonEnrollmentId, userId, actorId, comment, deleteAttachmentIds, files);
     }
 
     @Transactional(readOnly = true)

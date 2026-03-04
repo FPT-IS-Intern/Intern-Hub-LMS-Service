@@ -52,7 +52,7 @@ public class UserSubmissionController {
     @Authenticated
     @Operation(
             summary = "Nộp bài cho người dùng",
-            description = "Nộp hoặc cập nhật bài nộp của user hiện tại, thay toàn bộ file cũ bằng danh sách file mới.")
+            description = "Nộp hoặc cập nhật bài nộp của user hiện tại, hỗ trợ thêm file mới và xóa chọn lọc file cũ.")
     public ResponseApi<LessonSubmissionResponse> submitLesson(
             @PathVariable("lessonEnrollmentId") String lessonEnrollmentId,
             @RequestPart("data") @Valid LessonSubmissionRequest request,
@@ -64,6 +64,7 @@ public class UserSubmissionController {
                         userId,
                         userId,
                         request.comment(),
+                        parseIds(request.deleteAttachmentIds(), "deleteAttachmentIds"),
                         files);
         return ResponseApi.ok(toResponse(result));
     }
@@ -85,7 +86,12 @@ public class UserSubmissionController {
                         .map(
                                 item ->
                                         new SubmissionAttachmentResponse(
-                                                item.getFileName(), item.getFileUrl(), item.getFileSize()))
+                                                item.getSubmissionAttachmentId() == null
+                                                        ? null
+                                                        : item.getSubmissionAttachmentId().toString(),
+                                                item.getFileName(),
+                                                item.getFileUrl(),
+                                                item.getFileSize()))
                         .toList();
 
         return new LessonSubmissionResponse(
@@ -95,5 +101,15 @@ public class UserSubmissionController {
                 result.lastSubmissionAt(),
                 result.comment(),
                 attachments);
+    }
+
+    private List<Long> parseIds(List<String> values, String field) {
+        if (values == null || values.isEmpty()) {
+            return null;
+        }
+        return values.stream()
+                .filter(value -> value != null && !value.isBlank())
+                .map(value -> parseId(value, field))
+                .toList();
     }
 }

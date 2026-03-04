@@ -9,5 +9,7 @@ public interface SubmissionAttachmentRepository {
 
   void deleteByLessonSubmissionId(Long lessonSubmissionId);
 
+  void deleteByIds(List<Long> submissionAttachmentIds);
+
   void saveAll(List<SubmissionAttachmentModel> models);
 }

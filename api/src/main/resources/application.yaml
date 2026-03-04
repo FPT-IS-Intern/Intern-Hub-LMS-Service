@@ -80,4 +80,19 @@ common:
 snowflake:
   machine-id: 10
 
+logging:
+  level:
+    root: INFO
+    com.intern.hub: INFO
+    org.springframework: WARN
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN
+    org.apache.catalina: WARN
+    org.apache.coyote: WARN
+    org.apache.tomcat: WARN
+    liquibase: WARN
+
 gateway-url: ${GATEWAY_URL}

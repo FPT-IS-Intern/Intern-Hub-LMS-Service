@@ -18,4 +18,6 @@ public interface SubmissionAttachmentEntityRepository
             Long lessonSubmissionId);
 
     void deleteByLessonSubmissionEntity_LessonSubmissionId(Long lessonSubmissionId);
+
+    void deleteBySubmissionAttachmentIdIn(List<Long> submissionAttachmentIds);
 }
