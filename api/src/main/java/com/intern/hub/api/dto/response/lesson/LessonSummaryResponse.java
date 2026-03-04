@@ -10,7 +10,6 @@ public record LessonSummaryResponse(
         String lessonId,
         String name,
         String lessonImageUrl,
-        String lessonEnrollmentId,
         Long createdAt,
         Long updatedAt) {
 }

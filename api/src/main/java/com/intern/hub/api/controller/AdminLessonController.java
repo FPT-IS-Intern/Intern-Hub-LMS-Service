@@ -70,9 +70,7 @@ public class AdminLessonController {
       @PageableDefault(size = 10) Pageable pageable) {
 
     var lessonPage = adminLessonService.getLessons(pageable);
-    var res =
-        PaginationUtils.toPaginatedData(
-            lessonPage, model -> lessonApiMapper.toSummaryResponse(model, null));
+    var res = PaginationUtils.toPaginatedData(lessonPage, lessonApiMapper::toSummaryResponse);
 
     return ResponseApi.ok(res);
   }
@@ -87,7 +85,7 @@ public class AdminLessonController {
     var fileModels = lessonFileService.getFiles(lessonIdValue);
 
     List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
-    LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files, null);
+    LessonDetailResponse res = lessonApiMapper.toDetailResponse(model, files);
 
     return ResponseApi.ok(res);
   }

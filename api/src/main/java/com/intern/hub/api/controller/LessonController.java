@@ -24,7 +24,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -44,7 +43,7 @@ public class LessonController {
     @Authenticated
     @Operation(
             summary = "Danh sách bài học",
-            description = "Lấy danh sách bài học có phân trang, hỗ trợ userId để map lessonEnrollmentId.")
+            description = "Lấy danh sách bài học có phân trang, kèm trạng thái enrollment của user hiện tại.")
     public ResponseApi<PaginatedData<LessonUserSummaryResponse>> getLessons(
             @PageableDefault(size = 10) Pageable pageable) {
         var lessonPage = lessonService.getLessons(pageable);
@@ -64,7 +63,7 @@ public class LessonController {
     @Authenticated
     @Operation(
             summary = "Chi tiết bài học",
-            description = "Lấy chi tiết bài học theo id, kèm file và lessonEnrollmentId (nếu có userId).")
+            description = "Lấy chi tiết bài học theo id, kèm file và trạng thái enrollment của user hiện tại.")
     public ResponseApi<LessonUserDetailResponse> getLessonDetail(
             @PathVariable("lessonId") String lessonId) {
         Long lessonIdValue = parseId(lessonId, "lessonId");

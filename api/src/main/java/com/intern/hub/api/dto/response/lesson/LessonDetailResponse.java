@@ -12,6 +12,5 @@ public record LessonDetailResponse(
         String content,
         String requirements,
         String lessonImageUrl,
-        List<LessonFileInfoResponse> files,
-        String lessonEnrollmentId) {
+        List<LessonFileInfoResponse> files) {
 }

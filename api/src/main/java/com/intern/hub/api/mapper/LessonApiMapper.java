@@ -17,13 +17,10 @@ public interface LessonApiMapper {
   @Mapping(target = "lessonImageUrl", ignore = true)
   LessonModel toModel(LessonCreateRequest request);
 
-  @Mapping(target = "lessonEnrollmentId", source = "lessonEnrollmentId")
-  LessonSummaryResponse toSummaryResponse(LessonModel model, Long lessonEnrollmentId);
+  LessonSummaryResponse toSummaryResponse(LessonModel model);
 
   @Mapping(target = "files", source = "files")
-  @Mapping(target = "lessonEnrollmentId", source = "lessonEnrollmentId")
-  LessonDetailResponse toDetailResponse(
-      LessonModel model, List<LessonFileInfoResponse> files, Long lessonEnrollmentId);
+  LessonDetailResponse toDetailResponse(LessonModel model, List<LessonFileInfoResponse> files);
 
   LessonFileInfoResponse toFileResponse(LessonFileModel fileModel);
 

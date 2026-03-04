@@ -2,10 +2,10 @@ package com.intern.hub.api.controller;
 
 import com.intern.hub.api.dto.response.course.CourseUserDetailResponse;
 import com.intern.hub.api.dto.response.course.CourseUserSummaryResponse;
-import com.intern.hub.api.dto.response.lesson.LessonSummaryResponse;
-import com.intern.hub.api.mapper.LessonApiMapper;
+import com.intern.hub.api.dto.response.lesson.LessonUserSummaryResponse;
 import com.intern.hub.api.util.PaginationUtils;
 import com.intern.hub.api.util.UserContext;
+import com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel;
 import com.intern.hub.core.service.course.CourseService;
 import com.intern.hub.core.service.enrollment.EnrollmentService;
 import com.intern.hub.core.service.lesson.LessonService;
@@ -23,7 +23,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,7 +35,6 @@ public class CourseController {
     CourseService courseService;
     EnrollmentService enrollmentService;
     LessonService lessonService;
-    LessonApiMapper lessonApiMapper;
 
     @GetMapping
     @Authenticated
@@ -66,7 +64,9 @@ public class CourseController {
         var enrollment = enrollmentService.getCourseEnrollment(courseIdValue, userId).orElse(null);
         var lessons =
                 courseService.getCourseLessons(courseIdValue).stream()
-                        .map(item -> lessonApiMapper.toSummaryResponse(item, null))
+                        .map(item -> toLessonUserSummaryResponse(
+                                item,
+                                enrollmentService.getLessonEnrollment(item.getLessonId(), userId).orElse(null)))
                         .toList();
         var courseIdString = model.getCourseId() == null ? null : model.getCourseId().toString();
         var res =
@@ -90,31 +90,22 @@ public class CourseController {
     @Authenticated
     @Operation(
             summary = "Danh sách lesson theo khóa học",
-            description = "Trả danh sách lesson của course; có thể kèm lessonEnrollmentId theo userId.")
-    public ResponseApi<PaginatedData<LessonSummaryResponse>> getCourseLessons(
+            description = "Trả danh sách lesson của course kèm trạng thái enrollment của user hiện tại.")
+    public ResponseApi<PaginatedData<LessonUserSummaryResponse>> getCourseLessons(
             @PathVariable("courseId") String courseId,
-            @RequestParam(value = "userId", required = false) String userId,
             @PageableDefault Pageable pageable) {
         Long courseIdValue = parseId(courseId, "courseId");
-        Long userIdValue = parseOptionalId(userId, "userId");
+        Long userIdValue = UserContext.requiredUserId();
 
         var page = courseService.getCourseLessons(courseIdValue, pageable);
         var res =
                 PaginationUtils.toPaginatedData(
                         page,
-                        model ->
-                                lessonApiMapper.toSummaryResponse(
-                                        model,
-                                        lessonService.getLessonEnrollmentId(model.getLessonId(), userIdValue)));
+                        model -> toLessonUserSummaryResponse(
+                                model,
+                                enrollmentService.getLessonEnrollment(model.getLessonId(), userIdValue).orElse(null)));
 
         return ResponseApi.ok(res);
-    }
-
-    private Long parseOptionalId(String value, String field) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        return parseId(value, field);
     }
 
     private Long parseId(String value, String field) {
@@ -144,5 +135,24 @@ public class CourseController {
                 enrollment == null || enrollment.getCourseProgress() == null
                         ? null
                         : enrollment.getCourseProgress().name());
+    }
+
+    private LessonUserSummaryResponse toLessonUserSummaryResponse(
+            com.intern.hub.core.domain.model.lesson.LessonModel model, LessonEnrollmentModel enrollment) {
+        return new LessonUserSummaryResponse(
+                model.getLessonId() == null ? null : model.getLessonId().toString(),
+                model.getName(),
+                model.getLessonImageUrl(),
+                enrollment == null || enrollment.getLessonEnrollmentId() == null
+                        ? null
+                        : enrollment.getLessonEnrollmentId().toString(),
+                enrollment == null || enrollment.getCourseEnrollmentId() == null
+                        ? null
+                        : enrollment.getCourseEnrollmentId().toString(),
+                enrollment == null || enrollment.getLessonProgress() == null
+                        ? null
+                        : enrollment.getLessonProgress().name(),
+                model.getCreatedAt(),
+                model.getUpdatedAt());
     }
 }

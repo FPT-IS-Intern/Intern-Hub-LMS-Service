@@ -1,6 +1,6 @@
 package com.intern.hub.api.dto.response.course;
 
-import com.intern.hub.api.dto.response.lesson.LessonSummaryResponse;
+import com.intern.hub.api.dto.response.lesson.LessonUserSummaryResponse;
 
 import java.util.List;
 
@@ -12,5 +12,5 @@ public record CourseUserDetailResponse(
         boolean enrolled,
         String courseEnrollmentId,
         String courseProgress,
-        List<LessonSummaryResponse> lessons) {
+        List<LessonUserSummaryResponse> lessons) {
 }

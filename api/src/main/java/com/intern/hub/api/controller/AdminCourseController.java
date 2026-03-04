@@ -3,8 +3,8 @@ package com.intern.hub.api.controller;
 import com.intern.hub.api.dto.request.CourseCreateRequest;
 import com.intern.hub.api.dto.response.course.CourseDetailResponse;
 import com.intern.hub.api.dto.response.course.CourseSummaryResponse;
-import com.intern.hub.api.mapper.LessonApiMapper;
 import com.intern.hub.api.mapper.CourseApiMapper;
+import com.intern.hub.api.mapper.LessonApiMapper;
 import com.intern.hub.api.util.PaginationUtils;
 import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.service.course.AdminCourseService;
@@ -72,7 +72,7 @@ public class AdminCourseController {
         var model = adminCourseService.getCourse(courseIdValue);
         var lessons =
                 courseService.getCourseLessons(courseIdValue).stream()
-                        .map(item -> lessonApiMapper.toSummaryResponse(item, null))
+                        .map(lessonApiMapper::toSummaryResponse)
                         .toList();
         var courseIdString = model.getCourseId() == null ? null : model.getCourseId().toString();
         var res =
