@@ -1,6 +1,5 @@
 package com.intern.hub.api.controller;
 
-import com.intern.hub.api.dto.request.CourseEnrollRequest;
 import com.intern.hub.api.dto.response.enrollment.CourseEnrollmentResponse;
 import com.intern.hub.api.dto.response.enrollment.LessonEnrollmentResponse;
 import com.intern.hub.api.util.UserContext;
@@ -10,14 +9,12 @@ import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,16 +22,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping
-@Tag(name = "Enrollment", description = "Ghi danh khóa học cho user.")
-public class EnrollmentController {
+@Tag(name = "User Enrollment", description = "API người dùng để tra cứu và ghi danh khóa học.")
+public class UserEnrollmentController {
 
     EnrollmentService enrollmentService;
 
     @GetMapping("/lms/courses/{courseId}/enrollment")
     @Authenticated
     @Operation(
-            summary = "Enrollment của tôi theo khóa học",
-            description = "Lấy course enrollment theo courseId và user hiện tại.")
+            summary = "Tra cứu ghi danh khóa học của tôi",
+            description = "Lấy course enrollment theo courseId của user hiện tại.")
     public ResponseApi<CourseEnrollmentResponse> getCourseEnrollment(
             @PathVariable("courseId") String courseId) {
         var enrollment =
@@ -46,8 +43,8 @@ public class EnrollmentController {
     @GetMapping("/lms/lessons/{lessonId}/enrollment")
     @Authenticated
     @Operation(
-            summary = "Enrollment của tôi theo bài học",
-            description = "Lấy lesson enrollment theo lessonId và user hiện tại.")
+            summary = "Tra cứu ghi danh bài học của tôi",
+            description = "Lấy lesson enrollment theo lessonId của user hiện tại.")
     public ResponseApi<LessonEnrollmentResponse> getLessonEnrollment(
             @PathVariable("lessonId") String lessonId) {
         var enrollment =
@@ -59,12 +56,10 @@ public class EnrollmentController {
     @PostMapping("/lms/courses/{courseId}/enroll")
     @Authenticated
     @Operation(
-            summary = "Ghi danh khóa học",
-            description = "Tạo/cập nhật trạng thái ghi danh của user vào khóa học.")
-    public ResponseApi<?> enrollCourse(
-            @PathVariable("courseId") String courseId, @RequestBody @Valid CourseEnrollRequest request) {
-        enrollmentService.enrollCourse(
-                parseId(courseId, "courseId"), parseId(request.userId(), "userId"));
+            summary = "Ghi danh khóa học cho người dùng",
+            description = "Tạo hoặc cập nhật trạng thái ghi danh vào khóa học cho user hiện tại.")
+    public ResponseApi<?> enrollCourse(@PathVariable("courseId") String courseId) {
+        enrollmentService.enrollCourse(parseId(courseId, "courseId"), UserContext.requiredUserId());
         return ResponseApi.noContent();
     }
 

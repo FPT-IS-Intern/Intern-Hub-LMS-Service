@@ -32,8 +32,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/lms/lessons")
-@Tag(name = "Lesson", description = "Tra cứu bài học toàn hệ thống.")
-public class LessonController {
+@Tag(name = "User Lesson", description = "API người dùng để tra cứu bài học và tiến độ học.")
+public class UserLessonController {
 
     EnrollmentService enrollmentService;
     LessonService lessonService;
@@ -42,7 +42,7 @@ public class LessonController {
     @GetMapping
     @Authenticated
     @Operation(
-            summary = "Danh sách bài học",
+            summary = "Danh sách bài học của người dùng",
             description = "Lấy danh sách bài học có phân trang, kèm trạng thái enrollment của user hiện tại.")
     public ResponseApi<PaginatedData<LessonUserSummaryResponse>> getLessons(
             @PageableDefault(size = 10) Pageable pageable) {
@@ -62,7 +62,7 @@ public class LessonController {
     @GetMapping("/{lessonId}")
     @Authenticated
     @Operation(
-            summary = "Chi tiết bài học",
+            summary = "Chi tiết bài học của người dùng",
             description = "Lấy chi tiết bài học theo id, kèm file và trạng thái enrollment của user hiện tại.")
     public ResponseApi<LessonUserDetailResponse> getLessonDetail(
             @PathVariable("lessonId") String lessonId) {

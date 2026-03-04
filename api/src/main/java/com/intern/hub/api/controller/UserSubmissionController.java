@@ -30,15 +30,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/lms/lesson-enrollments")
-@Tag(name = "Submission", description = "Nộp bài cho từng lesson enrollment.")
-public class SubmissionController {
+@Tag(name = "User Submission", description = "API người dùng để xem và nộp bài theo lesson enrollment.")
+public class UserSubmissionController {
 
     SubmissionService submissionService;
 
     @GetMapping("/{lessonEnrollmentId}/submissions")
     @Authenticated
     @Operation(
-            summary = "Chi tiết bài nộp",
+            summary = "Chi tiết bài nộp của tôi",
             description = "Lấy bài nộp hiện tại theo lesson enrollment id.")
     public ResponseApi<LessonSubmissionResponse> getSubmission(
             @PathVariable("lessonEnrollmentId") String lessonEnrollmentId) {
@@ -51,17 +51,18 @@ public class SubmissionController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Authenticated
     @Operation(
-            summary = "Nộp bài",
-            description = "Nộp/cập nhật bài nộp: thay toàn bộ file cũ bằng danh sách file mới.")
+            summary = "Nộp bài cho người dùng",
+            description = "Nộp hoặc cập nhật bài nộp của user hiện tại, thay toàn bộ file cũ bằng danh sách file mới.")
     public ResponseApi<LessonSubmissionResponse> submitLesson(
             @PathVariable("lessonEnrollmentId") String lessonEnrollmentId,
             @RequestPart("data") @Valid LessonSubmissionRequest request,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+        Long userId = UserContext.requiredUserId();
         var result =
                 submissionService.submitLesson(
                         parseId(lessonEnrollmentId, "lessonEnrollmentId"),
-                        parseId(request.userId(), "userId"),
-                        UserContext.requiredUserId(),
+                        userId,
+                        userId,
                         request.comment(),
                         files);
         return ResponseApi.ok(toResponse(result));

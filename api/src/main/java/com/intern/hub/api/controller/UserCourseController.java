@@ -29,8 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/lms/courses")
-@Tag(name = "Course", description = "Tra cứu khóa học và danh sách bài học theo khóa học.")
-public class CourseController {
+@Tag(
+        name = "User Course",
+        description = "API người dùng để tra cứu khóa học và danh sách bài học trong khóa học.")
+public class UserCourseController {
 
     CourseService courseService;
     EnrollmentService enrollmentService;
@@ -38,7 +40,9 @@ public class CourseController {
 
     @GetMapping
     @Authenticated
-    @Operation(summary = "Danh sách khóa học", description = "Lấy danh sách khóa học có phân trang.")
+    @Operation(
+            summary = "Danh sách khóa học của người dùng",
+            description = "Lấy danh sách khóa học có phân trang, kèm trạng thái enroll của user hiện tại.")
     public ResponseApi<PaginatedData<CourseUserSummaryResponse>> getCourses(
             @PageableDefault(size = 10) Pageable pageable) {
         Long userId = UserContext.requiredUserId();
@@ -56,7 +60,9 @@ public class CourseController {
 
     @GetMapping("/{courseId}")
     @Authenticated
-    @Operation(summary = "Chi tiết khóa học", description = "Lấy chi tiết khóa học theo id.")
+    @Operation(
+            summary = "Chi tiết khóa học của người dùng",
+            description = "Lấy chi tiết khóa học theo id, kèm trạng thái enroll và tiến độ của user hiện tại.")
     public ResponseApi<CourseUserDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
         Long courseIdValue = parseId(courseId, "courseId");
         Long userId = UserContext.requiredUserId();
@@ -89,7 +95,7 @@ public class CourseController {
     @GetMapping("/{courseId}/lessons")
     @Authenticated
     @Operation(
-            summary = "Danh sách lesson theo khóa học",
+            summary = "Danh sách bài học trong khóa học",
             description = "Trả danh sách lesson của course kèm trạng thái enrollment của user hiện tại.")
     public ResponseApi<PaginatedData<LessonUserSummaryResponse>> getCourseLessons(
             @PathVariable("courseId") String courseId,
