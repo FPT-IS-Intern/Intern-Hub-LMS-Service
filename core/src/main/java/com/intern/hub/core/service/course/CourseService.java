@@ -4,6 +4,7 @@ import com.intern.hub.core.domain.model.course.CourseModel;
 import com.intern.hub.core.domain.model.lesson.LessonModel;
 import com.intern.hub.core.repository.course.CourseLessonRepository;
 import com.intern.hub.core.repository.course.CourseRepository;
+import com.intern.hub.core.repository.lesson.LessonRepository;
 import com.intern.hub.core.service.lesson.LessonQueryService;
 import com.intern.hub.library.common.exception.NotFoundException;
 import lombok.AccessLevel;
@@ -24,6 +25,7 @@ public class CourseService {
 
     CourseRepository courseRepository;
     CourseLessonRepository courseLessonRepository;
+    LessonRepository lessonRepository;
     LessonQueryService lessonQueryService;
 
     @Transactional(readOnly = true)
@@ -46,6 +48,15 @@ public class CourseService {
                 .orElseThrow(
                         () -> new NotFoundException("course.not.found", "Không tìm thấy khóa học id: " + courseId));
         return courseLessonRepository.findLessonIdsByCourseId(courseId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LessonModel> getCourseLessons(Long courseId) {
+        List<Long> lessonIds = getCourseLessonIds(courseId);
+        if (lessonIds.isEmpty()) {
+            return List.of();
+        }
+        return lessonRepository.findAllByIds(lessonIds);
     }
 
     @Transactional(readOnly = true)

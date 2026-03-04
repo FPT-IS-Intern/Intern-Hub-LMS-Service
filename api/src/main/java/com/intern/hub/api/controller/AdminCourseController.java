@@ -3,10 +3,12 @@ package com.intern.hub.api.controller;
 import com.intern.hub.api.dto.request.CourseCreateRequest;
 import com.intern.hub.api.dto.response.course.CourseDetailResponse;
 import com.intern.hub.api.dto.response.course.CourseSummaryResponse;
+import com.intern.hub.api.mapper.LessonApiMapper;
 import com.intern.hub.api.mapper.CourseApiMapper;
 import com.intern.hub.api.util.PaginationUtils;
 import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.service.course.AdminCourseService;
+import com.intern.hub.core.service.course.CourseService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
@@ -36,7 +38,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdminCourseController {
 
     AdminCourseService adminCourseService;
+    CourseService courseService;
     CourseApiMapper courseApiMapper;
+    LessonApiMapper lessonApiMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Authenticated
@@ -48,27 +52,6 @@ public class AdminCourseController {
         adminCourseService.createCourse(
                 courseApiMapper.toModel(request), image, parseLessonIds(request.lessonIds()), UserContext.requiredUserId());
         return ResponseApi.noContent();
-    }
-
-    private List<Long> parseLessonIds(List<String> lessonIds) {
-        if (lessonIds == null || lessonIds.isEmpty()) {
-            return null;
-        }
-        return lessonIds.stream()
-                .filter(value -> value != null && !value.isBlank())
-                .map(value -> parseId(value, "lessonIds"))
-                .toList();
-    }
-
-    private Long parseId(String value, String field) {
-        if (value == null || value.isBlank()) {
-            throw new BadRequestException("id.invalid", field + " không hợp lệ");
-        }
-        try {
-            return Long.parseLong(value);
-        } catch (NumberFormatException ex) {
-            throw new BadRequestException("id.invalid", field + " không hợp lệ");
-        }
     }
 
     @GetMapping
@@ -87,8 +70,10 @@ public class AdminCourseController {
     public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
         Long courseIdValue = parseId(courseId, "courseId");
         var model = adminCourseService.getCourse(courseIdValue);
-        var lessonIds =
-                adminCourseService.getCourseLessonIds(courseIdValue).stream().map(String::valueOf).toList();
+        var lessons =
+                courseService.getCourseLessons(courseIdValue).stream()
+                        .map(item -> lessonApiMapper.toSummaryResponse(item, null))
+                        .toList();
         var courseIdString = model.getCourseId() == null ? null : model.getCourseId().toString();
         var res =
                 new CourseDetailResponse(
@@ -96,7 +81,7 @@ public class AdminCourseController {
                         model.getName(),
                         model.getDescription(),
                         model.getCourseImageUrl(),
-                        lessonIds);
+                        lessons);
         return ResponseApi.ok(res);
     }
 
@@ -124,6 +109,27 @@ public class AdminCourseController {
     public ResponseApi<?> deleteCourse(@PathVariable("courseId") String courseId) {
         adminCourseService.deleteCourse(parseId(courseId, "courseId"), UserContext.requiredUserId());
         return ResponseApi.noContent();
+    }
+
+    private List<Long> parseLessonIds(List<String> lessonIds) {
+        if (lessonIds == null || lessonIds.isEmpty()) {
+            return null;
+        }
+        return lessonIds.stream()
+                .filter(value -> value != null && !value.isBlank())
+                .map(value -> parseId(value, "lessonIds"))
+                .toList();
+    }
+
+    private Long parseId(String value, String field) {
+        if (value == null || value.isBlank()) {
+            throw new BadRequestException("id.invalid", field + " không hợp lệ");
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ex) {
+            throw new BadRequestException("id.invalid", field + " không hợp lệ");
+        }
     }
 
     private List<Long> parseLessonIdsForUpdate(List<String> lessonIds) {

@@ -53,8 +53,10 @@ public class CourseController {
     public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
         Long courseIdValue = parseId(courseId, "courseId");
         var model = courseService.getCourse(courseIdValue);
-        var lessonIds =
-                courseService.getCourseLessonIds(courseIdValue).stream().map(String::valueOf).toList();
+        var lessons =
+                courseService.getCourseLessons(courseIdValue).stream()
+                        .map(item -> lessonApiMapper.toSummaryResponse(item, null))
+                        .toList();
         var courseIdString = model.getCourseId() == null ? null : model.getCourseId().toString();
         var res =
                 new CourseDetailResponse(
@@ -62,7 +64,7 @@ public class CourseController {
                         model.getName(),
                         model.getDescription(),
                         model.getCourseImageUrl(),
-                        lessonIds);
+                        lessons);
         return ResponseApi.ok(res);
     }
 
