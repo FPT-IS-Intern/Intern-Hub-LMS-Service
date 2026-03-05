@@ -48,5 +48,9 @@ public class CoursePositionAssignmentRepositoryImpl implements CoursePositionAss
         coursePositionEntityRepository.flush();
         saveCoursePositions(courseId, positionIds);
     }
-}
 
+    @Override
+    public List<Long> findPositionIdsByCourseId(Long courseId) {
+        return coursePositionEntityRepository.findPositionIdsByCourseId(courseId);
+    }
+}

@@ -83,6 +83,9 @@ public class AdminCourseController {
                 courseService.getCourseLessons(courseIdValue).stream()
                         .map(lessonApiMapper::toSummaryResponse)
                         .toList();
+        var positionIds = adminCourseService.getCoursePositionIds(courseIdValue).stream()
+                .map(String::valueOf)
+                .toList();
         var evaluatorUserIds = adminCourseService.getCourseEvaluatorUserIds(courseIdValue);
         var evaluators = userDirectoryRepository.findByIds(evaluatorUserIds).stream()
                 .map(user ->
@@ -100,6 +103,7 @@ public class AdminCourseController {
                         model.getName(),
                         model.getDescription(),
                         model.getCourseImageUrl(),
+                        positionIds,
                         lessons,
                         evaluators);
         return ResponseApi.ok(res);

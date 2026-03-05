@@ -8,5 +8,6 @@ public record CourseDetailResponse(
     String name,
     String description,
     String courseImageUrl,
+    List<String> positionIds,
     List<LessonSummaryResponse> lessons,
     List<CourseEvaluatorUserResponse> evaluators) {}

@@ -126,6 +126,11 @@ public class AdminCourseService {
         return courseEvaluatorAssignmentRepository.findEvaluatorUserIdsByCourseId(courseId);
     }
 
+    @Transactional(readOnly = true)
+    public List<Long> getCoursePositionIds(Long courseId) {
+        return coursePositionAssignmentRepository.findPositionIdsByCourseId(courseId);
+    }
+
     /**
      * Cập nhật thông tin khóa học và thay ảnh đại diện nếu có ảnh mới.
      */
