@@ -2,12 +2,11 @@ package com.intern.hub.api.util;
 
 import com.intern.hub.starter.security.context.AuthContext;
 import com.intern.hub.starter.security.context.AuthContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 import java.util.Set;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 public final class UserContext {
 

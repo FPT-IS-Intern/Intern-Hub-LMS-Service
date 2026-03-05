@@ -6,6 +6,7 @@ import com.intern.hub.infra.feign.model.DmsDocumentClientModel;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.InternalErrorException;
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import feign.FeignException;
 
 /**
  * Admin 1/29/2026

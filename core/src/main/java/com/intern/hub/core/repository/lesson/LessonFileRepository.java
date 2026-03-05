@@ -2,19 +2,22 @@ package com.intern.hub.core.repository.lesson;
 
 import com.intern.hub.core.domain.model.lesson.LessonFileModel;
 import com.intern.hub.core.domain.model.lesson.constant.LessonFileType;
+
 import java.util.List;
 import java.util.Optional;
 
-/** Admin 1/29/2026 */
+/**
+ * Admin 1/29/2026
+ */
 public interface LessonFileRepository {
 
-  void save(LessonFileModel lessonFileModel);
+    void save(LessonFileModel lessonFileModel);
 
-  Long getTotalSizeByLessonId(Long lessonId, LessonFileType lessonFileType);
+    Long getTotalSizeByLessonId(Long lessonId, LessonFileType lessonFileType);
 
-  List<LessonFileModel> findAllByLessonId(Long lessonId);
+    List<LessonFileModel> findAllByLessonId(Long lessonId);
 
-  Optional<LessonFileModel> findById(Long lessonFileId);
+    Optional<LessonFileModel> findById(Long lessonFileId);
 
-  void deleteById(Long lessonFileId);
+    void deleteById(Long lessonFileId);
 }

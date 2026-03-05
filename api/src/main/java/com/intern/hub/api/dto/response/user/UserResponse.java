@@ -1,9 +1,9 @@
 package com.intern.hub.api.dto.response.user;
 
-import java.time.LocalDate;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
 
 /**
  * Response DTO for user data. Mapping from UserModel is handled by MapStruct in UserApiMapper.
