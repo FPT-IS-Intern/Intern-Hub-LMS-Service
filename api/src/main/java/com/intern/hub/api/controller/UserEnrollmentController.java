@@ -1,7 +1,6 @@
 package com.intern.hub.api.controller;
 
 import com.intern.hub.api.dto.response.enrollment.CourseEnrollmentResponse;
-import com.intern.hub.api.dto.response.enrollment.LessonEnrollmentResponse;
 import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.service.enrollment.EnrollmentService;
 import com.intern.hub.library.common.dto.ResponseApi;
@@ -32,36 +31,13 @@ public class UserEnrollmentController {
   @Operation(
       summary = "Tra cứu ghi danh khóa học của tôi",
       description = "Lấy course enrollment theo courseId của user hiện tại.")
-  public ResponseApi<CourseEnrollmentResponse> getCourseEnrollment(
-      @PathVariable("courseId") String courseId) {
-    var enrollment =
-        enrollmentService.getCourseEnrollment(
-            parseId(courseId, "courseId"), UserContext.requiredUserId());
-    return ResponseApi.ok(enrollment.map(this::toCourseEnrollmentResponse).orElse(null));
-  }
-
-  @GetMapping("/lms/lessons/{lessonId}/enrollment")
-  @Authenticated
-  @Operation(
-      summary = "Tra cứu ghi danh bài học của tôi",
-      description = "Lấy lesson enrollment theo lessonId của user hiện tại.")
-  public ResponseApi<LessonEnrollmentResponse> getLessonEnrollment(
-      @PathVariable("lessonId") String lessonId) {
-    var enrollment =
-        enrollmentService.getLessonEnrollment(
-            parseId(lessonId, "lessonId"), UserContext.requiredUserId());
-    return ResponseApi.ok(enrollment.map(this::toLessonEnrollmentResponse).orElse(null));
-  }
-
-  @PostMapping("/lms/courses/{courseId}/enroll")
-  @Authenticated
-  @Operation(
-      summary = "Ghi danh khóa học cho người dùng",
-      description = "Tạo hoặc cập nhật trạng thái ghi danh vào khóa học cho user hiện tại.")
-  public ResponseApi<?> enrollCourse(@PathVariable("courseId") String courseId) {
-    enrollmentService.enrollCourse(parseId(courseId, "courseId"), UserContext.requiredUserId());
-    return ResponseApi.noContent();
-  }
+    public ResponseApi<CourseEnrollmentResponse> getCourseEnrollment(
+            @PathVariable("courseId") String courseId) {
+        var enrollment =
+                enrollmentService.getCourseEnrollment(
+                        parseId(courseId, "courseId"), UserContext.requiredUserId());
+        return ResponseApi.ok(enrollment.map(this::toCourseEnrollmentResponse).orElse(null));
+    }
 
   private Long parseId(String value, String field) {
     if (value == null || value.isBlank()) {
@@ -74,21 +50,12 @@ public class UserEnrollmentController {
     }
   }
 
-  private CourseEnrollmentResponse toCourseEnrollmentResponse(
-      com.intern.hub.core.domain.model.enrollment.CourseEnrollmentModel model) {
-    return new CourseEnrollmentResponse(
-        model.getCourseEnrollmentId() == null ? null : model.getCourseEnrollmentId().toString(),
-        model.getCourseId() == null ? null : model.getCourseId().toString(),
-        model.getUserId() == null ? null : model.getUserId().toString(),
-        model.getCourseProgress() == null ? null : model.getCourseProgress().name());
-  }
-
-  private LessonEnrollmentResponse toLessonEnrollmentResponse(
-      com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel model) {
-    return new LessonEnrollmentResponse(
-        model.getLessonEnrollmentId() == null ? null : model.getLessonEnrollmentId().toString(),
-        model.getCourseEnrollmentId() == null ? null : model.getCourseEnrollmentId().toString(),
-        model.getLessonId() == null ? null : model.getLessonId().toString(),
-        model.getLessonProgress() == null ? null : model.getLessonProgress().name());
-  }
+    private CourseEnrollmentResponse toCourseEnrollmentResponse(
+            com.intern.hub.core.domain.model.enrollment.CourseEnrollmentModel model) {
+        return new CourseEnrollmentResponse(
+                model.getCourseEnrollmentId() == null ? null : model.getCourseEnrollmentId().toString(),
+                model.getCourseId() == null ? null : model.getCourseId().toString(),
+                model.getUserId() == null ? null : model.getUserId().toString(),
+                model.getCourseProgress() == null ? null : model.getCourseProgress().name());
+    }
 }

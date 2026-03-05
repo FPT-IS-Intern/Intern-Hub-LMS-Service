@@ -1,13 +1,10 @@
 package com.intern.hub.core.service.submission;
 
-import com.intern.hub.core.domain.model.enrollment.constant.CourseProgress;
-import com.intern.hub.core.domain.model.enrollment.constant.LessonProgress;
 import com.intern.hub.core.domain.model.submission.LessonSubmissionModel;
 import com.intern.hub.core.domain.model.submission.SubmissionAttachmentModel;
 import com.intern.hub.core.domain.model.submission.SubmissionCommentModel;
 import com.intern.hub.core.domain.model.submission.constant.SubmissionStatus;
 import com.intern.hub.core.repository.FileStorageRepository;
-import com.intern.hub.core.repository.enrollment.CourseEnrollmentRepository;
 import com.intern.hub.core.repository.enrollment.LessonEnrollmentRepository;
 import com.intern.hub.core.repository.submission.LessonSubmissionRepository;
 import com.intern.hub.core.repository.submission.SubmissionAttachmentRepository;
@@ -44,7 +41,6 @@ public class LessonSubmissionService {
             List<SubmissionAttachmentModel> attachments) {
     }
 
-    CourseEnrollmentRepository courseEnrollmentRepository;
     LessonEnrollmentRepository lessonEnrollmentRepository;
     LessonSubmissionRepository lessonSubmissionRepository;
     SubmissionAttachmentRepository submissionAttachmentRepository;
@@ -210,35 +206,6 @@ public class LessonSubmissionService {
             throw new BadRequestException(
                     "submission.file.required", "Bài nộp phải còn ít nhất 1 file đính kèm");
         }
-
-        lessonEnrollmentRepository.updateProgress(lessonEnrollmentId, LessonProgress.COMPLETED);
-
-        Long courseEnrollmentId =
-                lessonEnrollmentRepository
-                        .findCourseEnrollmentIdByLessonEnrollmentId(lessonEnrollmentId)
-                        .orElseThrow(
-                                () ->
-                                        new NotFoundException(
-                                                "course.enrollment.not.found", "Không tìm thấy course enrollment"));
-
-        long totalLessons = lessonEnrollmentRepository.countByCourseEnrollmentId(courseEnrollmentId);
-        long completedLessons =
-                lessonEnrollmentRepository.countByCourseEnrollmentIdAndProgress(
-                        courseEnrollmentId, LessonProgress.COMPLETED);
-        CourseProgress courseProgress =
-                totalLessons > 0 && completedLessons == totalLessons
-                        ? CourseProgress.COMPLETED
-                        : CourseProgress.IN_PROGRESS;
-
-        courseEnrollmentRepository
-                .findById(courseEnrollmentId)
-                .ifPresent(
-                        existing -> {
-                            if (existing.getCourseProgress() != courseProgress) {
-                                existing.setCourseProgress(courseProgress);
-                                courseEnrollmentRepository.save(existing);
-                            }
-                        });
 
         return new LessonSubmissionResult(
                 submission.getLessonSubmissionId(),
