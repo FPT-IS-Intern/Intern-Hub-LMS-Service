@@ -1,6 +1,7 @@
 package com.intern.hub.infra.feign;
 
 import com.intern.hub.infra.feign.model.HrmUserClientModel;
+import com.intern.hub.infra.feign.model.HrmPositionClientModel;
 import com.intern.hub.library.common.dto.ResponseApi;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -21,4 +22,7 @@ public interface HrmInternalFeignClient {
 
     @PostMapping("/hrm/internal/users/by-ids")
     ResponseApi<List<HrmUserClientModel>> getUsersByIdsInternal(@RequestBody List<Long> userIds);
+
+    @GetMapping("/hrm/internal/positions")
+    ResponseApi<List<HrmPositionClientModel>> getPositionsInternal();
 }

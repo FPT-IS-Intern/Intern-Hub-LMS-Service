@@ -43,6 +43,13 @@ public class CourseEvaluatorAssignmentRepositoryImpl implements CourseEvaluatorA
     }
 
     @Override
+    public void replaceCourseEvaluators(Long courseId, List<Long> evaluatorUserIds) {
+        courseEvaluatorEntityRepository.deleteByCourseEntity_CourseId(courseId);
+        courseEvaluatorEntityRepository.flush();
+        saveCourseEvaluators(courseId, evaluatorUserIds);
+    }
+
+    @Override
     public List<Long> findEvaluatorUserIdsByCourseId(Long courseId) {
         return courseEvaluatorEntityRepository.findUserIdsByCourseId(courseId);
     }

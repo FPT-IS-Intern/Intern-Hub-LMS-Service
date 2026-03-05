@@ -58,7 +58,8 @@ public class AdminCourseController {
                 image,
                 parseLessonIds(request.lessonIds()),
                 parseEvaluatorUserIds(request.evaluatorUserIds()),
-                UserContext.requiredUserId());
+                UserContext.requiredUserId()
+        );
         return ResponseApi.noContent();
     }
 
@@ -72,10 +73,10 @@ public class AdminCourseController {
         return ResponseApi.ok(res);
     }
 
-  @GetMapping("/{courseId:\\d+}")
-  @Authenticated
-  @Operation(summary = "Chi tiết khóa học", description = "Lấy chi tiết khóa học theo id.")
-  public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
+    @GetMapping("/{courseId:\\d+}")
+    @Authenticated
+    @Operation(summary = "Chi tiết khóa học", description = "Lấy chi tiết khóa học theo id.")
+    public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
         Long courseIdValue = parseId(courseId, "courseId");
         var model = adminCourseService.getCourse(courseIdValue);
         var lessons =
@@ -104,28 +105,31 @@ public class AdminCourseController {
         return ResponseApi.ok(res);
     }
 
-  @PutMapping(value = "/{courseId:\\d+}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @Authenticated
-  @Operation(
-      summary = "Cập nhật khóa học",
+    @PutMapping(value = "/{courseId:\\d+}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Authenticated
+    @Operation(
+            summary = "Cập nhật khóa học",
             description = "Cập nhật thông tin khóa học, có thể thay ảnh.")
     public ResponseApi<?> updateCourse(
             @PathVariable("courseId") String courseId,
             @RequestPart("data") @Valid CourseCreateRequest request,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
         adminCourseService.updateCourse(
                 parseId(courseId, "courseId"),
                 courseApiMapper.toModel(request),
                 image,
                 parseLessonIdsForUpdate(request.lessonIds()),
-                UserContext.requiredUserId());
+                parseEvaluatorUserIdsForUpdate(request.evaluatorUserIds()),
+                UserContext.requiredUserId()
+        );
         return ResponseApi.noContent();
     }
 
-  @DeleteMapping("/{courseId:\\d+}")
-  @Authenticated
-  @Operation(summary = "Xóa khóa học", description = "Xóa khóa học theo id.")
-  public ResponseApi<?> deleteCourse(@PathVariable("courseId") String courseId) {
+    @DeleteMapping("/{courseId:\\d+}")
+    @Authenticated
+    @Operation(summary = "Xóa khóa học", description = "Xóa khóa học theo id.")
+    public ResponseApi<?> deleteCourse(@PathVariable("courseId") String courseId) {
         adminCourseService.deleteCourse(parseId(courseId, "courseId"), UserContext.requiredUserId());
         return ResponseApi.noContent();
     }
@@ -196,5 +200,15 @@ public class AdminCourseController {
                 .filter(value -> value != null && !value.isBlank())
                 .map(value -> parseId(value, "evaluatorUserIds"))
                 .toList();
+    }
+
+    private List<Long> parseEvaluatorUserIdsForUpdate(List<String> evaluatorUserIds) {
+        if (evaluatorUserIds == null) {
+            return null;
+        }
+        if (evaluatorUserIds.isEmpty()) {
+            return List.of();
+        }
+        return parseEvaluatorUserIds(evaluatorUserIds);
     }
 }

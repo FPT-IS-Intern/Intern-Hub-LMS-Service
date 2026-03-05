@@ -1,6 +1,7 @@
 package com.intern.hub.core.repository.user;
 
 import com.intern.hub.core.domain.model.user.UserDirectoryModel;
+import com.intern.hub.core.domain.model.user.PositionDirectoryModel;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,4 +12,6 @@ public interface UserDirectoryRepository {
     Optional<UserDirectoryModel> findByEmail(String email);
 
     List<UserDirectoryModel> findByIds(List<Long> userIds);
+
+    List<PositionDirectoryModel> findAllPositions();
 }

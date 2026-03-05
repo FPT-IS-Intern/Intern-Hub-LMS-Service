@@ -124,7 +124,12 @@ public class AdminCourseService {
      */
     @Transactional
     public void updateCourse(
-            Long courseId, CourseModel updateModel, MultipartFile newImage, List<Long> lessonIds, Long actorId) {
+            Long courseId,
+            CourseModel updateModel,
+            MultipartFile newImage,
+            List<Long> lessonIds,
+            List<Long> evaluatorUserIds,
+            Long actorId) {
         CourseModel existing =
                 courseRepository
                         .findById(courseId)
@@ -138,6 +143,10 @@ public class AdminCourseService {
 
         if (lessonIds != null) {
             courseLessonRepository.replaceCourseLessons(courseId, distinctOrdered(lessonIds));
+        }
+        if (evaluatorUserIds != null) {
+            courseEvaluatorAssignmentRepository.replaceCourseEvaluators(
+                    courseId, distinctOrdered(evaluatorUserIds));
         }
 
         if (newImage != null && !newImage.isEmpty()) {

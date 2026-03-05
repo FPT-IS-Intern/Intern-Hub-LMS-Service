@@ -1,6 +1,7 @@
 package com.intern.hub.infra.repository.user;
 
 import com.intern.hub.core.domain.model.user.UserDirectoryModel;
+import com.intern.hub.core.domain.model.user.PositionDirectoryModel;
 import com.intern.hub.core.repository.user.UserDirectoryRepository;
 import com.intern.hub.infra.feign.HrmInternalFeignClient;
 import com.intern.hub.library.common.exception.InternalErrorException;
@@ -73,6 +74,26 @@ public class HrmUserDirectoryRepository implements UserDirectoryRepository {
             log.error("Failed to fetch HRM internal users by ids {}", userIds, ex);
             throw new InternalErrorException(
                     "hrm.user.fetch.error", "Không thể lấy thông tin user từ HRM");
+        }
+    }
+
+    @Override
+    public List<PositionDirectoryModel> findAllPositions() {
+        try {
+            var response = hrmInternalFeignClient.getPositionsInternal();
+            if (response == null || response.data() == null) {
+                return List.of();
+            }
+            return response.data().stream()
+                    .map(position -> PositionDirectoryModel.builder()
+                            .positionId(position.positionId())
+                            .name(position.name())
+                            .build())
+                    .toList();
+        } catch (Exception ex) {
+            log.error("Failed to fetch HRM internal positions", ex);
+            throw new InternalErrorException(
+                    "hrm.position.fetch.error", "Không thể lấy danh sách position từ HRM");
         }
     }
 
