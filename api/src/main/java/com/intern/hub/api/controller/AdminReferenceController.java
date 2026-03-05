@@ -1,8 +1,10 @@
 package com.intern.hub.api.controller;
 
 import com.intern.hub.api.dto.response.reference.AdminPositionReferenceResponse;
+import com.intern.hub.api.dto.response.reference.AdminUserReferenceResponse;
 import com.intern.hub.core.repository.user.UserDirectoryRepository;
 import com.intern.hub.library.common.dto.ResponseApi;
+import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -37,5 +40,27 @@ public class AdminReferenceController {
                 .toList();
         return ResponseApi.ok(result);
     }
-}
 
+    @GetMapping("/users/by-email")
+    @Authenticated
+    @Operation(
+            summary = "Tra cứu user theo email",
+            description = "Lấy thông tin user reference theo email để FE hiển thị candidate.")
+    public ResponseApi<AdminUserReferenceResponse> getUserByEmail(
+            @RequestParam("email") String email) {
+        if (email == null || email.isBlank()) {
+            throw new BadRequestException("email.invalid", "email không hợp lệ");
+        }
+
+        var user = userDirectoryRepository.findByEmail(email)
+                .map(item ->
+                        new AdminUserReferenceResponse(
+                                item.getUserId() == null ? null : item.getUserId().toString(),
+                                item.getEmail(),
+                                item.getFullName(),
+                                item.getRole(),
+                                item.getAvatarUrl()))
+                .orElse(null);
+        return ResponseApi.ok(user);
+    }
+}
