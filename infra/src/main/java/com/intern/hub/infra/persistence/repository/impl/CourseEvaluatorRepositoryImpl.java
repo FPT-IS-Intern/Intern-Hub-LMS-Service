@@ -17,8 +17,18 @@ public class CourseEvaluatorRepositoryImpl implements CourseEvaluatorRepository 
     CourseEvaluatorEntityRepository courseEvaluatorEntityRepository;
 
     @Override
+    public List<EvaluatorCourseOverviewModel> findAllCourseOverviews() {
+        return toOverviewModels(courseEvaluatorEntityRepository.findAllCourseOverviews());
+    }
+
+    @Override
     public List<EvaluatorCourseOverviewModel> findCourseOverviewsByEvaluatorUserId(Long evaluatorUserId) {
-        return courseEvaluatorEntityRepository.findCourseOverviewsByEvaluatorUserId(evaluatorUserId).stream()
+        return toOverviewModels(courseEvaluatorEntityRepository.findCourseOverviewsByEvaluatorUserId(evaluatorUserId));
+    }
+
+    private List<EvaluatorCourseOverviewModel> toOverviewModels(
+            List<CourseEvaluatorEntityRepository.CourseOverviewProjection> rows) {
+        return rows.stream()
                 .map(
                         row -> {
                             long total = row.getTotalEnrollmentCount() == null ? 0L : row.getTotalEnrollmentCount();
@@ -36,4 +46,3 @@ public class CourseEvaluatorRepositoryImpl implements CourseEvaluatorRepository 
                 .toList();
     }
 }
-

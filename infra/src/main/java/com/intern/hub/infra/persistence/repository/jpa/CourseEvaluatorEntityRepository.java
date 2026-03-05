@@ -20,6 +20,21 @@ public interface CourseEvaluatorEntityRepository
     @Query(
             """
             SELECT
+              c.courseId AS courseId,
+              c.name AS name,
+              c.courseImageUrl AS courseImageUrl,
+              COUNT(en.courseEnrollmentId) AS totalEnrollmentCount,
+              COALESCE(SUM(CASE WHEN en.courseProgress = com.intern.hub.core.domain.model.enrollment.constant.CourseProgress.COMPLETED THEN 1 ELSE 0 END), 0) AS completedEnrollmentCount
+            FROM CourseEntity c
+            LEFT JOIN CourseEnrollmentEntity en ON en.courseEntity.courseId = c.courseId
+            GROUP BY c.courseId, c.name, c.courseImageUrl, c.createdAt
+            ORDER BY c.createdAt DESC
+            """)
+    List<CourseOverviewProjection> findAllCourseOverviews();
+
+    @Query(
+            """
+            SELECT
               ce.courseEntity.courseId AS courseId,
               ce.courseEntity.name AS name,
               ce.courseEntity.courseImageUrl AS courseImageUrl,
@@ -28,7 +43,7 @@ public interface CourseEvaluatorEntityRepository
             FROM CourseEvaluatorEntity ce
             LEFT JOIN CourseEnrollmentEntity en ON en.courseEntity.courseId = ce.courseEntity.courseId
             WHERE ce.userId = :userId
-            GROUP BY ce.courseEntity.courseId, ce.courseEntity.name, ce.courseEntity.courseImageUrl
+            GROUP BY ce.courseEntity.courseId, ce.courseEntity.name, ce.courseEntity.courseImageUrl, ce.courseEntity.createdAt
             ORDER BY ce.courseEntity.createdAt DESC
             """)
     List<CourseOverviewProjection> findCourseOverviewsByEvaluatorUserId(@Param("userId") Long userId);

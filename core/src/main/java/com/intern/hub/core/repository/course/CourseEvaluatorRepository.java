@@ -5,6 +5,7 @@ import java.util.List;
 
 public interface CourseEvaluatorRepository {
 
+    List<EvaluatorCourseOverviewModel> findAllCourseOverviews();
+
     List<EvaluatorCourseOverviewModel> findCourseOverviewsByEvaluatorUserId(Long evaluatorUserId);
 }
-

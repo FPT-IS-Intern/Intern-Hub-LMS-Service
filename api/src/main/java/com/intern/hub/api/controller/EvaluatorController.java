@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,11 +33,15 @@ public class EvaluatorController {
     @Authenticated
     @Operation(
             summary = "Danh sách khóa học evaluator",
-            description = "Lấy danh sách khóa học của evaluator kèm số lượng enrollment, hoàn thành và chưa hoàn thành.")
-    public ResponseApi<List<EvaluatorCourseOverviewResponse>> getEvaluatorCourses() {
+            description = "Lấy danh sách khóa học kèm số lượng enrollment, hoàn thành và chưa hoàn thành. "
+                    + "onlyEvaluable=true: chỉ khóa học user hiện tại có thể đánh giá; false: tất cả khóa học.")
+    public ResponseApi<List<EvaluatorCourseOverviewResponse>> getEvaluatorCourses(
+            @RequestParam(value = "onlyEvaluable", required = false, defaultValue = "false")
+            boolean onlyEvaluable
+    ) {
         Long evaluatorUserId = UserContext.requiredUserId();
         var result = evaluatorService
-                .getEvaluatorCourseOverviews(evaluatorUserId)
+                .getCourseOverviews(evaluatorUserId, onlyEvaluable)
                 .stream()
                 .map(item ->
                         new EvaluatorCourseOverviewResponse(
@@ -51,4 +56,3 @@ public class EvaluatorController {
         return ResponseApi.ok(result);
     }
 }
-
