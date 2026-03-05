@@ -18,6 +18,12 @@ public interface CourseEvaluatorEntityRepository
     void deleteByCourseEntity_CourseId(Long courseId);
 
     @Query(
+            "select ce.userId from CourseEvaluatorEntity ce "
+                    + "where ce.courseEntity.courseId = :courseId "
+                    + "order by ce.createdAt asc")
+    List<Long> findUserIdsByCourseId(@Param("courseId") Long courseId);
+
+    @Query(
             """
             SELECT
               c.courseId AS courseId,

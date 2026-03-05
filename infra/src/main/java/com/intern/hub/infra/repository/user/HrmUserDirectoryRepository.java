@@ -5,6 +5,7 @@ import com.intern.hub.core.repository.user.UserDirectoryRepository;
 import com.intern.hub.infra.feign.HrmInternalFeignClient;
 import com.intern.hub.library.common.exception.InternalErrorException;
 import feign.FeignException;
+import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -47,13 +48,7 @@ public class HrmUserDirectoryRepository implements UserDirectoryRepository {
             }
             var user = response.data();
             return Optional.of(
-                    UserDirectoryModel.builder()
-                            .userId(user.userId())
-                            .email(user.email())
-                            .fullName(user.fullName())
-                            .role(user.role())
-                            .avatarUrl(user.avatarUrl())
-                            .build());
+                    toUserDirectoryModel(user));
         } catch (FeignException.NotFound ex) {
             return Optional.empty();
         } catch (Exception ex) {
@@ -61,5 +56,33 @@ public class HrmUserDirectoryRepository implements UserDirectoryRepository {
             throw new InternalErrorException(
                     "hrm.user.fetch.error", "Không thể lấy thông tin user từ HRM");
         }
+    }
+
+    @Override
+    public List<UserDirectoryModel> findByIds(List<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return List.of();
+        }
+        try {
+            var response = hrmInternalFeignClient.getUsersByIdsInternal(userIds);
+            if (response == null || response.data() == null) {
+                return List.of();
+            }
+            return response.data().stream().map(this::toUserDirectoryModel).toList();
+        } catch (Exception ex) {
+            log.error("Failed to fetch HRM internal users by ids {}", userIds, ex);
+            throw new InternalErrorException(
+                    "hrm.user.fetch.error", "Không thể lấy thông tin user từ HRM");
+        }
+    }
+
+    private UserDirectoryModel toUserDirectoryModel(com.intern.hub.infra.feign.model.HrmUserClientModel user) {
+        return UserDirectoryModel.builder()
+                .userId(user.userId())
+                .email(user.email())
+                .fullName(user.fullName())
+                .role(user.role())
+                .avatarUrl(user.avatarUrl())
+                .build();
     }
 }

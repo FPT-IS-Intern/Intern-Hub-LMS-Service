@@ -2,6 +2,7 @@ package com.intern.hub.core.service.course;
 
 import com.intern.hub.core.domain.model.course.CourseModel;
 import com.intern.hub.core.repository.FileStorageRepository;
+import com.intern.hub.core.repository.course.CourseEvaluatorAssignmentRepository;
 import com.intern.hub.core.repository.course.CourseLessonRepository;
 import com.intern.hub.core.repository.course.CourseRepository;
 import com.intern.hub.core.service.storage.StorageObjectLifecycleManager;
@@ -34,6 +35,7 @@ public class AdminCourseService {
 
     CourseRepository courseRepository;
     CourseLessonRepository courseLessonRepository;
+    CourseEvaluatorAssignmentRepository courseEvaluatorAssignmentRepository;
     FileStorageRepository fileStorageRepository;
     StorageObjectLifecycleManager storageObjectLifecycleManager;
 
@@ -54,7 +56,12 @@ public class AdminCourseService {
      * thứ tự đã truyền.
      */
     @Transactional
-    public void createCourse(CourseModel model, MultipartFile image, List<Long> lessonIds, Long actorId) {
+    public void createCourse(
+            CourseModel model,
+            MultipartFile image,
+            List<Long> lessonIds,
+            List<Long> evaluatorUserIds,
+            Long actorId) {
         if (image == null || image.isEmpty()) {
             throw new BadRequestException("course.image.required", "Ảnh khóa học là bắt buộc");
         }
@@ -64,6 +71,10 @@ public class AdminCourseService {
 
         if (hasItems(lessonIds)) {
             courseLessonRepository.saveCourseLessons(courseId, distinctOrdered(lessonIds));
+        }
+        if (hasItems(evaluatorUserIds)) {
+            courseEvaluatorAssignmentRepository.saveCourseEvaluators(
+                    courseId, distinctOrdered(evaluatorUserIds));
         }
 
         String imageUrl =
@@ -101,6 +112,11 @@ public class AdminCourseService {
     @Transactional(readOnly = true)
     public List<Long> getCourseLessonIds(Long courseId) {
         return courseLessonRepository.findLessonIdsByCourseId(courseId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getCourseEvaluatorUserIds(Long courseId) {
+        return courseEvaluatorAssignmentRepository.findEvaluatorUserIdsByCourseId(courseId);
     }
 
     /**
