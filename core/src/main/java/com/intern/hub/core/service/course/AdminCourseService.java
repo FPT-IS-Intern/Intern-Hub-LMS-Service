@@ -4,6 +4,7 @@ import com.intern.hub.core.domain.model.course.CourseModel;
 import com.intern.hub.core.repository.FileStorageRepository;
 import com.intern.hub.core.repository.course.CourseEvaluatorAssignmentRepository;
 import com.intern.hub.core.repository.course.CourseLessonRepository;
+import com.intern.hub.core.repository.course.CoursePositionAssignmentRepository;
 import com.intern.hub.core.repository.course.CourseRepository;
 import com.intern.hub.core.service.storage.StorageObjectLifecycleManager;
 import com.intern.hub.library.common.exception.BadRequestException;
@@ -36,6 +37,7 @@ public class AdminCourseService {
     CourseRepository courseRepository;
     CourseLessonRepository courseLessonRepository;
     CourseEvaluatorAssignmentRepository courseEvaluatorAssignmentRepository;
+    CoursePositionAssignmentRepository coursePositionAssignmentRepository;
     FileStorageRepository fileStorageRepository;
     StorageObjectLifecycleManager storageObjectLifecycleManager;
 
@@ -61,6 +63,7 @@ public class AdminCourseService {
             MultipartFile image,
             List<Long> lessonIds,
             List<Long> evaluatorUserIds,
+            List<Long> positionIds,
             Long actorId) {
         if (image == null || image.isEmpty()) {
             throw new BadRequestException("course.image.required", "Ảnh khóa học là bắt buộc");
@@ -75,6 +78,10 @@ public class AdminCourseService {
         if (hasItems(evaluatorUserIds)) {
             courseEvaluatorAssignmentRepository.saveCourseEvaluators(
                     courseId, distinctOrdered(evaluatorUserIds));
+        }
+        if (hasItems(positionIds)) {
+            coursePositionAssignmentRepository.saveCoursePositions(
+                    courseId, distinctOrdered(positionIds));
         }
 
         String imageUrl =
@@ -129,14 +136,13 @@ public class AdminCourseService {
             MultipartFile newImage,
             List<Long> lessonIds,
             List<Long> evaluatorUserIds,
+            List<Long> positionIds,
             Long actorId) {
-        CourseModel existing =
-                courseRepository
-                        .findById(courseId)
-                        .orElseThrow(
-                                () ->
-                                        new NotFoundException(
-                                                "course.not.found", "Không tìm thấy khóa học id: " + courseId));
+        CourseModel existing = courseRepository
+                .findById(courseId)
+                .orElseThrow(() -> new NotFoundException(
+                        "course.not.found", "Không tìm thấy khóa học id: " + courseId
+                ));
 
         existing.setName(updateModel.getName());
         existing.setDescription(updateModel.getDescription());
@@ -147,6 +153,10 @@ public class AdminCourseService {
         if (evaluatorUserIds != null) {
             courseEvaluatorAssignmentRepository.replaceCourseEvaluators(
                     courseId, distinctOrdered(evaluatorUserIds));
+        }
+        if (positionIds != null) {
+            coursePositionAssignmentRepository.replaceCoursePositions(
+                    courseId, distinctOrdered(positionIds));
         }
 
         if (newImage != null && !newImage.isEmpty()) {

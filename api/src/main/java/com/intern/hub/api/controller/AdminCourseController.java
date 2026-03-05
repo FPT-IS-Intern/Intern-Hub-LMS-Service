@@ -57,6 +57,7 @@ public class AdminCourseController {
                 image,
                 parseLessonIds(request.lessonIds()),
                 parseEvaluatorUserIds(request.evaluatorUserIds()),
+                parsePositionIds(request.positionIds()),
                 UserContext.requiredUserId()
         );
         return ResponseApi.noContent();
@@ -120,6 +121,7 @@ public class AdminCourseController {
                 image,
                 parseLessonIdsForUpdate(request.lessonIds()),
                 parseEvaluatorUserIdsForUpdate(request.evaluatorUserIds()),
+                parsePositionIdsForUpdate(request.positionIds()),
                 UserContext.requiredUserId()
         );
         return ResponseApi.noContent();
@@ -182,5 +184,25 @@ public class AdminCourseController {
             return List.of();
         }
         return parseEvaluatorUserIds(evaluatorUserIds);
+    }
+
+    private List<Long> parsePositionIds(List<String> positionIds) {
+        if (positionIds == null || positionIds.isEmpty()) {
+            return null;
+        }
+        return positionIds.stream()
+                .filter(value -> value != null && !value.isBlank())
+                .map(value -> parseId(value, "positionIds"))
+                .toList();
+    }
+
+    private List<Long> parsePositionIdsForUpdate(List<String> positionIds) {
+        if (positionIds == null) {
+            return null;
+        }
+        if (positionIds.isEmpty()) {
+            return List.of();
+        }
+        return parsePositionIds(positionIds);
     }
 }

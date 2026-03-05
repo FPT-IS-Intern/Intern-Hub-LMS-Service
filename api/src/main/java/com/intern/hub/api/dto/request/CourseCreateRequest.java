@@ -13,5 +13,6 @@ public record CourseCreateRequest(
         @Size(max = 255, message = "Mô tả tối đa 255 ký tự")
         String description,
         List<String> lessonIds,
-        List<String> evaluatorUserIds) {
+        List<String> evaluatorUserIds,
+        List<String> positionIds) {
 }
