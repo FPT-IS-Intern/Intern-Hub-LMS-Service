@@ -1,12 +1,14 @@
 package com.intern.hub.api.controller;
 
 import com.intern.hub.api.dto.request.CourseCreateRequest;
+import com.intern.hub.api.dto.response.course.CourseEvaluatorCandidateResponse;
 import com.intern.hub.api.dto.response.course.CourseDetailResponse;
 import com.intern.hub.api.dto.response.course.CourseSummaryResponse;
 import com.intern.hub.api.mapper.CourseApiMapper;
 import com.intern.hub.api.mapper.LessonApiMapper;
 import com.intern.hub.api.util.PaginationUtils;
 import com.intern.hub.api.util.UserContext;
+import com.intern.hub.core.repository.user.UserDirectoryRepository;
 import com.intern.hub.core.service.course.AdminCourseService;
 import com.intern.hub.core.service.course.CourseService;
 import com.intern.hub.library.common.dto.PaginatedData;
@@ -37,6 +39,7 @@ public class AdminCourseController {
 
   AdminCourseService adminCourseService;
   CourseService courseService;
+  UserDirectoryRepository userDirectoryRepository;
   CourseApiMapper courseApiMapper;
   LessonApiMapper lessonApiMapper;
 
@@ -84,6 +87,34 @@ public class AdminCourseController {
             model.getCourseImageUrl(),
             lessons);
     return ResponseApi.ok(res);
+  }
+
+  @GetMapping("/evaluator-candidate")
+  @Authenticated
+  @Operation(
+      summary = "Tra cứu người dùng theo email",
+      description =
+          "Tra cứu thông tin user theo email để hiển thị candidate evaluator trước khi thực hiện add vào course.")
+  public ResponseApi<CourseEvaluatorCandidateResponse> getEvaluatorCandidateByEmail(
+      @RequestParam("email") String email) {
+    if (email == null || email.isBlank()) {
+      throw new BadRequestException("email.invalid", "email không hợp lệ");
+    }
+
+    var candidate =
+        userDirectoryRepository
+            .findByEmail(email)
+            .map(
+                user ->
+                    new CourseEvaluatorCandidateResponse(
+                        user.getUserId() == null ? null : user.getUserId().toString(),
+                        user.getEmail(),
+                        user.getFullName(),
+                        user.getRole(),
+                        user.getAvatarUrl()))
+            .orElse(null);
+
+    return ResponseApi.ok(candidate);
   }
 
   @PutMapping(value = "/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
