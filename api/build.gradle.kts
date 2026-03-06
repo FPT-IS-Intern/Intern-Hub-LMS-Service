@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.springBoot)
     alias(libs.plugins.dependencyManagement)
+    alias(libs.plugins.jib)
     java
 }
 
@@ -31,4 +32,8 @@ tasks.bootJar {
 
 tasks.jar {
     enabled = false
+}
+
+jib {
+    to.image = "intern-hub-lms-service:latest"
 }
