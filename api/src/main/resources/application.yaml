@@ -11,6 +11,10 @@ spring:
     hikari:
       minimum-idle: 1
       maximum-pool-size: 2
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   jpa:
     open-in-view: false
     properties:
