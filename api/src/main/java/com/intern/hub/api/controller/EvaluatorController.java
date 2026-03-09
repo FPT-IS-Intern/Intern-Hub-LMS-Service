@@ -1,20 +1,29 @@
 package com.intern.hub.api.controller;
 
+import com.intern.hub.api.dto.request.EvaluatorSubmissionCommentRequest;
 import com.intern.hub.api.dto.response.evaluator.EvaluatorCourseOverviewResponse;
+import com.intern.hub.api.dto.response.submission.EvaluatorSubmissionOverviewResponse;
+import com.intern.hub.api.dto.response.submission.SubmissionAttachmentResponse;
 import com.intern.hub.api.util.PaginationUtils;
 import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.service.evaluator.EvaluatorService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
+import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.web.PageableDefault;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,5 +61,77 @@ public class EvaluatorController {
                                 item.getNotCompletedEnrollmentCount(),
                                 item.isCanEvaluate()));
         return ResponseApi.ok(result);
+    }
+
+    @GetMapping("/courses/{courseId}/submissions")
+    @Authenticated
+    @Operation(
+            summary = "Danh sach bai nop cua khoa hoc",
+            description = "Lay danh sach bai nop trong khoa hoc ma evaluator duoc phan cong.")
+    public ResponseApi<List<EvaluatorSubmissionOverviewResponse>> getCourseSubmissions(
+            @PathVariable("courseId") String courseId) {
+        Long evaluatorUserId = UserContext.requiredUserId();
+        var result =
+                evaluatorService.getCourseSubmissions(parseId(courseId, "courseId"), evaluatorUserId);
+        return ResponseApi.ok(result.stream().map(this::toSubmissionResponse).toList());
+    }
+
+    @PostMapping("/submissions/{lessonSubmissionId}/comments")
+    @Authenticated
+    @Operation(
+            summary = "Gui nhan xet cho bai nop",
+            description = "Evaluator gui them nhan xet cho bai nop thuoc khoa hoc duoc phan cong.")
+    public ResponseApi<?> commentSubmission(
+            @PathVariable("lessonSubmissionId") String lessonSubmissionId,
+            @Valid @RequestBody EvaluatorSubmissionCommentRequest request) {
+        evaluatorService.commentSubmission(
+                parseId(lessonSubmissionId, "lessonSubmissionId"),
+                UserContext.requiredUserId(),
+                request.comment());
+        return ResponseApi.noContent();
+    }
+
+    private EvaluatorSubmissionOverviewResponse toSubmissionResponse(
+            com.intern.hub.core.domain.model.submission.EvaluatorSubmissionOverviewModel item) {
+        var attachments = item.getAttachments() == null
+                ? List.<SubmissionAttachmentResponse>of()
+                : item.getAttachments().stream()
+                        .map(
+                                attachment ->
+                                        new SubmissionAttachmentResponse(
+                                                attachment.getSubmissionAttachmentId() == null
+                                                        ? null
+                                                        : attachment
+                                                                .getSubmissionAttachmentId()
+                                                                .toString(),
+                                                attachment.getFileName(),
+                                                attachment.getFileUrl(),
+                                                attachment.getFileSize()))
+                        .toList();
+        return new EvaluatorSubmissionOverviewResponse(
+                item.getLessonSubmissionId() == null ? null : item.getLessonSubmissionId().toString(),
+                item.getCourseEnrollmentId() == null ? null : item.getCourseEnrollmentId().toString(),
+                item.getLessonEnrollmentId() == null ? null : item.getLessonEnrollmentId().toString(),
+                item.getLessonId() == null ? null : item.getLessonId().toString(),
+                item.getLessonName(),
+                item.getUserId() == null ? null : item.getUserId().toString(),
+                item.getUserEmail(),
+                item.getUserFullName(),
+                item.getUserAvatarUrl(),
+                item.getSubmissionStatus() == null ? null : item.getSubmissionStatus().name(),
+                item.getLastSubmissionAt(),
+                item.getComment(),
+                attachments);
+    }
+
+    private Long parseId(String value, String field) {
+        if (value == null || value.isBlank()) {
+            throw new BadRequestException("id.invalid", field + " khong hop le");
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ex) {
+            throw new BadRequestException("id.invalid", field + " khong hop le");
+        }
     }
 }

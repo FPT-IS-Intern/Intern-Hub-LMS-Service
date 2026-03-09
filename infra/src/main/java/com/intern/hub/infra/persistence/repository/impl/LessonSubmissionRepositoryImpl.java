@@ -1,5 +1,6 @@
 package com.intern.hub.infra.persistence.repository.impl;
 
+import com.intern.hub.core.domain.model.submission.EvaluatorSubmissionOverviewModel;
 import com.intern.hub.core.domain.model.submission.LessonSubmissionModel;
 import com.intern.hub.core.repository.submission.LessonSubmissionRepository;
 import com.intern.hub.infra.persistence.entity.submission.LessonSubmissionEntity;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,10 +23,38 @@ public class LessonSubmissionRepositoryImpl implements LessonSubmissionRepositor
     LessonEnrollmentEntityRepository lessonEnrollmentEntityRepository;
 
     @Override
+    public Optional<LessonSubmissionModel> findById(Long lessonSubmissionId) {
+        return lessonSubmissionEntityRepository.findById(lessonSubmissionId).map(this::toModel);
+    }
+
+    @Override
     public Optional<LessonSubmissionModel> findByLessonEnrollmentId(Long lessonEnrollmentId) {
         return lessonSubmissionEntityRepository
                 .findByLessonEnrollmentEntity_LessonEnrollmentId(lessonEnrollmentId)
                 .map(this::toModel);
+    }
+
+    @Override
+    public List<EvaluatorSubmissionOverviewModel> findByCourseId(Long courseId) {
+        return lessonSubmissionEntityRepository.findByCourseId(courseId).stream()
+                .map(
+                        item ->
+                                EvaluatorSubmissionOverviewModel.builder()
+                                        .lessonSubmissionId(item.getLessonSubmissionId())
+                                        .courseEnrollmentId(item.getCourseEnrollmentId())
+                                        .lessonEnrollmentId(item.getLessonEnrollmentId())
+                                        .lessonId(item.getLessonId())
+                                        .lessonName(item.getLessonName())
+                                        .userId(item.getUserId())
+                                        .submissionStatus(item.getSubmissionStatus())
+                                        .lastSubmissionAt(item.getLastSubmissionAt())
+                                        .build())
+                .toList();
+    }
+
+    @Override
+    public Optional<Long> findCourseIdByLessonSubmissionId(Long lessonSubmissionId) {
+        return lessonSubmissionEntityRepository.findCourseIdByLessonSubmissionId(lessonSubmissionId);
     }
 
     @Override

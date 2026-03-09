@@ -1,9 +1,17 @@
 package com.intern.hub.core.service.evaluator;
 
 import com.intern.hub.core.domain.model.course.EvaluatorCourseOverviewModel;
+import com.intern.hub.core.domain.model.submission.EvaluatorSubmissionOverviewModel;
+import com.intern.hub.core.domain.model.submission.SubmissionCommentModel;
 import com.intern.hub.core.repository.course.CourseEvaluatorRepository;
+import com.intern.hub.core.repository.course.CourseEvaluatorAssignmentRepository;
+import com.intern.hub.core.repository.submission.LessonSubmissionRepository;
+import com.intern.hub.core.repository.submission.SubmissionAttachmentRepository;
+import com.intern.hub.core.repository.submission.SubmissionCommentRepository;
 import com.intern.hub.core.repository.user.UserDirectoryRepository;
+import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.NotFoundException;
+import com.intern.hub.library.common.exception.ForbiddenException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class EvaluatorService {
 
     CourseEvaluatorRepository courseEvaluatorRepository;
+    CourseEvaluatorAssignmentRepository courseEvaluatorAssignmentRepository;
     UserDirectoryRepository userDirectoryRepository;
+    LessonSubmissionRepository lessonSubmissionRepository;
+    SubmissionAttachmentRepository submissionAttachmentRepository;
+    SubmissionCommentRepository submissionCommentRepository;
 
     @Transactional(readOnly = true)
     public Page<EvaluatorCourseOverviewModel> getCourseOverviews(
@@ -30,5 +42,75 @@ public class EvaluatorService {
             return courseEvaluatorRepository.findCourseOverviewsByEvaluatorUserId(evaluatorUserId, pageable);
         }
         return courseEvaluatorRepository.findAllCourseOverviews(evaluatorUserId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<EvaluatorSubmissionOverviewModel> getCourseSubmissions(
+            Long courseId, Long evaluatorUserId) {
+        if (courseEvaluatorAssignmentRepository.findEvaluatorUserIdsByCourseId(courseId).stream()
+                .noneMatch(evaluatorUserId::equals)) {
+            throw new ForbiddenException("evaluator.course.forbidden", "Ban khong duoc phan cong danh gia khoa hoc nay");
+        }
+
+        var submissions = lessonSubmissionRepository.findByCourseId(courseId);
+        var users = userDirectoryRepository.findByIds(
+                submissions.stream().map(EvaluatorSubmissionOverviewModel::getUserId).distinct().toList());
+        var userMap = users.stream().collect(java.util.stream.Collectors.toMap(
+                user -> user.getUserId(),
+                user -> user));
+
+        return submissions.stream()
+                .map(
+                        item -> {
+                            var user = userMap.get(item.getUserId());
+                            item.setUserEmail(user == null ? null : user.getEmail());
+                            item.setUserFullName(user == null ? null : user.getFullName());
+                            item.setUserAvatarUrl(user == null ? null : user.getAvatarUrl());
+                            item.setAttachments(
+                                    submissionAttachmentRepository.findByLessonSubmissionId(item.getLessonSubmissionId()));
+                            item.setComment(
+                                    submissionCommentRepository
+                                            .findLatestByLessonSubmissionId(item.getLessonSubmissionId())
+                                            .map(comment -> comment.getContent())
+                                            .orElse(null));
+                            return item;
+                        })
+                .toList();
+    }
+
+    @Transactional
+    public void commentSubmission(Long lessonSubmissionId, Long evaluatorUserId, String comment) {
+        if (comment == null || comment.isBlank()) {
+            throw new BadRequestException("submission.comment.invalid", "Noi dung nhan xet khong duoc de trong");
+        }
+
+        lessonSubmissionRepository
+                .findById(lessonSubmissionId)
+                .orElseThrow(
+                        () ->
+                                new NotFoundException(
+                                        "lesson.submission.not.found", "Khong tim thay bai nop"));
+
+        Long courseId =
+                lessonSubmissionRepository
+                        .findCourseIdByLessonSubmissionId(lessonSubmissionId)
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "course.not.found", "Khong tim thay khoa hoc cua bai nop"));
+
+        if (courseEvaluatorAssignmentRepository.findEvaluatorUserIdsByCourseId(courseId).stream()
+                .noneMatch(evaluatorUserId::equals)) {
+            throw new ForbiddenException(
+                    "evaluator.course.forbidden", "Ban khong duoc phan cong danh gia bai nop nay");
+        }
+
+        submissionCommentRepository.save(
+                SubmissionCommentModel.builder()
+                        .lessonSubmissionId(lessonSubmissionId)
+                        .userId(evaluatorUserId)
+                        .content(comment.trim())
+                        .commentAt(System.currentTimeMillis())
+                        .build());
     }
 }
