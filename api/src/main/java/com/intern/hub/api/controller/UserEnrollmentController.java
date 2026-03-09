@@ -8,6 +8,7 @@ import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.RequestBody;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,6 +39,17 @@ public class UserEnrollmentController {
                         parseId(courseId, "courseId"), UserContext.requiredUserId());
         return ResponseApi.ok(enrollment.map(this::toCourseEnrollmentResponse).orElse(null));
     }
+
+  @PostMapping("/lms/courses/{courseId}/enroll")
+  @Authenticated
+  @Operation(
+      summary = "Ghi danh khóa học cho người dùng",
+      description = "Tạo hoặc cập nhật trạng thái ghi danh vào khóa học cho user hiện tại.")
+  public ResponseApi<?> enrollCourse(
+      @PathVariable("courseId") String courseId, @RequestBody(required = false) Object request) {
+    enrollmentService.enrollCourse(parseId(courseId, "courseId"), UserContext.requiredUserId());
+    return ResponseApi.noContent();
+  }
 
   private Long parseId(String value, String field) {
     if (value == null || value.isBlank()) {
