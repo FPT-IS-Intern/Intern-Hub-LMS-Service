@@ -13,7 +13,9 @@ public record EvaluatorSubmissionOverviewResponse(
         String userFullName,
         String userAvatarUrl,
         String submissionStatus,
+        String evaluationStatus,
         Long lastSubmissionAt,
-        String comment,
+        String learnerNote,
+        String evaluatorComment,
         List<SubmissionAttachmentResponse> attachments) {
 }

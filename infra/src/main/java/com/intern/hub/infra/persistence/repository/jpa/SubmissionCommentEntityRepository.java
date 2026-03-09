@@ -14,4 +14,7 @@ public interface SubmissionCommentEntityRepository
 
     java.util.Optional<SubmissionCommentEntity> findFirstByLessonSubmissionEntity_LessonSubmissionIdOrderByCommentAtDesc(
             Long lessonSubmissionId);
+
+    java.util.List<SubmissionCommentEntity> findByLessonSubmissionEntity_LessonSubmissionIdOrderByCommentAtDesc(
+            Long lessonSubmissionId);
 }

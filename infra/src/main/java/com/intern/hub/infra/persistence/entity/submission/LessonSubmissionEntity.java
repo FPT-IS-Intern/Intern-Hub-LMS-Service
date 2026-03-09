@@ -1,6 +1,7 @@
 package com.intern.hub.infra.persistence.entity.submission;
 
 import com.intern.hub.core.domain.model.submission.constant.SubmissionStatus;
+import com.intern.hub.core.domain.model.submission.constant.SubmissionEvaluationStatus;
 import com.intern.hub.infra.generator.SnowflakeGenerated;
 import com.intern.hub.infra.persistence.entity.base.AuditEntity;
 import com.intern.hub.infra.persistence.entity.enrollment.LessonEnrollmentEntity;
@@ -34,6 +35,10 @@ public class LessonSubmissionEntity extends AuditEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "submission_status", nullable = false)
     SubmissionStatus submissionStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "evaluation_status", nullable = false)
+    SubmissionEvaluationStatus evaluationStatus;
 
     @Column(name = "last_submission_at", nullable = false)
     Long lastSubmissionAt;

@@ -4,6 +4,7 @@ import com.intern.hub.core.domain.model.submission.LessonSubmissionModel;
 import com.intern.hub.core.domain.model.submission.SubmissionAttachmentModel;
 import com.intern.hub.core.domain.model.submission.SubmissionCommentModel;
 import com.intern.hub.core.domain.model.submission.constant.SubmissionStatus;
+import com.intern.hub.core.domain.model.submission.constant.SubmissionEvaluationStatus;
 import com.intern.hub.core.repository.FileStorageRepository;
 import com.intern.hub.core.repository.enrollment.CourseEnrollmentRepository;
 import com.intern.hub.core.repository.enrollment.LessonEnrollmentRepository;
@@ -37,6 +38,7 @@ public class LessonSubmissionService {
             Long lessonSubmissionId,
             Long lessonEnrollmentId,
             SubmissionStatus submissionStatus,
+            SubmissionEvaluationStatus evaluationStatus,
             Long lastSubmissionAt,
             String comment,
             List<SubmissionAttachmentModel> attachments) {
@@ -90,8 +92,9 @@ public class LessonSubmissionService {
                 lessonSubmissionRepository
                         .findByLessonEnrollmentId(lessonEnrollmentId)
                         .map(
-                                existing -> {
+                                    existing -> {
                                     existing.setSubmissionStatus(SubmissionStatus.SUBMITTED);
+                                    existing.setEvaluationStatus(SubmissionEvaluationStatus.PENDING);
                                     existing.setLastSubmissionAt(now);
                                     return lessonSubmissionRepository.save(existing);
                                 })
@@ -101,6 +104,7 @@ public class LessonSubmissionService {
                                                 LessonSubmissionModel.builder()
                                                         .lessonEnrollmentId(lessonEnrollmentId)
                                                         .submissionStatus(SubmissionStatus.SUBMITTED)
+                                                        .evaluationStatus(SubmissionEvaluationStatus.PENDING)
                                                         .lastSubmissionAt(now)
                                                         .build()));
 
@@ -213,6 +217,7 @@ public class LessonSubmissionService {
                 submission.getLessonSubmissionId(),
                 submission.getLessonEnrollmentId(),
                 submission.getSubmissionStatus(),
+                submission.getEvaluationStatus(),
                 submission.getLastSubmissionAt(),
                 hasText(comment) ? comment.trim() : null,
                 attachments);
@@ -242,6 +247,7 @@ public class LessonSubmissionService {
                 submission.getLessonSubmissionId(),
                 submission.getLessonEnrollmentId(),
                 submission.getSubmissionStatus(),
+                submission.getEvaluationStatus(),
                 submission.getLastSubmissionAt(),
                 latestComment,
                 attachments);
@@ -278,6 +284,7 @@ public class LessonSubmissionService {
                                     submission.getLessonSubmissionId(),
                                     submission.getLessonEnrollmentId(),
                                     submission.getSubmissionStatus(),
+                                    submission.getEvaluationStatus(),
                                     submission.getLastSubmissionAt(),
                                     latestComment,
                                     attachments);

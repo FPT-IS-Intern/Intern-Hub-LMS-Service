@@ -1,6 +1,7 @@
 package com.intern.hub.core.domain.model.submission;
 
 import com.intern.hub.core.domain.model.submission.constant.SubmissionStatus;
+import com.intern.hub.core.domain.model.submission.constant.SubmissionEvaluationStatus;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,9 @@ public class EvaluatorSubmissionOverviewModel {
     String userFullName;
     String userAvatarUrl;
     SubmissionStatus submissionStatus;
+    SubmissionEvaluationStatus evaluationStatus;
     Long lastSubmissionAt;
-    String comment;
+    String learnerNote;
+    String evaluatorComment;
     List<SubmissionAttachmentModel> attachments;
 }

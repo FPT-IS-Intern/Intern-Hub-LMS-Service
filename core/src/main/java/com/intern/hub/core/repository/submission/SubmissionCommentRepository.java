@@ -9,4 +9,6 @@ public interface SubmissionCommentRepository {
     SubmissionCommentModel save(SubmissionCommentModel model);
 
     Optional<SubmissionCommentModel> findLatestByLessonSubmissionId(Long lessonSubmissionId);
+
+    java.util.List<SubmissionCommentModel> findByLessonSubmissionIdOrderByCommentAtDesc(Long lessonSubmissionId);
 }

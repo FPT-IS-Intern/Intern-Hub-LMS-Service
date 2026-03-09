@@ -1,12 +1,14 @@
 package com.intern.hub.api.controller;
 
 import com.intern.hub.api.dto.request.EvaluatorSubmissionCommentRequest;
+import com.intern.hub.api.dto.request.EvaluatorSubmissionEvaluationRequest;
 import com.intern.hub.api.dto.response.evaluator.EvaluatorCourseOverviewResponse;
 import com.intern.hub.api.dto.response.submission.EvaluatorSubmissionOverviewResponse;
 import com.intern.hub.api.dto.response.submission.SubmissionAttachmentResponse;
 import com.intern.hub.api.util.PaginationUtils;
 import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.service.evaluator.EvaluatorService;
+import com.intern.hub.core.domain.model.submission.constant.SubmissionEvaluationStatus;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
@@ -91,6 +93,21 @@ public class EvaluatorController {
         return ResponseApi.noContent();
     }
 
+    @PostMapping("/submissions/{lessonSubmissionId}/evaluation-status")
+    @Authenticated
+    @Operation(
+            summary = "Cap nhat trang thai duyet bai nop",
+            description = "Evaluator cap nhat trang thai bai nop sang PENDING, APPROVED hoac REJECTED.")
+    public ResponseApi<?> updateEvaluationStatus(
+            @PathVariable("lessonSubmissionId") String lessonSubmissionId,
+            @Valid @RequestBody EvaluatorSubmissionEvaluationRequest request) {
+        evaluatorService.evaluateSubmission(
+                parseId(lessonSubmissionId, "lessonSubmissionId"),
+                UserContext.requiredUserId(),
+                parseEvaluationStatus(request.evaluationStatus()));
+        return ResponseApi.noContent();
+    }
+
     private EvaluatorSubmissionOverviewResponse toSubmissionResponse(
             com.intern.hub.core.domain.model.submission.EvaluatorSubmissionOverviewModel item) {
         var attachments = item.getAttachments() == null
@@ -119,9 +136,22 @@ public class EvaluatorController {
                 item.getUserFullName(),
                 item.getUserAvatarUrl(),
                 item.getSubmissionStatus() == null ? null : item.getSubmissionStatus().name(),
+                item.getEvaluationStatus() == null ? null : item.getEvaluationStatus().name(),
                 item.getLastSubmissionAt(),
-                item.getComment(),
+                item.getLearnerNote(),
+                item.getEvaluatorComment(),
                 attachments);
+    }
+
+    private SubmissionEvaluationStatus parseEvaluationStatus(String value) {
+        if (value == null || value.isBlank()) {
+            throw new BadRequestException("submission.evaluation.invalid", "Trang thai danh gia khong hop le");
+        }
+        try {
+            return SubmissionEvaluationStatus.valueOf(value.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException("submission.evaluation.invalid", "Trang thai danh gia khong hop le");
+        }
     }
 
     private Long parseId(String value, String field) {

@@ -47,6 +47,14 @@ public class SubmissionCommentRepositoryImpl implements SubmissionCommentReposit
                 .map(this::toModel);
     }
 
+    @Override
+    public java.util.List<SubmissionCommentModel> findByLessonSubmissionIdOrderByCommentAtDesc(Long lessonSubmissionId) {
+        return submissionCommentEntityRepository
+                .findByLessonSubmissionEntity_LessonSubmissionIdOrderByCommentAtDesc(lessonSubmissionId).stream()
+                .map(this::toModel)
+                .toList();
+    }
+
     private SubmissionCommentModel toModel(SubmissionCommentEntity entity) {
         return SubmissionCommentModel.builder()
                 .submissionCommentId(entity.getSubmissionCommentId())

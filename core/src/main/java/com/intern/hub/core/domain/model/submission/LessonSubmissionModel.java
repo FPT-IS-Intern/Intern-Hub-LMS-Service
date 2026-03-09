@@ -1,6 +1,7 @@
 package com.intern.hub.core.domain.model.submission;
 
 import com.intern.hub.core.domain.model.submission.constant.SubmissionStatus;
+import com.intern.hub.core.domain.model.submission.constant.SubmissionEvaluationStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,5 +19,6 @@ public class LessonSubmissionModel {
     Long lessonSubmissionId;
     Long lessonEnrollmentId;
     SubmissionStatus submissionStatus;
+    SubmissionEvaluationStatus evaluationStatus;
     Long lastSubmissionAt;
 }

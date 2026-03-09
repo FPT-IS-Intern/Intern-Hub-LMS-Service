@@ -6,6 +6,7 @@ public record LessonSubmissionResponse(
         String lessonSubmissionId,
         String lessonEnrollmentId,
         String submissionStatus,
+        String evaluationStatus,
         Long lastSubmissionAt,
         String comment,
         List<SubmissionAttachmentResponse> attachments) {

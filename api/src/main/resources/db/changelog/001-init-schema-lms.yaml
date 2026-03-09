@@ -139,6 +139,7 @@ databaseChangeLog:
               "updated_by" varchar(100) COLLATE "pg_catalog"."default",
               "version" int4,
               "last_submission_at" int8 NOT NULL,
+              "evaluation_status" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
               "submission_status" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
               "lesson_enrollment_id" int8 NOT NULL
               )
@@ -283,6 +284,7 @@ databaseChangeLog:
               -- Checks structure for table lesson_submissions
               -- ----------------------------
               ALTER TABLE "schema_lms"."lesson_submissions" ADD CONSTRAINT "lesson_submissions_submission_status_check" CHECK (submission_status::text = ANY (ARRAY['SUBMITTED'::character varying, 'NOT_SUBMITTED'::character varying]::text[]));
+              ALTER TABLE "schema_lms"."lesson_submissions" ADD CONSTRAINT "lesson_submissions_evaluation_status_check" CHECK (evaluation_status::text = ANY (ARRAY['PENDING'::character varying, 'APPROVED'::character varying, 'REJECTED'::character varying]::text[]));
               
               -- ----------------------------
               -- Primary Key structure for table lesson_submissions

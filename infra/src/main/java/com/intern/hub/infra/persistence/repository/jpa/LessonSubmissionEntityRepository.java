@@ -40,6 +40,7 @@ public interface LessonSubmissionEntityRepository
               l.name AS lessonName,
               ce.userId AS userId,
               ls.submissionStatus AS submissionStatus,
+              ls.evaluationStatus AS evaluationStatus,
               ls.lastSubmissionAt AS lastSubmissionAt
             FROM LessonSubmissionEntity ls
             JOIN ls.lessonEnrollmentEntity le
@@ -64,6 +65,8 @@ public interface LessonSubmissionEntityRepository
         Long getUserId();
 
         com.intern.hub.core.domain.model.submission.constant.SubmissionStatus getSubmissionStatus();
+
+        com.intern.hub.core.domain.model.submission.constant.SubmissionEvaluationStatus getEvaluationStatus();
 
         Long getLastSubmissionAt();
     }

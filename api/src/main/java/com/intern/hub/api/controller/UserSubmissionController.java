@@ -112,6 +112,7 @@ public class UserSubmissionController {
         result.lessonSubmissionId() == null ? null : result.lessonSubmissionId().toString(),
         result.lessonEnrollmentId() == null ? null : result.lessonEnrollmentId().toString(),
         result.submissionStatus().name(),
+        result.evaluationStatus() == null ? null : result.evaluationStatus().name(),
         result.lastSubmissionAt(),
         result.comment(),
         attachments);

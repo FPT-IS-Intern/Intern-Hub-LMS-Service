@@ -47,6 +47,7 @@ public class LessonSubmissionRepositoryImpl implements LessonSubmissionRepositor
                                         .lessonName(item.getLessonName())
                                         .userId(item.getUserId())
                                         .submissionStatus(item.getSubmissionStatus())
+                                        .evaluationStatus(item.getEvaluationStatus())
                                         .lastSubmissionAt(item.getLastSubmissionAt())
                                         .build())
                 .toList();
@@ -72,6 +73,7 @@ public class LessonSubmissionRepositoryImpl implements LessonSubmissionRepositor
         entity.setLessonEnrollmentEntity(
                 lessonEnrollmentEntityRepository.getReferenceById(model.getLessonEnrollmentId()));
         entity.setSubmissionStatus(model.getSubmissionStatus());
+        entity.setEvaluationStatus(model.getEvaluationStatus());
         entity.setLastSubmissionAt(model.getLastSubmissionAt());
 
         return toModel(lessonSubmissionEntityRepository.save(entity));
@@ -82,6 +84,7 @@ public class LessonSubmissionRepositoryImpl implements LessonSubmissionRepositor
                 .lessonSubmissionId(entity.getLessonSubmissionId())
                 .lessonEnrollmentId(entity.getLessonEnrollmentEntity().getLessonEnrollmentId())
                 .submissionStatus(entity.getSubmissionStatus())
+                .evaluationStatus(entity.getEvaluationStatus())
                 .lastSubmissionAt(entity.getLastSubmissionAt())
                 .build();
     }
