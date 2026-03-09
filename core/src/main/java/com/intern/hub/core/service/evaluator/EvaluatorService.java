@@ -4,10 +4,11 @@ import com.intern.hub.core.domain.model.course.EvaluatorCourseOverviewModel;
 import com.intern.hub.core.repository.course.CourseEvaluatorRepository;
 import com.intern.hub.core.repository.user.UserDirectoryRepository;
 import com.intern.hub.library.common.exception.NotFoundException;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,13 +21,14 @@ public class EvaluatorService {
     UserDirectoryRepository userDirectoryRepository;
 
     @Transactional(readOnly = true)
-    public List<EvaluatorCourseOverviewModel> getCourseOverviews(Long evaluatorUserId, boolean onlyEvaluable) {
+    public Page<EvaluatorCourseOverviewModel> getCourseOverviews(
+            Long evaluatorUserId, boolean onlyEvaluable, Pageable pageable) {
         if (onlyEvaluable) {
             if (!userDirectoryRepository.existsByUserId(evaluatorUserId)) {
-                throw new NotFoundException("hrm.user.not.found", "Không tìm thấy user trong HRM");
+                throw new NotFoundException("hrm.user.not.found", "Khong tim thay user trong HRM");
             }
-            return courseEvaluatorRepository.findCourseOverviewsByEvaluatorUserId(evaluatorUserId);
+            return courseEvaluatorRepository.findCourseOverviewsByEvaluatorUserId(evaluatorUserId, pageable);
         }
-        return courseEvaluatorRepository.findAllCourseOverviews();
+        return courseEvaluatorRepository.findAllCourseOverviews(evaluatorUserId, pageable);
     }
 }

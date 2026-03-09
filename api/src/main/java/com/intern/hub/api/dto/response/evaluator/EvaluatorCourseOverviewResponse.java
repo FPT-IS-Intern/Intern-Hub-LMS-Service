@@ -6,6 +6,6 @@ public record EvaluatorCourseOverviewResponse(
         String courseImageUrl,
         Long totalEnrollmentCount,
         Long completedEnrollmentCount,
-        Long notCompletedEnrollmentCount) {
+        Long notCompletedEnrollmentCount,
+        boolean canEvaluate) {
 }
-

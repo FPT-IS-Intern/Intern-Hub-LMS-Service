@@ -1,11 +1,12 @@
 package com.intern.hub.core.repository.course;
 
 import com.intern.hub.core.domain.model.course.EvaluatorCourseOverviewModel;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CourseEvaluatorRepository {
 
-    List<EvaluatorCourseOverviewModel> findAllCourseOverviews();
+    Page<EvaluatorCourseOverviewModel> findAllCourseOverviews(Long evaluatorUserId, Pageable pageable);
 
-    List<EvaluatorCourseOverviewModel> findCourseOverviewsByEvaluatorUserId(Long evaluatorUserId);
+    Page<EvaluatorCourseOverviewModel> findCourseOverviewsByEvaluatorUserId(Long evaluatorUserId, Pageable pageable);
 }

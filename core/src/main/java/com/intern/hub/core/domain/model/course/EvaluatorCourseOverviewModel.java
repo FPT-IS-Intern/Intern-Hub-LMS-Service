@@ -22,5 +22,5 @@ public class EvaluatorCourseOverviewModel {
     Long totalEnrollmentCount;
     Long completedEnrollmentCount;
     Long notCompletedEnrollmentCount;
+    boolean canEvaluate;
 }
-

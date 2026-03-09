@@ -3,14 +3,13 @@ package com.intern.hub.infra.persistence.repository.jpa;
 import com.intern.hub.infra.persistence.entity.course.CourseEvaluatorEntity;
 import java.util.List;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * Admin 1/26/2026
- */
 @Repository
 public interface CourseEvaluatorEntityRepository
         extends JpaRepository<@NonNull CourseEvaluatorEntity, @NonNull Long> {
@@ -24,35 +23,48 @@ public interface CourseEvaluatorEntityRepository
     List<Long> findUserIdsByCourseId(@Param("courseId") Long courseId);
 
     @Query(
-            """
-            SELECT
-              c.courseId AS courseId,
-              c.name AS name,
-              c.courseImageUrl AS courseImageUrl,
-              COUNT(en.courseEnrollmentId) AS totalEnrollmentCount,
-              COALESCE(SUM(CASE WHEN en.courseProgress = com.intern.hub.core.domain.model.enrollment.constant.CourseProgress.COMPLETED THEN 1 ELSE 0 END), 0) AS completedEnrollmentCount
-            FROM CourseEntity c
-            LEFT JOIN CourseEnrollmentEntity en ON en.courseEntity.courseId = c.courseId
-            GROUP BY c.courseId, c.name, c.courseImageUrl, c.createdAt
-            ORDER BY c.createdAt DESC
-            """)
-    List<CourseOverviewProjection> findAllCourseOverviews();
+            value =
+                    """
+                    SELECT
+                      c.course_id AS courseId,
+                      c.name AS name,
+                      c.course_image_url AS courseImageUrl,
+                      COUNT(en.course_enrollment_id) AS totalEnrollmentCount,
+                      COALESCE(SUM(CASE WHEN en.course_progress = 'COMPLETED' THEN 1 ELSE 0 END), 0) AS completedEnrollmentCount,
+                      CASE WHEN COUNT(ce.course_evaluator_id) > 0 THEN true ELSE false END AS canEvaluate
+                    FROM ih_lms.courses c
+                    LEFT JOIN ih_lms.course_enrollments en ON en.course_id = c.course_id
+                    LEFT JOIN ih_lms.course_evaluators ce
+                      ON ce.course_id = c.course_id AND ce.user_id = :userId
+                    GROUP BY c.course_id, c.name, c.course_image_url, c.created_at
+                    ORDER BY c.created_at DESC
+                    """,
+            countQuery = "SELECT COUNT(*) FROM ih_lms.courses c",
+            nativeQuery = true)
+    Page<CourseOverviewProjection> findAllCourseOverviews(
+            @Param("userId") Long userId, Pageable pageable);
 
     @Query(
-            """
-            SELECT
-              ce.courseEntity.courseId AS courseId,
-              ce.courseEntity.name AS name,
-              ce.courseEntity.courseImageUrl AS courseImageUrl,
-              COUNT(en.courseEnrollmentId) AS totalEnrollmentCount,
-              COALESCE(SUM(CASE WHEN en.courseProgress = com.intern.hub.core.domain.model.enrollment.constant.CourseProgress.COMPLETED THEN 1 ELSE 0 END), 0) AS completedEnrollmentCount
-            FROM CourseEvaluatorEntity ce
-            LEFT JOIN CourseEnrollmentEntity en ON en.courseEntity.courseId = ce.courseEntity.courseId
-            WHERE ce.userId = :userId
-            GROUP BY ce.courseEntity.courseId, ce.courseEntity.name, ce.courseEntity.courseImageUrl, ce.courseEntity.createdAt
-            ORDER BY ce.courseEntity.createdAt DESC
-            """)
-    List<CourseOverviewProjection> findCourseOverviewsByEvaluatorUserId(@Param("userId") Long userId);
+            value =
+                    """
+                    SELECT
+                      ce.course_id AS courseId,
+                      c.name AS name,
+                      c.course_image_url AS courseImageUrl,
+                      COUNT(en.course_enrollment_id) AS totalEnrollmentCount,
+                      COALESCE(SUM(CASE WHEN en.course_progress = 'COMPLETED' THEN 1 ELSE 0 END), 0) AS completedEnrollmentCount,
+                      true AS canEvaluate
+                    FROM ih_lms.course_evaluators ce
+                    JOIN ih_lms.courses c ON c.course_id = ce.course_id
+                    LEFT JOIN ih_lms.course_enrollments en ON en.course_id = ce.course_id
+                    WHERE ce.user_id = :userId
+                    GROUP BY ce.course_id, c.name, c.course_image_url, c.created_at
+                    ORDER BY c.created_at DESC
+                    """,
+            countQuery = "SELECT COUNT(*) FROM ih_lms.course_evaluators ce WHERE ce.user_id = :userId",
+            nativeQuery = true)
+    Page<CourseOverviewProjection> findCourseOverviewsByEvaluatorUserId(
+            @Param("userId") Long userId, Pageable pageable);
 
     interface CourseOverviewProjection {
         Long getCourseId();
@@ -64,5 +76,7 @@ public interface CourseEvaluatorEntityRepository
         Long getTotalEnrollmentCount();
 
         Long getCompletedEnrollmentCount();
+
+        boolean getCanEvaluate();
     }
 }
