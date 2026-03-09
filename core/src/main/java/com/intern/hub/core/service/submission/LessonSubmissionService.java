@@ -5,6 +5,7 @@ import com.intern.hub.core.domain.model.submission.SubmissionAttachmentModel;
 import com.intern.hub.core.domain.model.submission.SubmissionCommentModel;
 import com.intern.hub.core.domain.model.submission.constant.SubmissionStatus;
 import com.intern.hub.core.repository.FileStorageRepository;
+import com.intern.hub.core.repository.enrollment.CourseEnrollmentRepository;
 import com.intern.hub.core.repository.enrollment.LessonEnrollmentRepository;
 import com.intern.hub.core.repository.submission.LessonSubmissionRepository;
 import com.intern.hub.core.repository.submission.SubmissionAttachmentRepository;
@@ -42,6 +43,7 @@ public class LessonSubmissionService {
     }
 
     LessonEnrollmentRepository lessonEnrollmentRepository;
+    CourseEnrollmentRepository courseEnrollmentRepository;
     LessonSubmissionRepository lessonSubmissionRepository;
     SubmissionAttachmentRepository submissionAttachmentRepository;
     SubmissionCommentRepository submissionCommentRepository;
@@ -243,6 +245,44 @@ public class LessonSubmissionService {
                 submission.getLastSubmissionAt(),
                 latestComment,
                 attachments);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LessonSubmissionResult> getSubmissionsByCourseEnrollment(Long courseEnrollmentId, Long userId) {
+        var courseEnrollment =
+                courseEnrollmentRepository
+                        .findById(courseEnrollmentId)
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "course.enrollment.not.found", "Khong tim thay course enrollment"));
+        if (!courseEnrollment.getUserId().equals(userId)) {
+            throw new ForbiddenException(
+                    "course.enrollment.invalid", "Course enrollment khong thuoc user nay");
+        }
+
+        return lessonEnrollmentRepository.findLessonEnrollmentIdsByCourseEnrollmentId(courseEnrollmentId).stream()
+                .map(lessonSubmissionRepository::findByLessonEnrollmentId)
+                .flatMap(java.util.Optional::stream)
+                .map(
+                        submission -> {
+                            List<SubmissionAttachmentModel> attachments =
+                                    submissionAttachmentRepository.findByLessonSubmissionId(
+                                            submission.getLessonSubmissionId());
+                            String latestComment =
+                                    submissionCommentRepository
+                                            .findLatestByLessonSubmissionId(submission.getLessonSubmissionId())
+                                            .map(SubmissionCommentModel::getContent)
+                                            .orElse(null);
+                            return new LessonSubmissionResult(
+                                    submission.getLessonSubmissionId(),
+                                    submission.getLessonEnrollmentId(),
+                                    submission.getSubmissionStatus(),
+                                    submission.getLastSubmissionAt(),
+                                    latestComment,
+                                    attachments);
+                        })
+                .toList();
     }
 
     private String buildSubmissionPath(Long lessonSubmissionId) {

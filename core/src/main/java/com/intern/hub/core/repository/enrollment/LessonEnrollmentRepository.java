@@ -10,6 +10,8 @@ public interface LessonEnrollmentRepository {
 
     List<Long> findLessonIdsByCourseEnrollmentId(Long courseEnrollmentId);
 
+    List<Long> findLessonEnrollmentIdsByCourseEnrollmentId(Long courseEnrollmentId);
+
     Optional<Long> findLessonEnrollmentId(Long courseEnrollmentId, Long lessonId);
 
     Optional<Long> findUserIdByLessonEnrollmentId(Long lessonEnrollmentId);

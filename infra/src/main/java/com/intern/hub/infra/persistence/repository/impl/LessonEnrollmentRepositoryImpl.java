@@ -31,6 +31,12 @@ public class LessonEnrollmentRepositoryImpl implements LessonEnrollmentRepositor
     }
 
     @Override
+    public List<Long> findLessonEnrollmentIdsByCourseEnrollmentId(Long courseEnrollmentId) {
+        return lessonEnrollmentEntityRepository.findLessonEnrollmentIdsByCourseEnrollmentId(
+                courseEnrollmentId);
+    }
+
+    @Override
     public Optional<Long> findLessonEnrollmentId(Long courseEnrollmentId, Long lessonId) {
         return Optional.ofNullable(
                 lessonEnrollmentEntityRepository.findLessonEnrollmentId(courseEnrollmentId, lessonId));

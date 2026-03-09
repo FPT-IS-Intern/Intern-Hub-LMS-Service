@@ -28,33 +28,45 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/lms/lesson-enrollments")
-@Tag(
-    name = "User Submission",
-    description = "API người dùng để xem và nộp bài theo lesson enrollment.")
+@RequestMapping("/lms")
+@Tag(name = "User Submission", description = "API nguoi dung de xem va nop bai.")
 public class UserSubmissionController {
 
   SubmissionService submissionService;
 
-  @GetMapping("/{lessonEnrollmentId}/submissions")
+  @GetMapping("/lesson-enrollments/{lessonEnrollmentId}/submissions")
   @Authenticated
   @Operation(
-      summary = "Chi tiết bài nộp của tôi",
-      description = "Lấy bài nộp hiện tại theo lesson enrollment id.")
+      summary = "Chi tiet bai nop cua toi",
+      description = "Lay bai nop hien tai theo lesson enrollment id.")
   public ResponseApi<LessonSubmissionResponse> getSubmission(
       @PathVariable("lessonEnrollmentId") String lessonEnrollmentId) {
     var result = submissionService.getSubmission(parseId(lessonEnrollmentId, "lessonEnrollmentId"));
     return ResponseApi.ok(toResponse(result));
   }
 
+  @GetMapping("/course-enrollments/{courseEnrollmentId}/submissions")
+  @Authenticated
+  @Operation(
+      summary = "Danh sach bai nop theo course enrollment",
+      description = "Lay tat ca bai nop hien co cua user hien tai thuoc course enrollment id.")
+  public ResponseApi<List<LessonSubmissionResponse>> getSubmissionsByCourseEnrollment(
+      @PathVariable("courseEnrollmentId") String courseEnrollmentId) {
+    Long userId = UserContext.requiredUserId();
+    var result =
+        submissionService.getSubmissionsByCourseEnrollment(
+            parseId(courseEnrollmentId, "courseEnrollmentId"), userId);
+    return ResponseApi.ok(result.stream().map(this::toResponse).toList());
+  }
+
   @PostMapping(
-      value = "/{lessonEnrollmentId}/submit",
+      value = "/lesson-enrollments/{lessonEnrollmentId}/submit",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Authenticated
   @Operation(
-      summary = "Nộp bài cho người dùng",
+      summary = "Nop bai cho nguoi dung",
       description =
-          "Nộp hoặc cập nhật bài nộp của user hiện tại, hỗ trợ thêm file mới và xóa chọn lọc file cũ.")
+          "Nop hoac cap nhat bai nop cua user hien tai, ho tro them file moi va xoa chon loc file cu.")
   public ResponseApi<LessonSubmissionResponse> submitLesson(
       @PathVariable("lessonEnrollmentId") String lessonEnrollmentId,
       @RequestPart("data") @Valid LessonSubmissionRequest request,
@@ -73,17 +85,16 @@ public class UserSubmissionController {
 
   private Long parseId(String value, String field) {
     if (value == null || value.isBlank()) {
-      throw new BadRequestException("id.invalid", field + " không hợp lệ");
+      throw new BadRequestException("id.invalid", field + " khong hop le");
     }
     try {
       return Long.parseLong(value);
     } catch (NumberFormatException ex) {
-      throw new BadRequestException("id.invalid", field + " không hợp lệ");
+      throw new BadRequestException("id.invalid", field + " khong hop le");
     }
   }
 
-  private LessonSubmissionResponse toResponse(
-      LessonSubmissionService.LessonSubmissionResult result) {
+  private LessonSubmissionResponse toResponse(LessonSubmissionService.LessonSubmissionResult result) {
     var attachments =
         result.attachments().stream()
             .map(

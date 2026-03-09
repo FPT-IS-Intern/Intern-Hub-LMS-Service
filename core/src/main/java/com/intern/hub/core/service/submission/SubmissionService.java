@@ -32,4 +32,9 @@ public class SubmissionService {
     public LessonSubmissionService.LessonSubmissionResult getSubmission(Long lessonEnrollmentId) {
         return lessonSubmissionService.getSubmission(lessonEnrollmentId);
     }
+
+    public java.util.List<LessonSubmissionService.LessonSubmissionResult> getSubmissionsByCourseEnrollment(
+            Long courseEnrollmentId, Long userId) {
+        return lessonSubmissionService.getSubmissionsByCourseEnrollment(courseEnrollmentId, userId);
+    }
 }

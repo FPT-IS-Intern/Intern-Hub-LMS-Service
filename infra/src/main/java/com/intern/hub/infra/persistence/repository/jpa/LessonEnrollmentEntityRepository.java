@@ -26,6 +26,13 @@ public interface LessonEnrollmentEntityRepository
     @Query(
             "select le.lessonEnrollmentId from LessonEnrollmentEntity le "
                     + "where le.courseEnrollmentEntity.courseEnrollmentId = :courseEnrollmentId "
+                    + "order by le.createdAt asc")
+    List<Long> findLessonEnrollmentIdsByCourseEnrollmentId(
+            @Param("courseEnrollmentId") Long courseEnrollmentId);
+
+    @Query(
+            "select le.lessonEnrollmentId from LessonEnrollmentEntity le "
+                    + "where le.courseEnrollmentEntity.courseEnrollmentId = :courseEnrollmentId "
                     + "and le.lessonEntity.lessonId = :lessonId")
     Long findLessonEnrollmentId(
             @Param("courseEnrollmentId") Long courseEnrollmentId, @Param("lessonId") Long lessonId);
