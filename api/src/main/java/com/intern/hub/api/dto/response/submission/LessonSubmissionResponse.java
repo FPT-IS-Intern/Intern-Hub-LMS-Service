@@ -9,5 +9,6 @@ public record LessonSubmissionResponse(
         String evaluationStatus,
         Long lastSubmissionAt,
         String comment,
+        String evaluatorComment,
         List<SubmissionAttachmentResponse> attachments) {
 }

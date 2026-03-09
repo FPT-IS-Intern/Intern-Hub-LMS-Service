@@ -41,6 +41,7 @@ public class LessonSubmissionService {
             SubmissionEvaluationStatus evaluationStatus,
             Long lastSubmissionAt,
             String comment,
+            String evaluatorComment,
             List<SubmissionAttachmentModel> attachments) {
     }
 
@@ -220,6 +221,7 @@ public class LessonSubmissionService {
                 submission.getEvaluationStatus(),
                 submission.getLastSubmissionAt(),
                 hasText(comment) ? comment.trim() : null,
+                null,
                 attachments);
     }
 
@@ -237,10 +239,24 @@ public class LessonSubmissionService {
         List<SubmissionAttachmentModel> attachments =
                 submissionAttachmentRepository.findByLessonSubmissionId(submission.getLessonSubmissionId());
 
+        var comments =
+                submissionCommentRepository.findByLessonSubmissionIdOrderByCommentAtDesc(
+                        submission.getLessonSubmissionId());
+        Long learnerUserId =
+                lessonEnrollmentRepository
+                        .findUserIdByLessonEnrollmentId(lessonEnrollmentId)
+                        .orElse(null);
         String latestComment =
-                submissionCommentRepository
-                        .findLatestByLessonSubmissionId(submission.getLessonSubmissionId())
+                comments.stream()
+                        .filter(comment -> java.util.Objects.equals(comment.getUserId(), learnerUserId))
                         .map(SubmissionCommentModel::getContent)
+                        .findFirst()
+                        .orElse(null);
+        String evaluatorComment =
+                comments.stream()
+                        .filter(comment -> !java.util.Objects.equals(comment.getUserId(), learnerUserId))
+                        .map(SubmissionCommentModel::getContent)
+                        .findFirst()
                         .orElse(null);
 
         return new LessonSubmissionResult(
@@ -250,6 +266,7 @@ public class LessonSubmissionService {
                 submission.getEvaluationStatus(),
                 submission.getLastSubmissionAt(),
                 latestComment,
+                evaluatorComment,
                 attachments);
     }
 
@@ -277,8 +294,21 @@ public class LessonSubmissionService {
                                             submission.getLessonSubmissionId());
                             String latestComment =
                                     submissionCommentRepository
-                                            .findLatestByLessonSubmissionId(submission.getLessonSubmissionId())
+                                            .findByLessonSubmissionIdOrderByCommentAtDesc(
+                                                    submission.getLessonSubmissionId())
+                                            .stream()
+                                            .filter(comment -> java.util.Objects.equals(comment.getUserId(), userId))
                                             .map(SubmissionCommentModel::getContent)
+                                            .findFirst()
+                                            .orElse(null);
+                            String evaluatorComment =
+                                    submissionCommentRepository
+                                            .findByLessonSubmissionIdOrderByCommentAtDesc(
+                                                    submission.getLessonSubmissionId())
+                                            .stream()
+                                            .filter(comment -> !java.util.Objects.equals(comment.getUserId(), userId))
+                                            .map(SubmissionCommentModel::getContent)
+                                            .findFirst()
                                             .orElse(null);
                             return new LessonSubmissionResult(
                                     submission.getLessonSubmissionId(),
@@ -287,6 +317,7 @@ public class LessonSubmissionService {
                                     submission.getEvaluationStatus(),
                                     submission.getLastSubmissionAt(),
                                     latestComment,
+                                    evaluatorComment,
                                     attachments);
                         })
                 .toList();

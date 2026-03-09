@@ -115,6 +115,7 @@ public class UserSubmissionController {
         result.evaluationStatus() == null ? null : result.evaluationStatus().name(),
         result.lastSubmissionAt(),
         result.comment(),
+        result.evaluatorComment(),
         attachments);
   }
 
