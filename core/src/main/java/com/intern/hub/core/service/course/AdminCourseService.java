@@ -68,6 +68,7 @@ public class AdminCourseService {
         if (image == null || image.isEmpty()) {
             throw new BadRequestException("course.image.required", "Ảnh khóa học là bắt buộc");
         }
+        validateRequiredAssignments(evaluatorUserIds, positionIds);
 
         CourseModel saved = courseRepository.save(model);
         Long courseId = saved.getCourseId();
@@ -143,6 +144,8 @@ public class AdminCourseService {
             List<Long> evaluatorUserIds,
             List<Long> positionIds,
             Long actorId) {
+        validateRequiredAssignments(evaluatorUserIds, positionIds);
+
         CourseModel existing = courseRepository
                 .findById(courseId)
                 .orElseThrow(() -> new NotFoundException(
@@ -220,6 +223,19 @@ public class AdminCourseService {
             }
         }
         return new ArrayList<>(unique);
+    }
+
+    private void validateRequiredAssignments(List<Long> evaluatorUserIds, List<Long> positionIds) {
+        if (distinctOrdered(evaluatorUserIds).isEmpty()) {
+            throw new BadRequestException(
+                    "course.evaluators.required",
+                    "Khóa học phải có ít nhất 1 người đánh giá");
+        }
+        if (distinctOrdered(positionIds).isEmpty()) {
+            throw new BadRequestException(
+                    "course.positions.required",
+                    "Khóa học phải có ít nhất 1 vị trí học viên");
+        }
     }
 
     private String buildCourseImagePath(Long courseId) {
