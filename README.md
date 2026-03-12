@@ -17,7 +17,9 @@ Chi tiết thêm: `LessonEnrollment` được hiểu theo ngữ cảnh course, t
 4. Tra cứu bài học (user).
 Chi tiết: lấy danh sách bài học toàn hệ hoặc theo khóa; với API theo course, `lessonEnrollmentId` luôn được tra cứu theo đúng `courseEnrollment` của user. Với API lesson toàn hệ, chỉ trả `lessonEnrollmentId` khi user chỉ có đúng 1 ngữ cảnh course cho lesson đó; nếu lesson xuất hiện ở nhiều course của cùng user thì trường enrollment sẽ để `null` để tránh mơ hồ.
 5. Nộp bài (user).
-Chi tiết: yêu cầu ít nhất 1 file; comment tùy chọn; thay thế toàn bộ attachments cũ nếu nộp lại; cập nhật `LessonProgress` sang `COMPLETED` và cập nhật `CourseProgress` nếu hoàn tất tất cả bài học.
+Chi tiết: yêu cầu ít nhất 1 file; comment tùy chọn; thay thế toàn bộ attachments cũ nếu nộp lại; khi user nộp bài thì `LessonSubmission` chuyển sang `PENDING`, `LessonProgress` giữ ở `IN_PROGRESS` cho đến khi evaluator duyệt.
+6. Duyệt bài (evaluator).
+Chi tiết: evaluator có thể comment và cập nhật trạng thái `PENDING` / `APPROVED` / `REJECTED`. Khi `APPROVED`, `LessonProgress` chuyển sang `COMPLETED`; khi `REJECTED` hoặc `PENDING`, `LessonProgress` về `IN_PROGRESS`. Sau mỗi lần đổi trạng thái, hệ thống tự đồng bộ lại `CourseProgress`.
 
 **Quy tắc nghiệp vụ & ràng buộc**
 - Ảnh khóa học bắt buộc khi tạo; ảnh bài học tùy chọn.
@@ -36,6 +38,10 @@ Chi tiết: yêu cầu ít nhất 1 file; comment tùy chọn; thay thế toàn 
   - Khi thêm lesson mới vào course, hệ thống tự sync `lesson_enrollment` còn thiếu cho toàn bộ user đã enroll course đó.
   - Khi bỏ lesson khỏi course, hệ thống không xóa lịch sử `lesson_enrollment`/`submission` cũ để tránh mất dữ liệu và tránh ảnh hưởng course khác cũng dùng cùng lesson.
   - Các API đọc theo `courseEnrollment` chỉ lấy submission/progress của những lesson hiện còn thuộc course.
+- Quy tắc tiến độ:
+  - `LessonProgress` chỉ chuyển sang `COMPLETED` khi evaluator duyệt `APPROVED`.
+  - User nộp lại bài hoặc evaluator chuyển về `REJECTED` / `PENDING` thì `LessonProgress` quay về `IN_PROGRESS`.
+  - `CourseProgress` là `COMPLETED` khi và chỉ khi toàn bộ lesson hiện có trong `course_enrollment` đều ở trạng thái `COMPLETED`; ngược lại là `IN_PROGRESS`.
 
 **Dữ liệu chính**
 - Course: thông tin khóa học và ảnh đại diện.
@@ -61,9 +67,11 @@ Chi tiết: yêu cầu ít nhất 1 file; comment tùy chọn; thay thế toàn 
 - `DELETE /admin/lessons/{lessonId}`: xóa bài học.
 - `POST /courses/{courseId}/enroll`: ghi danh khóa học.
 - `GET /courses/{courseId}/lessons`: danh sách bài học theo khóa, `userId` tùy chọn.
+- `GET /courses/{courseId}/lessons/{lessonId}`: chi tiết bài học theo đúng context của khóa học.
 - `GET /lessons`: danh sách bài học toàn hệ, `userId` tùy chọn.
 - `GET /lessons/{lessonId}`: chi tiết bài học, `userId` tùy chọn.
 - `POST /lesson-enrollments/{lessonEnrollmentId}/submit` (multipart): nộp bài.
+- `POST /evaluator/submissions/{lessonSubmissionId}/evaluation-status`: evaluator duyệt hoặc từ chối bài nộp.
 
 **Cấu hình liên quan nghiệp vụ**
 - DB schema: `schema_lms` (Liquibase tạo bảng và ràng buộc).
