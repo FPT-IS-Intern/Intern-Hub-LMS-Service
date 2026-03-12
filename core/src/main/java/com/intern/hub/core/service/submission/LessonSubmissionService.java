@@ -12,6 +12,7 @@ import com.intern.hub.core.repository.enrollment.LessonEnrollmentRepository;
 import com.intern.hub.core.repository.submission.LessonSubmissionRepository;
 import com.intern.hub.core.repository.submission.SubmissionAttachmentRepository;
 import com.intern.hub.core.repository.submission.SubmissionCommentRepository;
+import com.intern.hub.core.service.enrollment.EnrollmentProgressService;
 import com.intern.hub.core.service.storage.StorageObjectLifecycleManager;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.ForbiddenException;
@@ -52,6 +53,7 @@ public class LessonSubmissionService {
     LessonSubmissionRepository lessonSubmissionRepository;
     SubmissionAttachmentRepository submissionAttachmentRepository;
     SubmissionCommentRepository submissionCommentRepository;
+    EnrollmentProgressService enrollmentProgressService;
     FileStorageRepository fileStorageRepository;
     StorageObjectLifecycleManager storageObjectLifecycleManager;
 
@@ -215,6 +217,9 @@ public class LessonSubmissionService {
             throw new BadRequestException(
                     "submission.file.required", "Bài nộp phải còn ít nhất 1 file đính kèm");
         }
+
+        enrollmentProgressService.updateLessonProgressAndSyncCourse(
+                lessonEnrollmentId, com.intern.hub.core.domain.model.enrollment.constant.LessonProgress.IN_PROGRESS);
 
         return new LessonSubmissionResult(
                 submission.getLessonSubmissionId(),

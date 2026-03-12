@@ -10,6 +10,7 @@ import com.intern.hub.core.repository.submission.LessonSubmissionRepository;
 import com.intern.hub.core.repository.submission.SubmissionAttachmentRepository;
 import com.intern.hub.core.repository.submission.SubmissionCommentRepository;
 import com.intern.hub.core.repository.user.UserDirectoryRepository;
+import com.intern.hub.core.service.enrollment.EnrollmentProgressService;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import com.intern.hub.library.common.exception.ForbiddenException;
@@ -32,6 +33,7 @@ public class EvaluatorService {
     LessonSubmissionRepository lessonSubmissionRepository;
     SubmissionAttachmentRepository submissionAttachmentRepository;
     SubmissionCommentRepository submissionCommentRepository;
+    EnrollmentProgressService enrollmentProgressService;
 
     @Transactional(readOnly = true)
     public Page<EvaluatorCourseOverviewModel> getCourseOverviews(
@@ -155,5 +157,12 @@ public class EvaluatorService {
 
         submission.setEvaluationStatus(evaluationStatus);
         lessonSubmissionRepository.save(submission);
+
+        var nextLessonProgress =
+                evaluationStatus == SubmissionEvaluationStatus.APPROVED
+                        ? com.intern.hub.core.domain.model.enrollment.constant.LessonProgress.COMPLETED
+                        : com.intern.hub.core.domain.model.enrollment.constant.LessonProgress.IN_PROGRESS;
+        enrollmentProgressService.updateLessonProgressAndSyncCourse(
+                submission.getLessonEnrollmentId(), nextLessonProgress);
     }
 }
