@@ -2,7 +2,10 @@ package com.intern.hub.api.controller;
 
 import com.intern.hub.api.dto.response.course.CourseUserDetailResponse;
 import com.intern.hub.api.dto.response.course.CourseUserSummaryResponse;
+import com.intern.hub.api.dto.response.lesson.LessonFileInfoResponse;
+import com.intern.hub.api.dto.response.lesson.LessonUserDetailResponse;
 import com.intern.hub.api.dto.response.lesson.LessonUserSummaryResponse;
+import com.intern.hub.api.mapper.LessonApiMapper;
 import com.intern.hub.api.util.PaginationUtils;
 import com.intern.hub.api.util.UserContext;
 import com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel;
@@ -12,9 +15,11 @@ import com.intern.hub.core.service.lesson.LessonService;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
+import com.intern.hub.library.common.exception.NotFoundException;
 import com.intern.hub.starter.security.annotation.Authenticated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -37,6 +42,7 @@ public class UserCourseController {
   CourseService courseService;
   EnrollmentService enrollmentService;
   LessonService lessonService;
+  LessonApiMapper lessonApiMapper;
 
   @GetMapping
   @Authenticated
@@ -121,6 +127,34 @@ public class UserCourseController {
     return ResponseApi.ok(res);
   }
 
+  @GetMapping("/{courseId}/lessons/{lessonId}")
+  @Authenticated
+  @Operation(
+      summary = "Chi tiết bài học trong khóa học",
+      description =
+          "Lấy chi tiết lesson theo course context, kèm file và trạng thái enrollment của user hiện tại.")
+  public ResponseApi<LessonUserDetailResponse> getCourseLessonDetail(
+      @PathVariable("courseId") String courseId, @PathVariable("lessonId") String lessonId) {
+    Long courseIdValue = parseId(courseId, "courseId");
+    Long lessonIdValue = parseId(lessonId, "lessonId");
+    Long userId = UserContext.requiredUserId();
+
+    boolean lessonBelongsToCourse =
+        courseService.getCourseLessonIds(courseIdValue).stream().anyMatch(id -> id.equals(lessonIdValue));
+    if (!lessonBelongsToCourse) {
+      throw new NotFoundException(
+          "course.lesson.not.found", "Không tìm thấy bài học trong khóa học này");
+    }
+
+    var model = lessonService.getLesson(lessonIdValue);
+    var fileModels = lessonService.getLessonFiles(lessonIdValue);
+    var enrollment =
+        lessonService.getLessonEnrollment(courseIdValue, lessonIdValue, userId).orElse(null);
+    List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
+
+    return ResponseApi.ok(toLessonUserDetailResponse(model, files, enrollment));
+  }
+
   private Long parseId(String value, String field) {
     if (value == null || value.isBlank()) {
       throw new BadRequestException("id.invalid", field + " không hợp lệ");
@@ -167,5 +201,28 @@ public class UserCourseController {
             : enrollment.getLessonProgress().name(),
         model.getCreatedAt(),
         model.getUpdatedAt());
+  }
+
+  private LessonUserDetailResponse toLessonUserDetailResponse(
+      com.intern.hub.core.domain.model.lesson.LessonModel model,
+      List<LessonFileInfoResponse> files,
+      LessonEnrollmentModel enrollment) {
+    return new LessonUserDetailResponse(
+        model.getLessonId() == null ? null : model.getLessonId().toString(),
+        model.getName(),
+        model.getIntroduction(),
+        model.getContent(),
+        model.getRequirements(),
+        model.getLessonImageUrl(),
+        files,
+        enrollment == null || enrollment.getLessonEnrollmentId() == null
+            ? null
+            : enrollment.getLessonEnrollmentId().toString(),
+        enrollment == null || enrollment.getCourseEnrollmentId() == null
+            ? null
+            : enrollment.getCourseEnrollmentId().toString(),
+        enrollment == null || enrollment.getLessonProgress() == null
+            ? null
+            : enrollment.getLessonProgress().name());
   }
 }
