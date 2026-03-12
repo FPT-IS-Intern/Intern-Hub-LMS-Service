@@ -56,9 +56,24 @@ public class CourseEnrollmentService {
         List<Long> lessonIds = courseLessonRepository.findLessonIdsByCourseId(courseId);
         if (lessonIds.isEmpty()) return;
 
+        syncMissingLessonEnrollments(courseEnrollment.getCourseEnrollmentId(), lessonIds);
+    }
 
+    @Transactional
+    public void syncCourseLessonEnrollments(Long courseId, List<Long> lessonIds) {
+        if (lessonIds == null || lessonIds.isEmpty()) {
+            return;
+        }
+
+        List<CourseEnrollmentModel> courseEnrollments = courseEnrollmentRepository.findAllByCourseId(courseId);
+        for (CourseEnrollmentModel courseEnrollment : courseEnrollments) {
+            syncMissingLessonEnrollments(courseEnrollment.getCourseEnrollmentId(), lessonIds);
+        }
+    }
+
+    private void syncMissingLessonEnrollments(Long courseEnrollmentId, List<Long> lessonIds) {
         List<Long> enrolledLessonIds = lessonEnrollmentRepository
-                .findLessonIdsByCourseEnrollmentId(courseEnrollment.getCourseEnrollmentId());
+                .findLessonIdsByCourseEnrollmentId(courseEnrollmentId);
 
         Set<Long> missingLessonIds = new HashSet<>(lessonIds);
         enrolledLessonIds.forEach(missingLessonIds::remove);
@@ -71,7 +86,7 @@ public class CourseEnrollmentService {
         for (Long lessonId : missingLessonIds) {
             lessonEnrollments.add(
                     LessonEnrollmentModel.builder()
-                            .courseEnrollmentId(courseEnrollment.getCourseEnrollmentId())
+                            .courseEnrollmentId(courseEnrollmentId)
                             .lessonId(lessonId)
                             .lessonProgress(LessonProgress.IN_PROGRESS)
                             .build());

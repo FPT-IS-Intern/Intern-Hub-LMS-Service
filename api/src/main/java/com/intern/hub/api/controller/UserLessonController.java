@@ -55,9 +55,7 @@ public class UserLessonController {
             model ->
                 toLessonUserSummaryResponse(
                     model,
-                    enrollmentService
-                        .getLessonEnrollment(model.getLessonId(), userIdValue)
-                        .orElse(null)));
+                    lessonService.getLessonEnrollment(model.getLessonId(), userIdValue).orElse(null)));
 
     return ResponseApi.ok(res);
   }
@@ -75,7 +73,7 @@ public class UserLessonController {
     LessonModel model = lessonService.getLesson(lessonIdValue);
     var fileModels = lessonService.getLessonFiles(lessonIdValue);
     LessonEnrollmentModel enrollment =
-        enrollmentService.getLessonEnrollment(lessonIdValue, userIdValue).orElse(null);
+        lessonService.getLessonEnrollment(lessonIdValue, userIdValue).orElse(null);
 
     List<LessonFileInfoResponse> files = lessonApiMapper.toFileResponseList(fileModels);
     LessonUserDetailResponse res = toLessonUserDetailResponse(model, files, enrollment);

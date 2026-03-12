@@ -13,8 +13,9 @@ Chi tiết: tạo/cập nhật/xóa khóa học; ảnh đại diện bắt buộ
 Chi tiết: tạo/cập nhật/xóa bài học; ảnh đại diện tùy chọn; quản lý file tài liệu (MATERIAL) và file bài tập (ASSIGNMENT).
 3. Ghi danh khóa học (user).
 Chi tiết: tạo hoặc cập nhật `CourseEnrollment` sang `IN_PROGRESS`, tự động tạo `LessonEnrollment` cho toàn bộ bài học của khóa học nếu chưa có.
+Chi tiết thêm: `LessonEnrollment` được hiểu theo ngữ cảnh course, tức là khóa duy nhất là `(course_enrollment_id, lesson_id)`, không phải tiến độ global theo `user_id + lesson_id`.
 4. Tra cứu bài học (user).
-Chi tiết: lấy danh sách bài học toàn hệ hoặc theo khóa; nếu có `userId` sẽ trả thêm `lessonEnrollmentId` tương ứng.
+Chi tiết: lấy danh sách bài học toàn hệ hoặc theo khóa; với API theo course, `lessonEnrollmentId` luôn được tra cứu theo đúng `courseEnrollment` của user. Với API lesson toàn hệ, chỉ trả `lessonEnrollmentId` khi user chỉ có đúng 1 ngữ cảnh course cho lesson đó; nếu lesson xuất hiện ở nhiều course của cùng user thì trường enrollment sẽ để `null` để tránh mơ hồ.
 5. Nộp bài (user).
 Chi tiết: yêu cầu ít nhất 1 file; comment tùy chọn; thay thế toàn bộ attachments cũ nếu nộp lại; cập nhật `LessonProgress` sang `COMPLETED` và cập nhật `CourseProgress` nếu hoàn tất tất cả bài học.
 
@@ -28,6 +29,13 @@ Chi tiết: yêu cầu ít nhất 1 file; comment tùy chọn; thay thế toàn 
   - `course_enrollments`: (course_id, user_id)
   - `lesson_enrollments`: (course_enrollment_id, lesson_id)
   - `lesson_submissions`: (lesson_enrollment_id)
+- Hướng thiết kế hiện tại:
+  - Tiến độ/nộp bài của lesson là theo từng course enrollment.
+  - Cùng một `lesson_id` có thể xuất hiện ở nhiều course; khi đó user có thể có nhiều `lesson_enrollment` khác nhau cho lesson đó, tương ứng từng course.
+- Quy tắc cập nhật course:
+  - Khi thêm lesson mới vào course, hệ thống tự sync `lesson_enrollment` còn thiếu cho toàn bộ user đã enroll course đó.
+  - Khi bỏ lesson khỏi course, hệ thống không xóa lịch sử `lesson_enrollment`/`submission` cũ để tránh mất dữ liệu và tránh ảnh hưởng course khác cũng dùng cùng lesson.
+  - Các API đọc theo `courseEnrollment` chỉ lấy submission/progress của những lesson hiện còn thuộc course.
 
 **Dữ liệu chính**
 - Course: thông tin khóa học và ảnh đại diện.

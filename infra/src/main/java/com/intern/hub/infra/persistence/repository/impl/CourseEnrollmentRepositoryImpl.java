@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -27,6 +28,13 @@ public class CourseEnrollmentRepositoryImpl implements CourseEnrollmentRepositor
                 .stream()
                 .findFirst()
                 .map(this::toModel);
+    }
+
+    @Override
+    public List<CourseEnrollmentModel> findAllByCourseId(Long courseId) {
+        return courseEnrollmentEntityRepository.findAllByCourseEntity_CourseIdOrderByCreatedAtDesc(courseId).stream()
+                .map(this::toModel)
+                .toList();
     }
 
     @Override

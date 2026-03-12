@@ -2,6 +2,7 @@ package com.intern.hub.core.service.lesson;
 
 import com.intern.hub.core.domain.model.lesson.LessonModel;
 import com.intern.hub.core.repository.course.CourseLessonRepository;
+import com.intern.hub.core.repository.enrollment.CourseEnrollmentRepository;
 import com.intern.hub.core.repository.enrollment.LessonEnrollmentRepository;
 import com.intern.hub.core.repository.lesson.LessonRepository;
 import com.intern.hub.library.common.exception.NotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class LessonQueryService {
 
     LessonRepository lessonRepository;
     CourseLessonRepository courseLessonRepository;
+    CourseEnrollmentRepository courseEnrollmentRepository;
     LessonEnrollmentRepository lessonEnrollmentRepository;
 
     @Transactional(readOnly = true)
@@ -60,13 +63,38 @@ public class LessonQueryService {
     }
 
     @Transactional(readOnly = true)
-    /** Tìm lessonEnrollmentId theo lessonId + userId (trả null nếu không có). */
-    public Long getLessonEnrollmentId(Long lessonId, Long userId) {
+    public Optional<com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel> getLessonEnrollment(
+            Long lessonId, Long userId) {
         if (userId == null) {
-            return null;
+            return Optional.empty();
         }
-        return lessonEnrollmentRepository
-                .findLessonEnrollmentIdByLessonIdAndUserId(lessonId, userId)
+        List<com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel> enrollments =
+                lessonEnrollmentRepository.findAllByLessonIdAndUserId(lessonId, userId);
+        if (enrollments.size() != 1) {
+            return Optional.empty();
+        }
+        return Optional.of(enrollments.get(0));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel> getLessonEnrollment(
+            Long courseId, Long lessonId, Long userId) {
+        if (userId == null) {
+            return Optional.empty();
+        }
+        return courseEnrollmentRepository
+                .findByCourseIdAndUserId(courseId, userId)
+                .flatMap(
+                        courseEnrollment ->
+                                lessonEnrollmentRepository.findByCourseEnrollmentIdAndLessonId(
+                                        courseEnrollment.getCourseEnrollmentId(), lessonId));
+    }
+
+    @Transactional(readOnly = true)
+    /** Tìm lessonEnrollmentId theo lessonId + userId khi chỉ còn đúng 1 ngữ cảnh course. */
+    public Long getLessonEnrollmentId(Long lessonId, Long userId) {
+        return getLessonEnrollment(lessonId, userId)
+                .map(com.intern.hub.core.domain.model.enrollment.LessonEnrollmentModel::getLessonEnrollmentId)
                 .orElse(null);
     }
 

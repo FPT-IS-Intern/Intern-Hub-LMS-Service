@@ -91,10 +91,26 @@ public class LessonEnrollmentRepositoryImpl implements LessonEnrollmentRepositor
     }
 
     @Override
-    public Optional<LessonEnrollmentModel> findByLessonIdAndUserId(Long lessonId, Long userId) {
+    public List<LessonEnrollmentModel> findAllByLessonIdAndUserId(Long lessonId, Long userId) {
         return lessonEnrollmentEntityRepository
                 .findAllByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserIdOrderByCreatedAtDesc(
                         lessonId, userId)
+                .stream()
+                .map(this::toModel)
+                .toList();
+    }
+
+    @Override
+    public Optional<LessonEnrollmentModel> findByLessonIdAndUserId(Long lessonId, Long userId) {
+        return findAllByLessonIdAndUserId(lessonId, userId).stream().findFirst();
+    }
+
+    @Override
+    public Optional<LessonEnrollmentModel> findByCourseEnrollmentIdAndLessonId(
+            Long courseEnrollmentId, Long lessonId) {
+        return lessonEnrollmentEntityRepository
+                .findAllByCourseEnrollmentEntity_CourseEnrollmentIdAndLessonEntity_LessonIdOrderByCreatedAtDesc(
+                        courseEnrollmentId, lessonId)
                 .stream()
                 .findFirst()
                 .map(this::toModel);

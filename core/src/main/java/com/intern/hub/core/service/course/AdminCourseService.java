@@ -40,6 +40,7 @@ public class AdminCourseService {
     CoursePositionAssignmentRepository coursePositionAssignmentRepository;
     FileStorageRepository fileStorageRepository;
     StorageObjectLifecycleManager storageObjectLifecycleManager;
+    CourseEnrollmentService courseEnrollmentService;
 
     @NonFinal
     @Value("${aws.s3.paths.course}")
@@ -156,7 +157,13 @@ public class AdminCourseService {
         existing.setDescription(updateModel.getDescription());
 
         if (lessonIds != null) {
-            courseLessonRepository.replaceCourseLessons(courseId, distinctOrdered(lessonIds));
+            List<Long> currentLessonIds = courseLessonRepository.findLessonIdsByCourseId(courseId);
+            List<Long> normalizedLessonIds = distinctOrdered(lessonIds);
+            courseLessonRepository.replaceCourseLessons(courseId, normalizedLessonIds);
+            List<Long> addedLessonIds = normalizedLessonIds.stream()
+                    .filter(lessonId -> !currentLessonIds.contains(lessonId))
+                    .toList();
+            courseEnrollmentService.syncCourseLessonEnrollments(courseId, addedLessonIds);
         }
         if (evaluatorUserIds != null) {
             courseEvaluatorAssignmentRepository.replaceCourseEvaluators(

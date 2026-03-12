@@ -6,6 +6,7 @@ import com.intern.hub.core.domain.model.submission.SubmissionCommentModel;
 import com.intern.hub.core.domain.model.submission.constant.SubmissionStatus;
 import com.intern.hub.core.domain.model.submission.constant.SubmissionEvaluationStatus;
 import com.intern.hub.core.repository.FileStorageRepository;
+import com.intern.hub.core.repository.course.CourseLessonRepository;
 import com.intern.hub.core.repository.enrollment.CourseEnrollmentRepository;
 import com.intern.hub.core.repository.enrollment.LessonEnrollmentRepository;
 import com.intern.hub.core.repository.submission.LessonSubmissionRepository;
@@ -47,6 +48,7 @@ public class LessonSubmissionService {
 
     LessonEnrollmentRepository lessonEnrollmentRepository;
     CourseEnrollmentRepository courseEnrollmentRepository;
+    CourseLessonRepository courseLessonRepository;
     LessonSubmissionRepository lessonSubmissionRepository;
     SubmissionAttachmentRepository submissionAttachmentRepository;
     SubmissionCommentRepository submissionCommentRepository;
@@ -284,7 +286,9 @@ public class LessonSubmissionService {
                     "course.enrollment.invalid", "Course enrollment khong thuoc user nay");
         }
 
-        return lessonEnrollmentRepository.findLessonEnrollmentIdsByCourseEnrollmentId(courseEnrollmentId).stream()
+        return courseLessonRepository.findLessonIdsByCourseId(courseEnrollment.getCourseId()).stream()
+                .map(lessonId -> lessonEnrollmentRepository.findLessonEnrollmentId(courseEnrollmentId, lessonId))
+                .flatMap(java.util.Optional::stream)
                 .map(lessonSubmissionRepository::findByLessonEnrollmentId)
                 .flatMap(java.util.Optional::stream)
                 .map(

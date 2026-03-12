@@ -63,4 +63,8 @@ public interface LessonEnrollmentEntityRepository
 
     List<LessonEnrollmentEntity> findAllByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserIdOrderByCreatedAtDesc(
             Long lessonId, Long userId);
+
+    List<LessonEnrollmentEntity>
+            findAllByCourseEnrollmentEntity_CourseEnrollmentIdAndLessonEntity_LessonIdOrderByCreatedAtDesc(
+                    Long courseEnrollmentId, Long lessonId);
 }

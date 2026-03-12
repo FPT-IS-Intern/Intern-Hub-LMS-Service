@@ -79,9 +79,7 @@ public class UserCourseController {
                 item ->
                     toLessonUserSummaryResponse(
                         item,
-                        enrollmentService
-                            .getLessonEnrollment(item.getLessonId(), userId)
-                            .orElse(null)))
+                        lessonService.getLessonEnrollment(courseIdValue, item.getLessonId(), userId).orElse(null)))
             .toList();
     var courseIdString = model.getCourseId() == null ? null : model.getCourseId().toString();
     var res =
@@ -118,9 +116,7 @@ public class UserCourseController {
             model ->
                 toLessonUserSummaryResponse(
                     model,
-                    enrollmentService
-                        .getLessonEnrollment(model.getLessonId(), userIdValue)
-                        .orElse(null)));
+                    lessonService.getLessonEnrollment(courseIdValue, model.getLessonId(), userIdValue).orElse(null)));
 
     return ResponseApi.ok(res);
   }
