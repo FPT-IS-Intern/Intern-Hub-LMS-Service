@@ -56,10 +56,11 @@ public interface LessonEnrollmentEntityRepository
     @Query(
             "select le.lessonEnrollmentId from LessonEnrollmentEntity le "
                     + "where le.lessonEntity.lessonId = :lessonId "
-                    + "and le.courseEnrollmentEntity.userId = :userId")
-    Long findLessonEnrollmentIdByLessonIdAndUserId(
+                    + "and le.courseEnrollmentEntity.userId = :userId "
+                    + "order by le.createdAt desc")
+    List<Long> findLessonEnrollmentIdsByLessonIdAndUserId(
             @Param("lessonId") Long lessonId, @Param("userId") Long userId);
 
-    java.util.Optional<LessonEnrollmentEntity> findByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserId(
+    List<LessonEnrollmentEntity> findAllByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserIdOrderByCreatedAtDesc(
             Long lessonId, Long userId);
 }

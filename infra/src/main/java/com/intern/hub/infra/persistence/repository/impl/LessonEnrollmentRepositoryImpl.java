@@ -84,15 +84,19 @@ public class LessonEnrollmentRepositoryImpl implements LessonEnrollmentRepositor
 
     @Override
     public Optional<Long> findLessonEnrollmentIdByLessonIdAndUserId(Long lessonId, Long userId) {
-        return Optional.ofNullable(
-                lessonEnrollmentEntityRepository.findLessonEnrollmentIdByLessonIdAndUserId(
-                        lessonId, userId));
+        return lessonEnrollmentEntityRepository
+                .findLessonEnrollmentIdsByLessonIdAndUserId(lessonId, userId)
+                .stream()
+                .findFirst();
     }
 
     @Override
     public Optional<LessonEnrollmentModel> findByLessonIdAndUserId(Long lessonId, Long userId) {
         return lessonEnrollmentEntityRepository
-                .findByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserId(lessonId, userId)
+                .findAllByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserIdOrderByCreatedAtDesc(
+                        lessonId, userId)
+                .stream()
+                .findFirst()
                 .map(this::toModel);
     }
 

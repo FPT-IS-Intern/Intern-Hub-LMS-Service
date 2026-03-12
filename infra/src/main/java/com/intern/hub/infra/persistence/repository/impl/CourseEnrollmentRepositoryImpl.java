@@ -23,7 +23,9 @@ public class CourseEnrollmentRepositoryImpl implements CourseEnrollmentRepositor
     @Override
     public Optional<CourseEnrollmentModel> findByCourseIdAndUserId(Long courseId, Long userId) {
         return courseEnrollmentEntityRepository
-                .findByCourseEntity_CourseIdAndUserId(courseId, userId)
+                .findAllByCourseEntity_CourseIdAndUserIdOrderByCreatedAtDesc(courseId, userId)
+                .stream()
+                .findFirst()
                 .map(this::toModel);
     }
 

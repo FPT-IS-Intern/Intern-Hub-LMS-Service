@@ -5,6 +5,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -17,4 +18,7 @@ public interface CourseEnrollmentEntityRepository
     void deleteByCourseEntity_CourseId(Long courseId);
 
     Optional<CourseEnrollmentEntity> findByCourseEntity_CourseIdAndUserId(Long courseId, Long userId);
+
+    List<CourseEnrollmentEntity> findAllByCourseEntity_CourseIdAndUserIdOrderByCreatedAtDesc(
+            Long courseId, Long userId);
 }
