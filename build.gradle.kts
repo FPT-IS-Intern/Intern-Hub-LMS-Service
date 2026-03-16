@@ -1,4 +1,5 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 
 plugins {
     alias(libs.plugins.springBoot) apply false
@@ -19,6 +20,15 @@ allprojects {
 }
 
 subprojects {
+    plugins.withId("io.spring.dependency-management") {
+        extensions.configure<DependencyManagementExtension> {
+            imports {
+                mavenBom("org.springframework.boot:spring-boot-dependencies:${libs.versions.springBoot.get()}")
+                mavenBom("io.opentelemetry:opentelemetry-bom:${libs.versions.openTelemetry.get()}")
+            }
+        }
+    }
+
     plugins.withId("java") {
         apply(plugin = "com.diffplug.spotless")
 
