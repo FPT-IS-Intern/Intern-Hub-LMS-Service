@@ -14,6 +14,8 @@ import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;
+import com.intern.hub.starter.security.annotation.HasPermission;
+import com.intern.hub.starter.security.entity.Action;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -46,6 +48,7 @@ public class AdminLessonController {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Authenticated
+  @HasPermission(resource = "quan-ly-bai-hoc", action = Action.CREATE)
   @Operation(
       summary = "Tạo bài học",
       description = "Tạo bài học mới (multipart: data + image + file đính kèm).")
@@ -65,6 +68,7 @@ public class AdminLessonController {
 
   @GetMapping
   @Authenticated
+  @HasPermission(resource = "quan-ly-bai-hoc", action = Action.READ)
   @Operation(summary = "Danh sách bài học", description = "Lấy danh sách bài học có phân trang.")
   public ResponseApi<PaginatedData<LessonSummaryResponse>> getLessons(
       @PageableDefault(size = 10) Pageable pageable) {
@@ -77,6 +81,7 @@ public class AdminLessonController {
 
   @GetMapping("/{lessonId}")
   @Authenticated
+  @HasPermission(resource = "quan-ly-bai-hoc", action = Action.READ)
   @Operation(summary = "Chi tiết bài học", description = "Lấy chi tiết bài học kèm danh sách file.")
   public ResponseApi<LessonDetailResponse> getLessonDetail(
       @PathVariable("lessonId") String lessonId) {
@@ -92,6 +97,7 @@ public class AdminLessonController {
 
   @PutMapping(value = "/{lessonId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Authenticated
+  @HasPermission(resource = "quan-ly-bai-hoc", action = Action.UPDATE)
   @Operation(
       summary = "Cập nhật bài học",
       description = "Cập nhật bài học, hỗ trợ thêm/xóa file và thay ảnh.")
@@ -119,6 +125,7 @@ public class AdminLessonController {
 
   @DeleteMapping("/{lessonId}")
   @Authenticated
+  @HasPermission(resource = "quan-ly-bai-hoc", action = Action.DELETE)
   @Operation(summary = "Xóa bài học", description = "Xóa bài học theo id.")
   public ResponseApi<?> deleteLesson(@PathVariable("lessonId") String lessonId) {
     adminLessonService.deleteLesson(parseId(lessonId, "lessonId"), UserContext.requiredUserId());

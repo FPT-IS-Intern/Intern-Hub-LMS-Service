@@ -15,6 +15,8 @@ import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;
+import com.intern.hub.starter.security.annotation.HasPermission;
+import com.intern.hub.starter.security.entity.Action;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,6 +49,7 @@ public class AdminCourseController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Authenticated
+    @HasPermission(resource = "quan-ly-khoa-hoc", action = Action.CREATE)
     @Operation(summary = "Tạo khóa học", description = "Tạo khóa học mới (multipart: data + image).")
     public ResponseApi<?> createCourse(
             @RequestPart("data") @Valid CourseCreateRequest request,
@@ -65,6 +68,7 @@ public class AdminCourseController {
 
     @GetMapping
     @Authenticated
+    @HasPermission(resource = "quan-ly-khoa-hoc", action = Action.READ)
     @Operation(summary = "Danh sách khóa học", description = "Lấy danh sách khóa học có phân trang.")
     public ResponseApi<PaginatedData<CourseSummaryResponse>> getCourses(
             @PageableDefault(size = 10) Pageable pageable) {
@@ -75,6 +79,7 @@ public class AdminCourseController {
 
     @GetMapping("/{courseId:\\d+}")
     @Authenticated
+    @HasPermission(resource = "quan-ly-khoa-hoc", action = Action.READ)
     @Operation(summary = "Chi tiết khóa học", description = "Lấy chi tiết khóa học theo id.")
     public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
         Long courseIdValue = parseId(courseId, "courseId");
@@ -111,6 +116,7 @@ public class AdminCourseController {
 
     @PutMapping(value = "/{courseId:\\d+}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Authenticated
+    @HasPermission(resource = "quan-ly-khoa-hoc", action = Action.UPDATE)
     @Operation(
             summary = "Cập nhật khóa học",
             description = "Cập nhật thông tin khóa học, có thể thay ảnh.")
@@ -133,6 +139,7 @@ public class AdminCourseController {
 
     @DeleteMapping("/{courseId:\\d+}")
     @Authenticated
+    @HasPermission(resource = "quan-ly-khoa-hoc", action = Action.DELETE)
     @Operation(summary = "Xóa khóa học", description = "Xóa khóa học theo id.")
     public ResponseApi<?> deleteCourse(@PathVariable("courseId") String courseId) {
         adminCourseService.deleteCourse(parseId(courseId, "courseId"), UserContext.requiredUserId());

@@ -6,6 +6,8 @@ import com.intern.hub.core.repository.user.UserDirectoryRepository;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;
+import com.intern.hub.starter.security.annotation.HasPermission;
+import com.intern.hub.starter.security.entity.Action;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -28,6 +30,7 @@ public class AdminReferenceController {
 
     @GetMapping("/positions")
     @Authenticated
+    @HasPermission(resource = "quan-ly-khoa-hoc", action = Action.READ)
     @Operation(
             summary = "Danh sách position",
             description = "Lấy danh sách position từ HRM internal qua LMS để FE dùng làm reference.")
@@ -43,6 +46,7 @@ public class AdminReferenceController {
 
     @GetMapping("/users/by-email")
     @Authenticated
+    @HasPermission(resource = "quan-ly-khoa-hoc", action = Action.READ)
     @Operation(
             summary = "Tra cứu user theo email",
             description = "Lấy thông tin user reference theo email để FE hiển thị candidate.")
