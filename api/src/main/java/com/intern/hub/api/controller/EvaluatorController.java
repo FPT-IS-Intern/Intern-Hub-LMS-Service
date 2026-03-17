@@ -13,6 +13,8 @@ import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;
+import com.intern.hub.starter.security.annotation.HasPermission;
+import com.intern.hub.starter.security.entity.Action;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -41,6 +43,7 @@ public class EvaluatorController {
 
     @GetMapping("/courses")
     @Authenticated
+    @HasPermission(resource = "danh-gia-bai-hoc", action = Action.READ)
     @Operation(
             summary = "Danh sach khoa hoc evaluator",
             description = "Lay danh sach khoa hoc kem so luong enrollment, hoan thanh, chua hoan thanh "
@@ -67,6 +70,7 @@ public class EvaluatorController {
 
     @GetMapping("/courses/{courseId}/submissions")
     @Authenticated
+    @HasPermission(resource = "danh-gia-bai-hoc", action = Action.READ)
     @Operation(
             summary = "Danh sach bai nop cua khoa hoc",
             description = "Lay danh sach bai nop trong khoa hoc ma evaluator duoc phan cong.")
@@ -80,6 +84,7 @@ public class EvaluatorController {
 
     @PostMapping("/submissions/{lessonSubmissionId}/comments")
     @Authenticated
+    @HasPermission(resource = "danh-gia-bai-hoc", action = Action.REVIEW)
     @Operation(
             summary = "Gui nhan xet cho bai nop",
             description = "Evaluator gui them nhan xet cho bai nop thuoc khoa hoc duoc phan cong.")
@@ -95,6 +100,7 @@ public class EvaluatorController {
 
     @PostMapping("/submissions/{lessonSubmissionId}/evaluation-status")
     @Authenticated
+    @HasPermission(resource = "danh-gia-bai-hoc", action = Action.REVIEW)
     @Operation(
             summary = "Cap nhat trang thai duyet bai nop",
             description = "Evaluator cap nhat trang thai bai nop sang PENDING, APPROVED hoac REJECTED.")
