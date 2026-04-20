@@ -9,6 +9,7 @@ on:
       - 'infra/**'
       - 'core/**'
       - 'app/**'
+      - 'java/'
       - 'libs.versions.toml'
       - 'build.gradle.kts'
       - 'Dockerfile'
