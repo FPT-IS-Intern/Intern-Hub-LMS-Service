@@ -4,7 +4,7 @@ spring:
   jmx:
     enabled: false
   datasource:
-    url: ${DB_URL}
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ih_lms}}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driverClassName: org.postgresql.Driver
@@ -19,12 +19,12 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        default_schema: ih_lms
+        default_schema: ${SCHEMA_NAME:ih_lms}
     hibernate:
       ddl-auto: validate
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
-    default-schema: ih_lms
+    default-schema: ${SCHEMA_NAME:ih_lms}
     enabled: true
 
 server:
