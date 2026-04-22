@@ -4,6 +4,7 @@ import com.intern.hub.infra.persistence.entity.submission.LessonSubmissionEntity
 import java.util.List;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,10 @@ import java.util.Optional;
 @Repository
 public interface LessonSubmissionEntityRepository
         extends JpaRepository<@NonNull LessonSubmissionEntity, @NonNull Long> {
+
+    @Modifying
+    @Query("DELETE FROM LessonSubmissionEntity ls WHERE ls.lessonEnrollmentEntity.courseEnrollmentEntity.courseEntity.courseId = :courseId")
+    void deleteByCourseId(@Param("courseId") Long courseId);
 
     Optional<LessonSubmissionEntity> findByLessonEnrollmentEntity_LessonEnrollmentId(
             Long lessonEnrollmentId);

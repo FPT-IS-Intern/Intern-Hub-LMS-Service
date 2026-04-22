@@ -26,6 +26,10 @@ public class CourseRepositoryImpl implements CourseRepository {
     CourseEvaluatorEntityRepository courseEvaluatorEntityRepository;
     CoursePositionEntityRepository coursePositionEntityRepository;
     CourseEnrollmentEntityRepository courseEnrollmentEntityRepository;
+    LessonEnrollmentEntityRepository lessonEnrollmentEntityRepository;
+    LessonSubmissionEntityRepository lessonSubmissionEntityRepository;
+    SubmissionAttachmentEntityRepository submissionAttachmentEntityRepository;
+    SubmissionCommentEntityRepository submissionCommentEntityRepository;
 
     @Override
     public CourseModel save(CourseModel courseModel) {
@@ -53,6 +57,10 @@ public class CourseRepositoryImpl implements CourseRepository {
 
     @Override
     public void deleteWithRelationsById(Long courseId) {
+        submissionCommentEntityRepository.deleteByCourseId(courseId);
+        submissionAttachmentEntityRepository.deleteByCourseId(courseId);
+        lessonSubmissionEntityRepository.deleteByCourseId(courseId);
+        lessonEnrollmentEntityRepository.deleteByCourseId(courseId);
         courseEnrollmentEntityRepository.deleteByCourseEntity_CourseId(courseId);
         courseEvaluatorEntityRepository.deleteByCourseEntity_CourseId(courseId);
         coursePositionEntityRepository.deleteByCourseEntity_CourseId(courseId);

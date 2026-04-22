@@ -4,6 +4,7 @@ import com.intern.hub.core.domain.model.enrollment.constant.LessonProgress;
 import com.intern.hub.infra.persistence.entity.enrollment.LessonEnrollmentEntity;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,10 @@ import java.util.List;
 @Repository
 public interface LessonEnrollmentEntityRepository
         extends JpaRepository<@NonNull LessonEnrollmentEntity, @NonNull Long> {
+
+    @Modifying
+    @Query("DELETE FROM LessonEnrollmentEntity le WHERE le.courseEnrollmentEntity.courseEntity.courseId = :courseId")
+    void deleteByCourseId(@Param("courseId") Long courseId);
 
     @Query(
             "select le.lessonEntity.lessonId from LessonEnrollmentEntity le "
