@@ -533,30 +533,30 @@ databaseChangeLog:
 
         # ---------- Check Constraints ----------
 
-        - addCheckConstraint:
-            constraintName: course_enrollments_course_progress_check
-            tableName: course_enrollments
-            clause: course_progress IN ('IN_PROGRESS', 'COMPLETED', 'CANCELED')
+        - sql:
+            dbms: postgresql
+            endDelimiter: ;
+            sql: ALTER TABLE course_enrollments ADD CONSTRAINT course_enrollments_course_progress_check CHECK (course_progress IN ('IN_PROGRESS', 'COMPLETED', 'CANCELED'));
 
-        - addCheckConstraint:
-            constraintName: lesson_enrollments_lesson_progress_check
-            tableName: lesson_enrollments
-            clause: lesson_progress IN ('IN_PROGRESS', 'COMPLETED', 'CANCELED')
+        - sql:
+            dbms: postgresql
+            endDelimiter: ;
+            sql: ALTER TABLE lesson_enrollments ADD CONSTRAINT lesson_enrollments_lesson_progress_check CHECK (lesson_progress IN ('IN_PROGRESS', 'COMPLETED', 'CANCELED'));
 
-        - addCheckConstraint:
-            constraintName: lesson_files_lesson_file_type_check
-            tableName: lesson_files
-            clause: lesson_file_type IN ('MATERIAL', 'ASSIGNMENT')
+        - sql:
+            dbms: postgresql
+            endDelimiter: ;
+            sql: ALTER TABLE lesson_files ADD CONSTRAINT lesson_files_lesson_file_type_check CHECK (lesson_file_type IN ('MATERIAL', 'ASSIGNMENT'));
 
-        - addCheckConstraint:
-            constraintName: lesson_submissions_submission_status_check
-            tableName: lesson_submissions
-            clause: submission_status IN ('SUBMITTED', 'NOT_SUBMITTED')
+        - sql:
+            dbms: postgresql
+            endDelimiter: ;
+            sql: ALTER TABLE lesson_submissions ADD CONSTRAINT lesson_submissions_submission_status_check CHECK (submission_status IN ('SUBMITTED', 'NOT_SUBMITTED'));
 
-        - addCheckConstraint:
-            constraintName: lesson_submissions_evaluation_status_check
-            tableName: lesson_submissions
-            clause: evaluation_status IN ('PENDING', 'APPROVED', 'REJECTED')
+        - sql:
+            dbms: postgresql
+            endDelimiter: ;
+            sql: ALTER TABLE lesson_submissions ADD CONSTRAINT lesson_submissions_evaluation_status_check CHECK (evaluation_status IN ('PENDING', 'APPROVED', 'REJECTED'));
 
         # ---------- Foreign Keys ----------
 
