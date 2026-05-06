@@ -32,14 +32,14 @@ public interface CourseEvaluatorEntityRepository
                       COUNT(en.course_enrollment_id) AS totalEnrollmentCount,
                       COALESCE(SUM(CASE WHEN en.course_progress = 'COMPLETED' THEN 1 ELSE 0 END), 0) AS completedEnrollmentCount,
                       CASE WHEN COUNT(ce.course_evaluator_id) > 0 THEN true ELSE false END AS canEvaluate
-                    FROM ih_lms.courses c
-                    LEFT JOIN ih_lms.course_enrollments en ON en.course_id = c.course_id
-                    LEFT JOIN ih_lms.course_evaluators ce
+                    FROM courses c
+                    LEFT JOIN course_enrollments en ON en.course_id = c.course_id
+                    LEFT JOIN course_evaluators ce
                       ON ce.course_id = c.course_id AND ce.user_id = :userId
                     GROUP BY c.course_id, c.name, c.course_image_url, c.created_at
                     ORDER BY c.created_at DESC
                     """,
-            countQuery = "SELECT COUNT(*) FROM ih_lms.courses c",
+            countQuery = "SELECT COUNT(*) FROM courses c",
             nativeQuery = true)
     Page<CourseOverviewProjection> findAllCourseOverviews(
             @Param("userId") Long userId, Pageable pageable);
@@ -54,14 +54,14 @@ public interface CourseEvaluatorEntityRepository
                       COUNT(en.course_enrollment_id) AS totalEnrollmentCount,
                       COALESCE(SUM(CASE WHEN en.course_progress = 'COMPLETED' THEN 1 ELSE 0 END), 0) AS completedEnrollmentCount,
                       true AS canEvaluate
-                    FROM ih_lms.course_evaluators ce
-                    JOIN ih_lms.courses c ON c.course_id = ce.course_id
-                    LEFT JOIN ih_lms.course_enrollments en ON en.course_id = ce.course_id
+                    FROM course_evaluators ce
+                    JOIN courses c ON c.course_id = ce.course_id
+                    LEFT JOIN course_enrollments en ON en.course_id = ce.course_id
                     WHERE ce.user_id = :userId
                     GROUP BY ce.course_id, c.name, c.course_image_url, c.created_at
                     ORDER BY c.created_at DESC
                     """,
-            countQuery = "SELECT COUNT(*) FROM ih_lms.course_evaluators ce WHERE ce.user_id = :userId",
+            countQuery = "SELECT COUNT(*) FROM course_evaluators ce WHERE ce.user_id = :userId",
             nativeQuery = true)
     Page<CourseOverviewProjection> findCourseOverviewsByEvaluatorUserId(
             @Param("userId") Long userId, Pageable pageable);

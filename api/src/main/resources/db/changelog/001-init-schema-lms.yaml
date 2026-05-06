@@ -3,352 +3,658 @@ databaseChangeLog:
       id: 001-init-schema-lms
       author: admin
       changes:
-        - sql:
-            dbms: postgresql
-            splitStatements: true
-            stripComments: true
-            sql: |
-              -- ----------------------------
-              -- Table structure for course_enrollments
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."course_enrollments";
-              CREATE TABLE "schema_lms"."course_enrollments" (
-              "course_enrollment_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "course_progress" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-              "user_id" int8 NOT NULL,
-              "course_id" int8 NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for course_evaluators
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."course_evaluators";
-              CREATE TABLE "schema_lms"."course_evaluators" (
-              "course_evaluator_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "user_id" int8 NOT NULL,
-              "course_id" int8 NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for course_lessons
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."course_lessons";
-              CREATE TABLE "schema_lms"."course_lessons" (
-              "course_lesson_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "order_index" int4 NOT NULL,
-              "course_id" int8 NOT NULL,
-              "lesson_id" int8 NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for course_positions
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."course_positions";
-              CREATE TABLE "schema_lms"."course_positions" (
-              "course_position_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "position_id" int8 NOT NULL,
-              "course_id" int8 NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for courses
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."courses";
-              CREATE TABLE "schema_lms"."courses" (
-              "course_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "course_image_url" text COLLATE "pg_catalog"."default" NOT NULL,
-              "description" text COLLATE "pg_catalog"."default" NOT NULL,
-              "name" varchar(128) COLLATE "pg_catalog"."default" NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for lesson_enrollments
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."lesson_enrollments";
-              CREATE TABLE "schema_lms"."lesson_enrollments" (
-              "lesson_enrollment_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "lesson_progress" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-              "course_enrollment_id" int8 NOT NULL,
-              "lesson_id" int8 NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for lesson_files
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."lesson_files";
-              CREATE TABLE "schema_lms"."lesson_files" (
-              "lesson_file_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "file_name" text COLLATE "pg_catalog"."default" NOT NULL,
-              "file_size" int8 NOT NULL,
-              "file_url" text COLLATE "pg_catalog"."default" NOT NULL,
-              "lesson_file_type" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-              "lesson_id" int8 NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for lesson_submissions
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."lesson_submissions";
-              CREATE TABLE "schema_lms"."lesson_submissions" (
-              "lesson_submission_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "last_submission_at" int8 NOT NULL,
-              "evaluation_status" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-              "submission_status" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-              "lesson_enrollment_id" int8 NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for lessons
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."lessons";
-              CREATE TABLE "schema_lms"."lessons" (
-              "lesson_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "content" text COLLATE "pg_catalog"."default" NOT NULL,
-              "introduction" text COLLATE "pg_catalog"."default" NOT NULL,
-              "lesson_image_url" text COLLATE "pg_catalog"."default",
-              "name" text COLLATE "pg_catalog"."default" NOT NULL,
-              "requirements" text COLLATE "pg_catalog"."default" NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for submission_attachments
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."submission_attachments";
-              CREATE TABLE "schema_lms"."submission_attachments" (
-              "submission_attachment_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "file_name" text COLLATE "pg_catalog"."default" NOT NULL,
-              "file_size" int8 NOT NULL,
-              "file_url" text COLLATE "pg_catalog"."default" NOT NULL,
-              "lesson_submission_id" int8 NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Table structure for submission_comments
-              -- ----------------------------
-              DROP TABLE IF EXISTS "schema_lms"."submission_comments";
-              CREATE TABLE "schema_lms"."submission_comments" (
-              "submission_comment_id" int8 NOT NULL,
-              "created_at" int8 NOT NULL,
-              "created_by" varchar(50) COLLATE "pg_catalog"."default",
-              "updated_at" int8,
-              "updated_by" varchar(100) COLLATE "pg_catalog"."default",
-              "version" int4,
-              "comment_at" int8 NOT NULL,
-              "content" text COLLATE "pg_catalog"."default" NOT NULL,
-              "user_id" int8 NOT NULL,
-              "lesson_submission_id" int8 NOT NULL
-              )
-              ;
-              
-              -- ----------------------------
-              -- Uniques structure for table course_enrollments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_enrollments" ADD CONSTRAINT "uk2ikyy9u68ld3vnvq089m4j1xg" UNIQUE ("course_id", "user_id");
-              
-              -- ----------------------------
-              -- Checks structure for table course_enrollments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_enrollments" ADD CONSTRAINT "course_enrollments_course_progress_check" CHECK (course_progress::text = ANY (ARRAY['IN_PROGRESS'::character varying, 'COMPLETED'::character varying, 'CANCELED'::character varying]::text[]));
-              
-              -- ----------------------------
-              -- Primary Key structure for table course_enrollments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_enrollments" ADD CONSTRAINT "course_enrollments_pkey" PRIMARY KEY ("course_enrollment_id");
-              
-              -- ----------------------------
-              -- Uniques structure for table course_evaluators
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_evaluators" ADD CONSTRAINT "uk5ocxbrcf4hh6i907e2qqeln00" UNIQUE ("course_id", "user_id");
-              
-              -- ----------------------------
-              -- Primary Key structure for table course_evaluators
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_evaluators" ADD CONSTRAINT "course_evaluators_pkey" PRIMARY KEY ("course_evaluator_id");
-              
-              -- ----------------------------
-              -- Uniques structure for table course_lessons
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_lessons" ADD CONSTRAINT "uk3lnh5efggg5s62wde290a214" UNIQUE ("course_id", "lesson_id");
-              
-              -- ----------------------------
-              -- Primary Key structure for table course_lessons
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_lessons" ADD CONSTRAINT "course_lessons_pkey" PRIMARY KEY ("course_lesson_id");
-              
-              -- ----------------------------
-              -- Uniques structure for table course_positions
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_positions" ADD CONSTRAINT "uko02djn4hxh9ywubxdrl6vjyq7" UNIQUE ("course_id", "position_id");
-              
-              -- ----------------------------
-              -- Primary Key structure for table course_positions
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_positions" ADD CONSTRAINT "course_positions_pkey" PRIMARY KEY ("course_position_id");
-              
-              -- ----------------------------
-              -- Primary Key structure for table courses
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."courses" ADD CONSTRAINT "courses_pkey" PRIMARY KEY ("course_id");
-              
-              -- ----------------------------
-              -- Uniques structure for table lesson_enrollments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_enrollments" ADD CONSTRAINT "uk5emtw1hiipbayayf5k6wy24u1" UNIQUE ("course_enrollment_id", "lesson_id");
-              
-              -- ----------------------------
-              -- Checks structure for table lesson_enrollments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_enrollments" ADD CONSTRAINT "lesson_enrollments_lesson_progress_check" CHECK (lesson_progress::text = ANY (ARRAY['IN_PROGRESS'::character varying, 'COMPLETED'::character varying, 'CANCELED'::character varying]::text[]));
-              
-              -- ----------------------------
-              -- Primary Key structure for table lesson_enrollments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_enrollments" ADD CONSTRAINT "lesson_enrollments_pkey" PRIMARY KEY ("lesson_enrollment_id");
-              
-              -- ----------------------------
-              -- Checks structure for table lesson_files
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_files" ADD CONSTRAINT "lesson_files_lesson_file_type_check" CHECK (lesson_file_type::text = ANY (ARRAY['MATERIAL'::character varying, 'ASSIGNMENT'::character varying]::text[]));
-              
-              -- ----------------------------
-              -- Primary Key structure for table lesson_files
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_files" ADD CONSTRAINT "lesson_files_pkey" PRIMARY KEY ("lesson_file_id");
-              
-              -- ----------------------------
-              -- Uniques structure for table lesson_submissions
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_submissions" ADD CONSTRAINT "ukjifuuhkshudkdi53r8frp295q" UNIQUE ("lesson_enrollment_id");
-              
-              -- ----------------------------
-              -- Checks structure for table lesson_submissions
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_submissions" ADD CONSTRAINT "lesson_submissions_submission_status_check" CHECK (submission_status::text = ANY (ARRAY['SUBMITTED'::character varying, 'NOT_SUBMITTED'::character varying]::text[]));
-              ALTER TABLE "schema_lms"."lesson_submissions" ADD CONSTRAINT "lesson_submissions_evaluation_status_check" CHECK (evaluation_status::text = ANY (ARRAY['PENDING'::character varying, 'APPROVED'::character varying, 'REJECTED'::character varying]::text[]));
-              
-              -- ----------------------------
-              -- Primary Key structure for table lesson_submissions
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_submissions" ADD CONSTRAINT "lesson_submissions_pkey" PRIMARY KEY ("lesson_submission_id");
-              
-              -- ----------------------------
-              -- Primary Key structure for table lessons
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lessons" ADD CONSTRAINT "lessons_pkey" PRIMARY KEY ("lesson_id");
-              
-              -- ----------------------------
-              -- Primary Key structure for table submission_attachments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."submission_attachments" ADD CONSTRAINT "submission_attachments_pkey" PRIMARY KEY ("submission_attachment_id");
-              
-              -- ----------------------------
-              -- Primary Key structure for table submission_comments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."submission_comments" ADD CONSTRAINT "submission_comments_pkey" PRIMARY KEY ("submission_comment_id");
-              
-              -- ----------------------------
-              -- Foreign Keys structure for table course_enrollments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_enrollments" ADD CONSTRAINT "fkf78cq7ecdpk1clt1w5ofnb34t" FOREIGN KEY ("course_id") REFERENCES "schema_lms"."courses" ("course_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              
-              -- ----------------------------
-              -- Foreign Keys structure for table course_evaluators
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_evaluators" ADD CONSTRAINT "fka5jws6e9kiww60fx4xsgdcfb3" FOREIGN KEY ("course_id") REFERENCES "schema_lms"."courses" ("course_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              
-              -- ----------------------------
-              -- Foreign Keys structure for table course_lessons
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_lessons" ADD CONSTRAINT "fk9iskujo4lgqv253oc3ynwqhwq" FOREIGN KEY ("lesson_id") REFERENCES "schema_lms"."lessons" ("lesson_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              ALTER TABLE "schema_lms"."course_lessons" ADD CONSTRAINT "fklm9foqqux8n7gotr5u5cxymyl" FOREIGN KEY ("course_id") REFERENCES "schema_lms"."courses" ("course_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              
-              -- ----------------------------
-              -- Foreign Keys structure for table course_positions
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."course_positions" ADD CONSTRAINT "fk2mlxcmvtogw1bk94g850msd29" FOREIGN KEY ("course_id") REFERENCES "schema_lms"."courses" ("course_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              
-              -- ----------------------------
-              -- Foreign Keys structure for table lesson_enrollments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_enrollments" ADD CONSTRAINT "fk3kinhtyox8sae52tehacejn2d" FOREIGN KEY ("lesson_id") REFERENCES "schema_lms"."lessons" ("lesson_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              ALTER TABLE "schema_lms"."lesson_enrollments" ADD CONSTRAINT "fkjuhin4upl9uyg35brx0m1kbis" FOREIGN KEY ("course_enrollment_id") REFERENCES "schema_lms"."course_enrollments" ("course_enrollment_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              
-              -- ----------------------------
-              -- Foreign Keys structure for table lesson_files
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_files" ADD CONSTRAINT "fkfsbchs28m9rk41skhw6q0yuh0" FOREIGN KEY ("lesson_id") REFERENCES "schema_lms"."lessons" ("lesson_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              
-              -- ----------------------------
-              -- Foreign Keys structure for table lesson_submissions
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."lesson_submissions" ADD CONSTRAINT "fk8s8ihf15b6d2c96h2q0v53ooe" FOREIGN KEY ("lesson_enrollment_id") REFERENCES "schema_lms"."lesson_enrollments" ("lesson_enrollment_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              
-              -- ----------------------------
-              -- Foreign Keys structure for table submission_attachments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."submission_attachments" ADD CONSTRAINT "fkmi4ed9dynjdi9dl2aag959oai" FOREIGN KEY ("lesson_submission_id") REFERENCES "schema_lms"."lesson_submissions" ("lesson_submission_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-              
-              -- ----------------------------
-              -- Foreign Keys structure for table submission_comments
-              -- ----------------------------
-              ALTER TABLE "schema_lms"."submission_comments" ADD CONSTRAINT "fkkaxb9p4kc8gh3fs1quwgamye4" FOREIGN KEY ("lesson_submission_id") REFERENCES "schema_lms"."lesson_submissions" ("lesson_submission_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+        # ---------- Tables ----------
+
+        - createTable:
+            tableName: courses
+            columns:
+              - column:
+                  name: course_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: courses_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: course_image_url
+                  type: TEXT
+
+        - createTable:
+            tableName: lessons
+            columns:
+              - column:
+                  name: lesson_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: lessons_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: introduction
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requirements
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_image_url
+                  type: TEXT
+
+        - createTable:
+            tableName: course_enrollments
+            columns:
+              - column:
+                  name: course_enrollment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: course_enrollments_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: course_progress
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: course_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: course_evaluators
+            columns:
+              - column:
+                  name: course_evaluator_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: course_evaluators_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: course_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: course_lessons
+            columns:
+              - column:
+                  name: course_lesson_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: course_lessons_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: order_index
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: course_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: course_positions
+            columns:
+              - column:
+                  name: course_position_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: course_positions_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: position_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: course_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: lesson_enrollments
+            columns:
+              - column:
+                  name: lesson_enrollment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: lesson_enrollments_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: lesson_progress
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: course_enrollment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: lesson_files
+            columns:
+              - column:
+                  name: lesson_file_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: lesson_files_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: file_name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_size
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_url
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_file_type
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: lesson_submissions
+            columns:
+              - column:
+                  name: lesson_submission_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: lesson_submissions_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: last_submission_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: evaluation_status
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: submission_status
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_enrollment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: submission_attachments
+            columns:
+              - column:
+                  name: submission_attachment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: submission_attachments_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: file_name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_size
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_url
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_submission_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: submission_comments
+            columns:
+              - column:
+                  name: submission_comment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: submission_comments_pkey
+              - column:
+                  name: created_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: VARCHAR(50)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+              - column:
+                  name: version
+                  type: INT
+              - column:
+                  name: comment_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_submission_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        # ---------- Unique Constraints ----------
+
+        - addUniqueConstraint:
+            constraintName: uk2ikyy9u68ld3vnvq089m4j1xg
+            tableName: course_enrollments
+            columnNames: course_id, user_id
+
+        - addUniqueConstraint:
+            constraintName: uk5ocxbrcf4hh6i907e2qqeln00
+            tableName: course_evaluators
+            columnNames: course_id, user_id
+
+        - addUniqueConstraint:
+            constraintName: uk3lnh5efggg5s62wde290a214
+            tableName: course_lessons
+            columnNames: course_id, lesson_id
+
+        - addUniqueConstraint:
+            constraintName: uko02djn4hxh9ywubxdrl6vjyq7
+            tableName: course_positions
+            columnNames: course_id, position_id
+
+        - addUniqueConstraint:
+            constraintName: uk5emtw1hiipbayayf5k6wy24u1
+            tableName: lesson_enrollments
+            columnNames: course_enrollment_id, lesson_id
+
+        - addUniqueConstraint:
+            constraintName: ukjifuuhkshudkdi53r8frp295q
+            tableName: lesson_submissions
+            columnNames: lesson_enrollment_id
+
+        # ---------- Check Constraints ----------
+
+        - addCheckConstraint:
+            constraintName: course_enrollments_course_progress_check
+            tableName: course_enrollments
+            clause: course_progress IN ('IN_PROGRESS', 'COMPLETED', 'CANCELED')
+
+        - addCheckConstraint:
+            constraintName: lesson_enrollments_lesson_progress_check
+            tableName: lesson_enrollments
+            clause: lesson_progress IN ('IN_PROGRESS', 'COMPLETED', 'CANCELED')
+
+        - addCheckConstraint:
+            constraintName: lesson_files_lesson_file_type_check
+            tableName: lesson_files
+            clause: lesson_file_type IN ('MATERIAL', 'ASSIGNMENT')
+
+        - addCheckConstraint:
+            constraintName: lesson_submissions_submission_status_check
+            tableName: lesson_submissions
+            clause: submission_status IN ('SUBMITTED', 'NOT_SUBMITTED')
+
+        - addCheckConstraint:
+            constraintName: lesson_submissions_evaluation_status_check
+            tableName: lesson_submissions
+            clause: evaluation_status IN ('PENDING', 'APPROVED', 'REJECTED')
+
+        # ---------- Foreign Keys ----------
+
+        - addForeignKeyConstraint:
+            constraintName: fkf78cq7ecdpk1clt1w5ofnb34t
+            baseTableName: course_enrollments
+            baseColumnNames: course_id
+            referencedTableName: courses
+            referencedColumnNames: course_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fka5jws6e9kiww60fx4xsgdcfb3
+            baseTableName: course_evaluators
+            baseColumnNames: course_id
+            referencedTableName: courses
+            referencedColumnNames: course_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fklm9foqqux8n7gotr5u5cxymyl
+            baseTableName: course_lessons
+            baseColumnNames: course_id
+            referencedTableName: courses
+            referencedColumnNames: course_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fk9iskujo4lgqv253oc3ynwqhwq
+            baseTableName: course_lessons
+            baseColumnNames: lesson_id
+            referencedTableName: lessons
+            referencedColumnNames: lesson_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fk2mlxcmvtogw1bk94g850msd29
+            baseTableName: course_positions
+            baseColumnNames: course_id
+            referencedTableName: courses
+            referencedColumnNames: course_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fkjuhin4upl9uyg35brx0m1kbis
+            baseTableName: lesson_enrollments
+            baseColumnNames: course_enrollment_id
+            referencedTableName: course_enrollments
+            referencedColumnNames: course_enrollment_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fk3kinhtyox8sae52tehacejn2d
+            baseTableName: lesson_enrollments
+            baseColumnNames: lesson_id
+            referencedTableName: lessons
+            referencedColumnNames: lesson_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fkfsbchs28m9rk41skhw6q0yuh0
+            baseTableName: lesson_files
+            baseColumnNames: lesson_id
+            referencedTableName: lessons
+            referencedColumnNames: lesson_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fk8s8ihf15b6d2c96h2q0v53ooe
+            baseTableName: lesson_submissions
+            baseColumnNames: lesson_enrollment_id
+            referencedTableName: lesson_enrollments
+            referencedColumnNames: lesson_enrollment_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fkmi4ed9dynjdi9dl2aag959oai
+            baseTableName: submission_attachments
+            baseColumnNames: lesson_submission_id
+            referencedTableName: lesson_submissions
+            referencedColumnNames: lesson_submission_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+
+        - addForeignKeyConstraint:
+            constraintName: fkkaxb9p4kc8gh3fs1quwgamye4
+            baseTableName: submission_comments
+            baseColumnNames: lesson_submission_id
+            referencedTableName: lesson_submissions
+            referencedColumnNames: lesson_submission_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
