@@ -2,6 +2,7 @@ package com.intern.hub.infra.persistence.repository.jpa;
 
 import com.intern.hub.infra.persistence.entity.submission.LessonSubmissionEntity;
 import java.util.List;
+import java.util.Optional;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,34 +10,32 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
-/**
- * Admin 1/26/2026
- */
+/** Admin 1/26/2026 */
 @Repository
 public interface LessonSubmissionEntityRepository
-        extends JpaRepository<@NonNull LessonSubmissionEntity, @NonNull Long> {
+    extends JpaRepository<@NonNull LessonSubmissionEntity, @NonNull Long> {
 
-    @Modifying
-    @Query("DELETE FROM LessonSubmissionEntity ls WHERE ls.lessonEnrollmentEntity.courseEnrollmentEntity.courseEntity.courseId = :courseId")
-    void deleteByCourseId(@Param("courseId") Long courseId);
+  @Modifying
+  @Query(
+      "DELETE FROM LessonSubmissionEntity ls WHERE ls.lessonEnrollmentEntity.courseEnrollmentEntity.courseEntity.courseId = :courseId")
+  void deleteByCourseId(@Param("courseId") Long courseId);
 
-    Optional<LessonSubmissionEntity> findByLessonEnrollmentEntity_LessonEnrollmentId(
-            Long lessonEnrollmentId);
+  Optional<LessonSubmissionEntity> findByLessonEnrollmentEntity_LessonEnrollmentId(
+      Long lessonEnrollmentId);
 
-    @Query(
-            """
+  @Query(
+      """
             SELECT ce.courseEntity.courseId
             FROM LessonSubmissionEntity ls
             JOIN ls.lessonEnrollmentEntity le
             JOIN le.courseEnrollmentEntity ce
             WHERE ls.lessonSubmissionId = :lessonSubmissionId
             """)
-    Optional<Long> findCourseIdByLessonSubmissionId(@Param("lessonSubmissionId") Long lessonSubmissionId);
+  Optional<Long> findCourseIdByLessonSubmissionId(
+      @Param("lessonSubmissionId") Long lessonSubmissionId);
 
-    @Query(
-            """
+  @Query(
+      """
             SELECT
               ls.lessonSubmissionId AS lessonSubmissionId,
               le.lessonEnrollmentId AS lessonEnrollmentId,
@@ -54,25 +53,26 @@ public interface LessonSubmissionEntityRepository
             WHERE ce.courseEntity.courseId = :courseId
             ORDER BY ls.lastSubmissionAt DESC, ls.lessonSubmissionId DESC
             """)
-    List<CourseSubmissionProjection> findByCourseId(@Param("courseId") Long courseId);
+  List<CourseSubmissionProjection> findByCourseId(@Param("courseId") Long courseId);
 
-    interface CourseSubmissionProjection {
-        Long getLessonSubmissionId();
+  interface CourseSubmissionProjection {
+    Long getLessonSubmissionId();
 
-        Long getLessonEnrollmentId();
+    Long getLessonEnrollmentId();
 
-        Long getCourseEnrollmentId();
+    Long getCourseEnrollmentId();
 
-        Long getLessonId();
+    Long getLessonId();
 
-        String getLessonName();
+    String getLessonName();
 
-        Long getUserId();
+    Long getUserId();
 
-        com.intern.hub.core.domain.model.submission.constant.SubmissionStatus getSubmissionStatus();
+    com.intern.hub.core.domain.model.submission.constant.SubmissionStatus getSubmissionStatus();
 
-        com.intern.hub.core.domain.model.submission.constant.SubmissionEvaluationStatus getEvaluationStatus();
+    com.intern.hub.core.domain.model.submission.constant.SubmissionEvaluationStatus
+        getEvaluationStatus();
 
-        Long getLastSubmissionAt();
-    }
+    Long getLastSubmissionAt();
+  }
 }

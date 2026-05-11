@@ -7,142 +7,141 @@ import com.intern.hub.infra.persistence.entity.enrollment.LessonEnrollmentEntity
 import com.intern.hub.infra.persistence.repository.jpa.CourseEnrollmentEntityRepository;
 import com.intern.hub.infra.persistence.repository.jpa.LessonEnrollmentEntityRepository;
 import com.intern.hub.infra.persistence.repository.jpa.LessonEntityRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LessonEnrollmentRepositoryImpl implements LessonEnrollmentRepository {
 
-    LessonEnrollmentEntityRepository lessonEnrollmentEntityRepository;
-    CourseEnrollmentEntityRepository courseEnrollmentEntityRepository;
-    LessonEntityRepository lessonEntityRepository;
+  LessonEnrollmentEntityRepository lessonEnrollmentEntityRepository;
+  CourseEnrollmentEntityRepository courseEnrollmentEntityRepository;
+  LessonEntityRepository lessonEntityRepository;
 
-    @Override
-    public List<Long> findLessonIdsByCourseEnrollmentId(Long courseEnrollmentId) {
-        return lessonEnrollmentEntityRepository.findLessonIdsByCourseEnrollmentId(courseEnrollmentId);
+  @Override
+  public List<Long> findLessonIdsByCourseEnrollmentId(Long courseEnrollmentId) {
+    return lessonEnrollmentEntityRepository.findLessonIdsByCourseEnrollmentId(courseEnrollmentId);
+  }
+
+  @Override
+  public List<Long> findLessonEnrollmentIdsByCourseEnrollmentId(Long courseEnrollmentId) {
+    return lessonEnrollmentEntityRepository.findLessonEnrollmentIdsByCourseEnrollmentId(
+        courseEnrollmentId);
+  }
+
+  @Override
+  public Optional<Long> findLessonEnrollmentId(Long courseEnrollmentId, Long lessonId) {
+    return Optional.ofNullable(
+        lessonEnrollmentEntityRepository.findLessonEnrollmentId(courseEnrollmentId, lessonId));
+  }
+
+  @Override
+  public Optional<Long> findUserIdByLessonEnrollmentId(Long lessonEnrollmentId) {
+    return Optional.ofNullable(
+        lessonEnrollmentEntityRepository.findUserIdByLessonEnrollmentId(lessonEnrollmentId));
+  }
+
+  @Override
+  public Optional<Long> findCourseEnrollmentIdByLessonEnrollmentId(Long lessonEnrollmentId) {
+    return Optional.ofNullable(
+        lessonEnrollmentEntityRepository.findCourseEnrollmentIdByLessonEnrollmentId(
+            lessonEnrollmentId));
+  }
+
+  @Override
+  public long countByCourseEnrollmentId(Long courseEnrollmentId) {
+    return lessonEnrollmentEntityRepository.countByCourseEnrollmentEntity_CourseEnrollmentId(
+        courseEnrollmentId);
+  }
+
+  @Override
+  public long countByCourseEnrollmentIdAndProgress(
+      Long courseEnrollmentId, LessonProgress progress) {
+    return lessonEnrollmentEntityRepository
+        .countByCourseEnrollmentEntity_CourseEnrollmentIdAndLessonProgress(
+            courseEnrollmentId, progress);
+  }
+
+  @Override
+  public void updateProgress(Long lessonEnrollmentId, LessonProgress progress) {
+    LessonEnrollmentEntity entity =
+        lessonEnrollmentEntityRepository
+            .findById(lessonEnrollmentId)
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException(
+                        "Lesson enrollment not found: " + lessonEnrollmentId));
+    entity.setLessonProgress(progress);
+    lessonEnrollmentEntityRepository.save(entity);
+  }
+
+  @Override
+  public Optional<Long> findLessonEnrollmentIdByLessonIdAndUserId(Long lessonId, Long userId) {
+    return lessonEnrollmentEntityRepository
+        .findLessonEnrollmentIdsByLessonIdAndUserId(lessonId, userId)
+        .stream()
+        .findFirst();
+  }
+
+  @Override
+  public List<LessonEnrollmentModel> findAllByLessonIdAndUserId(Long lessonId, Long userId) {
+    return lessonEnrollmentEntityRepository
+        .findAllByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserIdOrderByCreatedAtDesc(
+            lessonId, userId)
+        .stream()
+        .map(this::toModel)
+        .toList();
+  }
+
+  @Override
+  public Optional<LessonEnrollmentModel> findByLessonIdAndUserId(Long lessonId, Long userId) {
+    return findAllByLessonIdAndUserId(lessonId, userId).stream().findFirst();
+  }
+
+  @Override
+  public Optional<LessonEnrollmentModel> findByCourseEnrollmentIdAndLessonId(
+      Long courseEnrollmentId, Long lessonId) {
+    return lessonEnrollmentEntityRepository
+        .findAllByCourseEnrollmentEntity_CourseEnrollmentIdAndLessonEntity_LessonIdOrderByCreatedAtDesc(
+            courseEnrollmentId, lessonId)
+        .stream()
+        .findFirst()
+        .map(this::toModel);
+  }
+
+  @Override
+  public void saveAll(List<LessonEnrollmentModel> models) {
+    if (models == null || models.isEmpty()) {
+      return;
     }
 
-    @Override
-    public List<Long> findLessonEnrollmentIdsByCourseEnrollmentId(Long courseEnrollmentId) {
-        return lessonEnrollmentEntityRepository.findLessonEnrollmentIdsByCourseEnrollmentId(
-                courseEnrollmentId);
+    var courseEnrollment =
+        courseEnrollmentEntityRepository.getReferenceById(models.get(0).getCourseEnrollmentId());
+    List<LessonEnrollmentEntity> entities = new ArrayList<>(models.size());
+
+    for (LessonEnrollmentModel model : models) {
+      LessonEnrollmentEntity entity = new LessonEnrollmentEntity();
+      entity.setCourseEnrollmentEntity(courseEnrollment);
+      entity.setLessonEntity(lessonEntityRepository.getReferenceById(model.getLessonId()));
+      entity.setLessonProgress(model.getLessonProgress());
+      entities.add(entity);
     }
 
-    @Override
-    public Optional<Long> findLessonEnrollmentId(Long courseEnrollmentId, Long lessonId) {
-        return Optional.ofNullable(
-                lessonEnrollmentEntityRepository.findLessonEnrollmentId(courseEnrollmentId, lessonId));
-    }
+    lessonEnrollmentEntityRepository.saveAll(entities);
+  }
 
-    @Override
-    public Optional<Long> findUserIdByLessonEnrollmentId(Long lessonEnrollmentId) {
-        return Optional.ofNullable(
-                lessonEnrollmentEntityRepository.findUserIdByLessonEnrollmentId(lessonEnrollmentId));
-    }
-
-    @Override
-    public Optional<Long> findCourseEnrollmentIdByLessonEnrollmentId(Long lessonEnrollmentId) {
-        return Optional.ofNullable(
-                lessonEnrollmentEntityRepository.findCourseEnrollmentIdByLessonEnrollmentId(
-                        lessonEnrollmentId));
-    }
-
-    @Override
-    public long countByCourseEnrollmentId(Long courseEnrollmentId) {
-        return lessonEnrollmentEntityRepository.countByCourseEnrollmentEntity_CourseEnrollmentId(
-                courseEnrollmentId);
-    }
-
-    @Override
-    public long countByCourseEnrollmentIdAndProgress(
-            Long courseEnrollmentId, LessonProgress progress) {
-        return lessonEnrollmentEntityRepository
-                .countByCourseEnrollmentEntity_CourseEnrollmentIdAndLessonProgress(
-                        courseEnrollmentId, progress);
-    }
-
-    @Override
-    public void updateProgress(Long lessonEnrollmentId, LessonProgress progress) {
-        LessonEnrollmentEntity entity =
-                lessonEnrollmentEntityRepository
-                        .findById(lessonEnrollmentId)
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Lesson enrollment not found: " + lessonEnrollmentId));
-        entity.setLessonProgress(progress);
-        lessonEnrollmentEntityRepository.save(entity);
-    }
-
-    @Override
-    public Optional<Long> findLessonEnrollmentIdByLessonIdAndUserId(Long lessonId, Long userId) {
-        return lessonEnrollmentEntityRepository
-                .findLessonEnrollmentIdsByLessonIdAndUserId(lessonId, userId)
-                .stream()
-                .findFirst();
-    }
-
-    @Override
-    public List<LessonEnrollmentModel> findAllByLessonIdAndUserId(Long lessonId, Long userId) {
-        return lessonEnrollmentEntityRepository
-                .findAllByLessonEntity_LessonIdAndCourseEnrollmentEntity_UserIdOrderByCreatedAtDesc(
-                        lessonId, userId)
-                .stream()
-                .map(this::toModel)
-                .toList();
-    }
-
-    @Override
-    public Optional<LessonEnrollmentModel> findByLessonIdAndUserId(Long lessonId, Long userId) {
-        return findAllByLessonIdAndUserId(lessonId, userId).stream().findFirst();
-    }
-
-    @Override
-    public Optional<LessonEnrollmentModel> findByCourseEnrollmentIdAndLessonId(
-            Long courseEnrollmentId, Long lessonId) {
-        return lessonEnrollmentEntityRepository
-                .findAllByCourseEnrollmentEntity_CourseEnrollmentIdAndLessonEntity_LessonIdOrderByCreatedAtDesc(
-                        courseEnrollmentId, lessonId)
-                .stream()
-                .findFirst()
-                .map(this::toModel);
-    }
-
-    @Override
-    public void saveAll(List<LessonEnrollmentModel> models) {
-        if (models == null || models.isEmpty()) {
-            return;
-        }
-
-        var courseEnrollment =
-                courseEnrollmentEntityRepository.getReferenceById(models.get(0).getCourseEnrollmentId());
-        List<LessonEnrollmentEntity> entities = new ArrayList<>(models.size());
-
-        for (LessonEnrollmentModel model : models) {
-            LessonEnrollmentEntity entity = new LessonEnrollmentEntity();
-            entity.setCourseEnrollmentEntity(courseEnrollment);
-            entity.setLessonEntity(lessonEntityRepository.getReferenceById(model.getLessonId()));
-            entity.setLessonProgress(model.getLessonProgress());
-            entities.add(entity);
-        }
-
-        lessonEnrollmentEntityRepository.saveAll(entities);
-    }
-
-    private LessonEnrollmentModel toModel(LessonEnrollmentEntity entity) {
-        return LessonEnrollmentModel.builder()
-                .lessonEnrollmentId(entity.getLessonEnrollmentId())
-                .courseEnrollmentId(entity.getCourseEnrollmentEntity().getCourseEnrollmentId())
-                .lessonId(entity.getLessonEntity().getLessonId())
-                .lessonProgress(entity.getLessonProgress())
-                .build();
-    }
+  private LessonEnrollmentModel toModel(LessonEnrollmentEntity entity) {
+    return LessonEnrollmentModel.builder()
+        .lessonEnrollmentId(entity.getLessonEnrollmentId())
+        .courseEnrollmentId(entity.getCourseEnrollmentEntity().getCourseEnrollmentId())
+        .lessonId(entity.getLessonEntity().getLessonId())
+        .lessonProgress(entity.getLessonProgress())
+        .build();
+  }
 }

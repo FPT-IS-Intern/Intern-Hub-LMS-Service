@@ -16,10 +16,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDirectoryModel {
 
-    Long userId;
-    String email;
-    String fullName;
-    String role;
-    String avatarUrl;
+  Long userId;
+  String email;
+  String fullName;
+  String role;
+  String avatarUrl;
 }
-

@@ -16,7 +16,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PositionDirectoryModel {
 
-    Long positionId;
-    String name;
+  Long positionId;
+  String name;
 }
-

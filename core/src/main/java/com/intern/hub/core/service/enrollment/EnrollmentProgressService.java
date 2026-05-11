@@ -16,48 +16,49 @@ import org.springframework.transaction.annotation.Transactional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EnrollmentProgressService {
 
-    LessonEnrollmentRepository lessonEnrollmentRepository;
-    CourseEnrollmentRepository courseEnrollmentRepository;
+  LessonEnrollmentRepository lessonEnrollmentRepository;
+  CourseEnrollmentRepository courseEnrollmentRepository;
 
-    @Transactional
-    public void updateLessonProgressAndSyncCourse(Long lessonEnrollmentId, LessonProgress lessonProgress) {
-        lessonEnrollmentRepository.updateProgress(lessonEnrollmentId, lessonProgress);
+  @Transactional
+  public void updateLessonProgressAndSyncCourse(
+      Long lessonEnrollmentId, LessonProgress lessonProgress) {
+    lessonEnrollmentRepository.updateProgress(lessonEnrollmentId, lessonProgress);
 
-        Long courseEnrollmentId =
-                lessonEnrollmentRepository
-                        .findCourseEnrollmentIdByLessonEnrollmentId(lessonEnrollmentId)
-                        .orElseThrow(
-                                () ->
-                                        new NotFoundException(
-                                                "course.enrollment.not.found",
-                                                "Khong tim thay course enrollment cua lesson enrollment"));
+    Long courseEnrollmentId =
+        lessonEnrollmentRepository
+            .findCourseEnrollmentIdByLessonEnrollmentId(lessonEnrollmentId)
+            .orElseThrow(
+                () ->
+                    new NotFoundException(
+                        "course.enrollment.not.found",
+                        "Khong tim thay course enrollment cua lesson enrollment"));
 
-        syncCourseProgress(courseEnrollmentId);
+    syncCourseProgress(courseEnrollmentId);
+  }
+
+  @Transactional
+  public void syncCourseProgress(Long courseEnrollmentId) {
+    var courseEnrollment =
+        courseEnrollmentRepository
+            .findById(courseEnrollmentId)
+            .orElseThrow(
+                () ->
+                    new NotFoundException(
+                        "course.enrollment.not.found", "Khong tim thay course enrollment"));
+
+    long totalLessons = lessonEnrollmentRepository.countByCourseEnrollmentId(courseEnrollmentId);
+    long completedLessons =
+        lessonEnrollmentRepository.countByCourseEnrollmentIdAndProgress(
+            courseEnrollmentId, LessonProgress.COMPLETED);
+
+    CourseProgress nextProgress =
+        totalLessons > 0 && totalLessons == completedLessons
+            ? CourseProgress.COMPLETED
+            : CourseProgress.IN_PROGRESS;
+
+    if (courseEnrollment.getCourseProgress() != nextProgress) {
+      courseEnrollment.setCourseProgress(nextProgress);
+      courseEnrollmentRepository.save(courseEnrollment);
     }
-
-    @Transactional
-    public void syncCourseProgress(Long courseEnrollmentId) {
-        var courseEnrollment =
-                courseEnrollmentRepository
-                        .findById(courseEnrollmentId)
-                        .orElseThrow(
-                                () ->
-                                        new NotFoundException(
-                                                "course.enrollment.not.found", "Khong tim thay course enrollment"));
-
-        long totalLessons = lessonEnrollmentRepository.countByCourseEnrollmentId(courseEnrollmentId);
-        long completedLessons =
-                lessonEnrollmentRepository.countByCourseEnrollmentIdAndProgress(
-                        courseEnrollmentId, LessonProgress.COMPLETED);
-
-        CourseProgress nextProgress =
-                totalLessons > 0 && totalLessons == completedLessons
-                        ? CourseProgress.COMPLETED
-                        : CourseProgress.IN_PROGRESS;
-
-        if (courseEnrollment.getCourseProgress() != nextProgress) {
-            courseEnrollment.setCourseProgress(nextProgress);
-            courseEnrollmentRepository.save(courseEnrollment);
-        }
-    }
+  }
 }

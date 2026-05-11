@@ -6,7 +6,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface CourseEvaluatorRepository {
 
-    Page<EvaluatorCourseOverviewModel> findAllCourseOverviews(Long evaluatorUserId, Pageable pageable);
+  Page<EvaluatorCourseOverviewModel> findAllCourseOverviews(
+      Long evaluatorUserId, Pageable pageable);
 
-    Page<EvaluatorCourseOverviewModel> findCourseOverviewsByEvaluatorUserId(Long evaluatorUserId, Pageable pageable);
+  Page<EvaluatorCourseOverviewModel> findCourseOverviewsByEvaluatorUserId(
+      Long evaluatorUserId, Pageable pageable);
 }

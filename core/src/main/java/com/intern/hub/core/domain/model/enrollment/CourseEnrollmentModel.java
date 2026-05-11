@@ -4,9 +4,7 @@ import com.intern.hub.core.domain.model.enrollment.constant.CourseProgress;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Admin 1/27/2026
- */
+/** Admin 1/27/2026 */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,8 +13,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CourseEnrollmentModel {
 
-    Long courseEnrollmentId;
-    Long courseId;
-    Long userId;
-    CourseProgress courseProgress;
+  Long courseEnrollmentId;
+  Long courseId;
+  Long userId;
+  CourseProgress courseProgress;
 }

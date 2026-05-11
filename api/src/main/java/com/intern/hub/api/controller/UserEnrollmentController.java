@@ -8,13 +8,13 @@ import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Authenticated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.RequestBody;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,13 +32,13 @@ public class UserEnrollmentController {
   @Operation(
       summary = "Tra cứu ghi danh khóa học của tôi",
       description = "Lấy course enrollment theo courseId của user hiện tại.")
-    public ResponseApi<CourseEnrollmentResponse> getCourseEnrollment(
-            @PathVariable("courseId") String courseId) {
-        var enrollment =
-                enrollmentService.getCourseEnrollment(
-                        parseId(courseId, "courseId"), UserContext.requiredUserId());
-        return ResponseApi.ok(enrollment.map(this::toCourseEnrollmentResponse).orElse(null));
-    }
+  public ResponseApi<CourseEnrollmentResponse> getCourseEnrollment(
+      @PathVariable("courseId") String courseId) {
+    var enrollment =
+        enrollmentService.getCourseEnrollment(
+            parseId(courseId, "courseId"), UserContext.requiredUserId());
+    return ResponseApi.ok(enrollment.map(this::toCourseEnrollmentResponse).orElse(null));
+  }
 
   @PostMapping("/lms/courses/{courseId}/enroll")
   @Authenticated
@@ -62,12 +62,12 @@ public class UserEnrollmentController {
     }
   }
 
-    private CourseEnrollmentResponse toCourseEnrollmentResponse(
-            com.intern.hub.core.domain.model.enrollment.CourseEnrollmentModel model) {
-        return new CourseEnrollmentResponse(
-                model.getCourseEnrollmentId() == null ? null : model.getCourseEnrollmentId().toString(),
-                model.getCourseId() == null ? null : model.getCourseId().toString(),
-                model.getUserId() == null ? null : model.getUserId().toString(),
-                model.getCourseProgress() == null ? null : model.getCourseProgress().name());
-    }
+  private CourseEnrollmentResponse toCourseEnrollmentResponse(
+      com.intern.hub.core.domain.model.enrollment.CourseEnrollmentModel model) {
+    return new CourseEnrollmentResponse(
+        model.getCourseEnrollmentId() == null ? null : model.getCourseEnrollmentId().toString(),
+        model.getCourseId() == null ? null : model.getCourseId().toString(),
+        model.getUserId() == null ? null : model.getUserId().toString(),
+        model.getCourseProgress() == null ? null : model.getCourseProgress().name());
+  }
 }

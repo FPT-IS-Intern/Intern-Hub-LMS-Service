@@ -1,7 +1,7 @@
 package com.intern.hub.infra.repository.user;
 
-import com.intern.hub.core.domain.model.user.UserDirectoryModel;
 import com.intern.hub.core.domain.model.user.PositionDirectoryModel;
+import com.intern.hub.core.domain.model.user.UserDirectoryModel;
 import com.intern.hub.core.repository.user.UserDirectoryRepository;
 import com.intern.hub.infra.feign.HrmInternalFeignClient;
 import com.intern.hub.library.common.exception.InternalErrorException;
@@ -20,90 +20,92 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class HrmUserDirectoryRepository implements UserDirectoryRepository {
 
-    HrmInternalFeignClient hrmInternalFeignClient;
+  HrmInternalFeignClient hrmInternalFeignClient;
 
-    @Override
-    public boolean existsByUserId(Long userId) {
-        try {
-            var response = hrmInternalFeignClient.getUserByIdInternal(userId);
-            return response != null && response.data() != null;
-        } catch (FeignException.NotFound ex) {
-            return false;
-        } catch (Exception ex) {
-            log.error("Failed to fetch HRM internal user by id {}", userId, ex);
-            throw new InternalErrorException(
-                    "hrm.user.fetch.error", "Không thể lấy thông tin user từ HRM");
-        }
+  @Override
+  public boolean existsByUserId(Long userId) {
+    try {
+      var response = hrmInternalFeignClient.getUserByIdInternal(userId);
+      return response != null && response.data() != null;
+    } catch (FeignException.NotFound ex) {
+      return false;
+    } catch (Exception ex) {
+      log.error("Failed to fetch HRM internal user by id {}", userId, ex);
+      throw new InternalErrorException(
+          "hrm.user.fetch.error", "Không thể lấy thông tin user từ HRM");
     }
+  }
 
-    @Override
-    public Optional<UserDirectoryModel> findByEmail(String email) {
-        String normalizedEmail = email == null ? null : email.strip().toLowerCase();
-        if (normalizedEmail == null || normalizedEmail.isBlank()) {
-            return Optional.empty();
-        }
-        try {
-            var response = hrmInternalFeignClient.getUserByEmailInternal(normalizedEmail);
-            if (response == null || response.data() == null) {
-                return Optional.empty();
-            }
-            var user = response.data();
-            return Optional.of(
-                    toUserDirectoryModel(user));
-        } catch (FeignException.NotFound ex) {
-            return Optional.empty();
-        } catch (Exception ex) {
-            log.error("Failed to fetch HRM internal user by email {}", normalizedEmail, ex);
-            throw new InternalErrorException(
-                    "hrm.user.fetch.error", "Không thể lấy thông tin user từ HRM");
-        }
+  @Override
+  public Optional<UserDirectoryModel> findByEmail(String email) {
+    String normalizedEmail = email == null ? null : email.strip().toLowerCase();
+    if (normalizedEmail == null || normalizedEmail.isBlank()) {
+      return Optional.empty();
     }
+    try {
+      var response = hrmInternalFeignClient.getUserByEmailInternal(normalizedEmail);
+      if (response == null || response.data() == null) {
+        return Optional.empty();
+      }
+      var user = response.data();
+      return Optional.of(toUserDirectoryModel(user));
+    } catch (FeignException.NotFound ex) {
+      return Optional.empty();
+    } catch (Exception ex) {
+      log.error("Failed to fetch HRM internal user by email {}", normalizedEmail, ex);
+      throw new InternalErrorException(
+          "hrm.user.fetch.error", "Không thể lấy thông tin user từ HRM");
+    }
+  }
 
-    @Override
-    public List<UserDirectoryModel> findByIds(List<Long> userIds) {
-        if (userIds == null || userIds.isEmpty()) {
-            return List.of();
-        }
-        try {
-            var response = hrmInternalFeignClient.getUsersByIdsInternal(userIds);
-            if (response == null || response.data() == null) {
-                return List.of();
-            }
-            return response.data().stream().map(this::toUserDirectoryModel).toList();
-        } catch (Exception ex) {
-            log.error("Failed to fetch HRM internal users by ids {}", userIds, ex);
-            throw new InternalErrorException(
-                    "hrm.user.fetch.error", "Không thể lấy thông tin user từ HRM");
-        }
+  @Override
+  public List<UserDirectoryModel> findByIds(List<Long> userIds) {
+    if (userIds == null || userIds.isEmpty()) {
+      return List.of();
     }
+    try {
+      var response = hrmInternalFeignClient.getUsersByIdsInternal(userIds);
+      if (response == null || response.data() == null) {
+        return List.of();
+      }
+      return response.data().stream().map(this::toUserDirectoryModel).toList();
+    } catch (Exception ex) {
+      log.error("Failed to fetch HRM internal users by ids {}", userIds, ex);
+      throw new InternalErrorException(
+          "hrm.user.fetch.error", "Không thể lấy thông tin user từ HRM");
+    }
+  }
 
-    @Override
-    public List<PositionDirectoryModel> findAllPositions() {
-        try {
-            var response = hrmInternalFeignClient.getPositionsInternal();
-            if (response == null || response.data() == null) {
-                return List.of();
-            }
-            return response.data().stream()
-                    .map(position -> PositionDirectoryModel.builder()
-                            .positionId(position.positionId())
-                            .name(position.name())
-                            .build())
-                    .toList();
-        } catch (Exception ex) {
-            log.error("Failed to fetch HRM internal positions", ex);
-            throw new InternalErrorException(
-                    "hrm.position.fetch.error", "Không thể lấy danh sách position từ HRM");
-        }
+  @Override
+  public List<PositionDirectoryModel> findAllPositions() {
+    try {
+      var response = hrmInternalFeignClient.getPositionsInternal();
+      if (response == null || response.data() == null) {
+        return List.of();
+      }
+      return response.data().stream()
+          .map(
+              position ->
+                  PositionDirectoryModel.builder()
+                      .positionId(position.positionId())
+                      .name(position.name())
+                      .build())
+          .toList();
+    } catch (Exception ex) {
+      log.error("Failed to fetch HRM internal positions", ex);
+      throw new InternalErrorException(
+          "hrm.position.fetch.error", "Không thể lấy danh sách position từ HRM");
     }
+  }
 
-    private UserDirectoryModel toUserDirectoryModel(com.intern.hub.infra.feign.model.HrmUserClientModel user) {
-        return UserDirectoryModel.builder()
-                .userId(user.userId())
-                .email(user.email())
-                .fullName(user.fullName())
-                .role(user.role())
-                .avatarUrl(user.avatarUrl())
-                .build();
-    }
+  private UserDirectoryModel toUserDirectoryModel(
+      com.intern.hub.infra.feign.model.HrmUserClientModel user) {
+    return UserDirectoryModel.builder()
+        .userId(user.userId())
+        .email(user.email())
+        .fullName(user.fullName())
+        .role(user.role())
+        .avatarUrl(user.avatarUrl())
+        .build();
+  }
 }

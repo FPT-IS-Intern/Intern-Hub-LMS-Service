@@ -55,7 +55,9 @@ public class UserLessonController {
             model ->
                 toLessonUserSummaryResponse(
                     model,
-                    lessonService.getLessonEnrollment(model.getLessonId(), userIdValue).orElse(null)));
+                    lessonService
+                        .getLessonEnrollment(model.getLessonId(), userIdValue)
+                        .orElse(null)));
 
     return ResponseApi.ok(res);
   }

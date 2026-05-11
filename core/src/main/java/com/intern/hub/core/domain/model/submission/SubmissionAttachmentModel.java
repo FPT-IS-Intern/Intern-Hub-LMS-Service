@@ -3,9 +3,7 @@ package com.intern.hub.core.domain.model.submission;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Admin 1/27/2026
- */
+/** Admin 1/27/2026 */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,9 +12,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubmissionAttachmentModel {
 
-    Long submissionAttachmentId;
-    Long lessonSubmissionId;
-    String fileUrl;
-    String fileName;
-    Long fileSize;
+  Long submissionAttachmentId;
+  Long lessonSubmissionId;
+  String fileUrl;
+  String fileName;
+  Long fileSize;
 }

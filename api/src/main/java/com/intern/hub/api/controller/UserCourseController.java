@@ -85,7 +85,9 @@ public class UserCourseController {
                 item ->
                     toLessonUserSummaryResponse(
                         item,
-                        lessonService.getLessonEnrollment(courseIdValue, item.getLessonId(), userId).orElse(null)))
+                        lessonService
+                            .getLessonEnrollment(courseIdValue, item.getLessonId(), userId)
+                            .orElse(null)))
             .toList();
     var courseIdString = model.getCourseId() == null ? null : model.getCourseId().toString();
     var res =
@@ -122,7 +124,9 @@ public class UserCourseController {
             model ->
                 toLessonUserSummaryResponse(
                     model,
-                    lessonService.getLessonEnrollment(courseIdValue, model.getLessonId(), userIdValue).orElse(null)));
+                    lessonService
+                        .getLessonEnrollment(courseIdValue, model.getLessonId(), userIdValue)
+                        .orElse(null)));
 
     return ResponseApi.ok(res);
   }
@@ -140,7 +144,8 @@ public class UserCourseController {
     Long userId = UserContext.requiredUserId();
 
     boolean lessonBelongsToCourse =
-        courseService.getCourseLessonIds(courseIdValue).stream().anyMatch(id -> id.equals(lessonIdValue));
+        courseService.getCourseLessonIds(courseIdValue).stream()
+            .anyMatch(id -> id.equals(lessonIdValue));
     if (!lessonBelongsToCourse) {
       throw new NotFoundException(
           "course.lesson.not.found", "Không tìm thấy bài học trong khóa học này");

@@ -10,10 +10,10 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring")
 public interface CourseEntityMapper {
 
-    CourseEntity toEntity(CourseModel model);
+  CourseEntity toEntity(CourseModel model);
 
-    CourseModel toModel(CourseEntity entity);
+  CourseModel toModel(CourseEntity entity);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateEntityFromModel(CourseModel model, @MappingTarget CourseEntity entity);
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  void updateEntityFromModel(CourseModel model, @MappingTarget CourseEntity entity);
 }

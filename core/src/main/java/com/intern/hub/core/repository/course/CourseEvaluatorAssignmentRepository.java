@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface CourseEvaluatorAssignmentRepository {
 
-    void saveCourseEvaluators(Long courseId, List<Long> evaluatorUserIds);
+  void saveCourseEvaluators(Long courseId, List<Long> evaluatorUserIds);
 
-    void replaceCourseEvaluators(Long courseId, List<Long> evaluatorUserIds);
+  void replaceCourseEvaluators(Long courseId, List<Long> evaluatorUserIds);
 
-    List<Long> findEvaluatorUserIdsByCourseId(Long courseId);
+  List<Long> findEvaluatorUserIdsByCourseId(Long courseId);
 }

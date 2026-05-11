@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface CourseLessonRepository {
 
-    List<Long> findLessonIdsByCourseId(Long courseId);
+  List<Long> findLessonIdsByCourseId(Long courseId);
 
-    void saveCourseLessons(Long courseId, List<Long> lessonIds);
+  void saveCourseLessons(Long courseId, List<Long> lessonIds);
 
-    void replaceCourseLessons(Long courseId, List<Long> lessonIds);
+  void replaceCourseLessons(Long courseId, List<Long> lessonIds);
 }

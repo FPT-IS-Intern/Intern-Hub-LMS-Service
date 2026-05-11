@@ -5,21 +5,19 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
 import org.springframework.stereotype.Component;
 
-/**
- * Admin 1/26/2026
- */
+/** Admin 1/26/2026 */
 @Component
 public class SnowflakeIdGenerator implements IdentifierGenerator {
 
-    private final Snowflake snowflake;
+  private final Snowflake snowflake;
 
-    public SnowflakeIdGenerator(Snowflake snowflake) {
-        this.snowflake = snowflake;
-    }
+  public SnowflakeIdGenerator(Snowflake snowflake) {
+    this.snowflake = snowflake;
+  }
 
-    @Override
-    public Object generate(
-            SharedSessionContractImplementor sharedSessionContractImplementor, Object o) {
-        return snowflake.next();
-    }
+  @Override
+  public Object generate(
+      SharedSessionContractImplementor sharedSessionContractImplementor, Object o) {
+    return snowflake.next();
+  }
 }

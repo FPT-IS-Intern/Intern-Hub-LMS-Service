@@ -12,19 +12,19 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CourseEvaluatorEntityRepository
-        extends JpaRepository<@NonNull CourseEvaluatorEntity, @NonNull Long> {
+    extends JpaRepository<@NonNull CourseEvaluatorEntity, @NonNull Long> {
 
-    void deleteByCourseEntity_CourseId(Long courseId);
+  void deleteByCourseEntity_CourseId(Long courseId);
 
-    @Query(
-            "select ce.userId from CourseEvaluatorEntity ce "
-                    + "where ce.courseEntity.courseId = :courseId "
-                    + "order by ce.createdAt asc")
-    List<Long> findUserIdsByCourseId(@Param("courseId") Long courseId);
+  @Query(
+      "select ce.userId from CourseEvaluatorEntity ce "
+          + "where ce.courseEntity.courseId = :courseId "
+          + "order by ce.createdAt asc")
+  List<Long> findUserIdsByCourseId(@Param("courseId") Long courseId);
 
-    @Query(
-            value =
-                    """
+  @Query(
+      value =
+          """
                     SELECT
                       c.course_id AS courseId,
                       c.name AS name,
@@ -39,14 +39,14 @@ public interface CourseEvaluatorEntityRepository
                     GROUP BY c.course_id, c.name, c.course_image_url, c.created_at
                     ORDER BY c.created_at DESC
                     """,
-            countQuery = "SELECT COUNT(*) FROM courses c",
-            nativeQuery = true)
-    Page<CourseOverviewProjection> findAllCourseOverviews(
-            @Param("userId") Long userId, Pageable pageable);
+      countQuery = "SELECT COUNT(*) FROM courses c",
+      nativeQuery = true)
+  Page<CourseOverviewProjection> findAllCourseOverviews(
+      @Param("userId") Long userId, Pageable pageable);
 
-    @Query(
-            value =
-                    """
+  @Query(
+      value =
+          """
                     SELECT
                       ce.course_id AS courseId,
                       c.name AS name,
@@ -61,22 +61,22 @@ public interface CourseEvaluatorEntityRepository
                     GROUP BY ce.course_id, c.name, c.course_image_url, c.created_at
                     ORDER BY c.created_at DESC
                     """,
-            countQuery = "SELECT COUNT(*) FROM course_evaluators ce WHERE ce.user_id = :userId",
-            nativeQuery = true)
-    Page<CourseOverviewProjection> findCourseOverviewsByEvaluatorUserId(
-            @Param("userId") Long userId, Pageable pageable);
+      countQuery = "SELECT COUNT(*) FROM course_evaluators ce WHERE ce.user_id = :userId",
+      nativeQuery = true)
+  Page<CourseOverviewProjection> findCourseOverviewsByEvaluatorUserId(
+      @Param("userId") Long userId, Pageable pageable);
 
-    interface CourseOverviewProjection {
-        Long getCourseId();
+  interface CourseOverviewProjection {
+    Long getCourseId();
 
-        String getName();
+    String getName();
 
-        String getCourseImageUrl();
+    String getCourseImageUrl();
 
-        Long getTotalEnrollmentCount();
+    Long getTotalEnrollmentCount();
 
-        Long getCompletedEnrollmentCount();
+    Long getCompletedEnrollmentCount();
 
-        boolean getCanEvaluate();
-    }
+    boolean getCanEvaluate();
+  }
 }

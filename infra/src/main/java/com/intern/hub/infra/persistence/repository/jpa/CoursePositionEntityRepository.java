@@ -8,20 +8,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-/**
- * Admin 1/26/2026
- */
+/** Admin 1/26/2026 */
 @Repository
 public interface CoursePositionEntityRepository
-        extends JpaRepository<@NonNull CoursePositionEntity, @NonNull Long> {
+    extends JpaRepository<@NonNull CoursePositionEntity, @NonNull Long> {
 
-    void deleteByCourseEntity_CourseId(Long courseId);
+  void deleteByCourseEntity_CourseId(Long courseId);
 
-    @Query("""
+  @Query(
+      """
             SELECT cp.positionId
             FROM CoursePositionEntity cp
             WHERE cp.courseEntity.courseId = :courseId
             ORDER BY cp.positionId
             """)
-    List<Long> findPositionIdsByCourseId(@Param("courseId") Long courseId);
+  List<Long> findPositionIdsByCourseId(@Param("courseId") Long courseId);
 }

@@ -8,20 +8,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-/**
- * Admin 1/26/2026
- */
+/** Admin 1/26/2026 */
 @Repository
 public interface SubmissionCommentEntityRepository
-        extends JpaRepository<@NonNull SubmissionCommentEntity, @NonNull Long> {
+    extends JpaRepository<@NonNull SubmissionCommentEntity, @NonNull Long> {
 
-    @Modifying
-    @Query("DELETE FROM SubmissionCommentEntity sc WHERE sc.lessonSubmissionEntity.lessonEnrollmentEntity.courseEnrollmentEntity.courseEntity.courseId = :courseId")
-    void deleteByCourseId(@Param("courseId") Long courseId);
+  @Modifying
+  @Query(
+      "DELETE FROM SubmissionCommentEntity sc WHERE sc.lessonSubmissionEntity.lessonEnrollmentEntity.courseEnrollmentEntity.courseEntity.courseId = :courseId")
+  void deleteByCourseId(@Param("courseId") Long courseId);
 
-    java.util.Optional<SubmissionCommentEntity> findFirstByLessonSubmissionEntity_LessonSubmissionIdOrderByCommentAtDesc(
-            Long lessonSubmissionId);
+  java.util.Optional<SubmissionCommentEntity>
+      findFirstByLessonSubmissionEntity_LessonSubmissionIdOrderByCommentAtDesc(
+          Long lessonSubmissionId);
 
-    java.util.List<SubmissionCommentEntity> findByLessonSubmissionEntity_LessonSubmissionIdOrderByCommentAtDesc(
-            Long lessonSubmissionId);
+  java.util.List<SubmissionCommentEntity>
+      findByLessonSubmissionEntity_LessonSubmissionIdOrderByCommentAtDesc(Long lessonSubmissionId);
 }

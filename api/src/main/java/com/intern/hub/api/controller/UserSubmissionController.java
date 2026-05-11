@@ -94,7 +94,8 @@ public class UserSubmissionController {
     }
   }
 
-  private LessonSubmissionResponse toResponse(LessonSubmissionService.LessonSubmissionResult result) {
+  private LessonSubmissionResponse toResponse(
+      LessonSubmissionService.LessonSubmissionResult result) {
     var attachments =
         result.attachments().stream()
             .map(

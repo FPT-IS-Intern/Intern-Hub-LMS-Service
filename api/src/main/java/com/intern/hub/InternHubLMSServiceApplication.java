@@ -11,8 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableSecurity
 @EnableGlobalExceptionHandler
 public class InternHubLMSServiceApplication {
-    // Test
-    public static void main(String[] args) {
-        SpringApplication.run(InternHubLMSServiceApplication.class, args);
-    }
+  // Test
+  public static void main(String[] args) {
+    SpringApplication.run(InternHubLMSServiceApplication.class, args);
+  }
 }

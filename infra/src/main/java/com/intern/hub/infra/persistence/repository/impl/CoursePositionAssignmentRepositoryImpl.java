@@ -16,41 +16,41 @@ import org.springframework.stereotype.Repository;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CoursePositionAssignmentRepositoryImpl implements CoursePositionAssignmentRepository {
 
-    CoursePositionEntityRepository coursePositionEntityRepository;
-    CourseEntityRepository courseEntityRepository;
+  CoursePositionEntityRepository coursePositionEntityRepository;
+  CourseEntityRepository courseEntityRepository;
 
-    @Override
-    public void saveCoursePositions(Long courseId, List<Long> positionIds) {
-        if (positionIds == null || positionIds.isEmpty()) {
-            return;
-        }
-
-        var courseEntity = courseEntityRepository.getReferenceById(courseId);
-        List<CoursePositionEntity> entities = new ArrayList<>(positionIds.size());
-        for (Long positionId : positionIds) {
-            if (positionId == null) {
-                continue;
-            }
-            CoursePositionEntity entity = new CoursePositionEntity();
-            entity.setCourseEntity(courseEntity);
-            entity.setPositionId(positionId);
-            entities.add(entity);
-        }
-
-        if (!entities.isEmpty()) {
-            coursePositionEntityRepository.saveAll(entities);
-        }
+  @Override
+  public void saveCoursePositions(Long courseId, List<Long> positionIds) {
+    if (positionIds == null || positionIds.isEmpty()) {
+      return;
     }
 
-    @Override
-    public void replaceCoursePositions(Long courseId, List<Long> positionIds) {
-        coursePositionEntityRepository.deleteByCourseEntity_CourseId(courseId);
-        coursePositionEntityRepository.flush();
-        saveCoursePositions(courseId, positionIds);
+    var courseEntity = courseEntityRepository.getReferenceById(courseId);
+    List<CoursePositionEntity> entities = new ArrayList<>(positionIds.size());
+    for (Long positionId : positionIds) {
+      if (positionId == null) {
+        continue;
+      }
+      CoursePositionEntity entity = new CoursePositionEntity();
+      entity.setCourseEntity(courseEntity);
+      entity.setPositionId(positionId);
+      entities.add(entity);
     }
 
-    @Override
-    public List<Long> findPositionIdsByCourseId(Long courseId) {
-        return coursePositionEntityRepository.findPositionIdsByCourseId(courseId);
+    if (!entities.isEmpty()) {
+      coursePositionEntityRepository.saveAll(entities);
     }
+  }
+
+  @Override
+  public void replaceCoursePositions(Long courseId, List<Long> positionIds) {
+    coursePositionEntityRepository.deleteByCourseEntity_CourseId(courseId);
+    coursePositionEntityRepository.flush();
+    saveCoursePositions(courseId, positionIds);
+  }
+
+  @Override
+  public List<Long> findPositionIdsByCourseId(Long courseId) {
+    return coursePositionEntityRepository.findPositionIdsByCourseId(courseId);
+  }
 }

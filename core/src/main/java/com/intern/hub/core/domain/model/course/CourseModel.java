@@ -3,9 +3,7 @@ package com.intern.hub.core.domain.model.course;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Admin 1/27/2026
- */
+/** Admin 1/27/2026 */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,10 +12,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CourseModel {
 
-    Long courseId;
-    String name;
-    String description;
-    String courseImageUrl;
-    Long createdAt;
-    Long updatedAt;
+  Long courseId;
+  String name;
+  String description;
+  String courseImageUrl;
+  Long createdAt;
+  Long updatedAt;
 }
