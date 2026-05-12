@@ -24,6 +24,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
@@ -37,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(
     name = "Admin Course",
     description = "Quản trị khóa học: CRUD và gắn lesson theo danh sách id.")
+@Slf4j
 public class AdminCourseController {
 
   AdminCourseService adminCourseService;
@@ -52,6 +54,14 @@ public class AdminCourseController {
   public ResponseApi<?> createCourse(
       @RequestPart("data") @Valid CourseCreateRequest request,
       @RequestPart(value = "image", required = true) MultipartFile image) {
+    Long actorId = UserContext.requiredUserId();
+    int lessonCount = request.lessonIds() == null ? 0 : request.lessonIds().size();
+    int evaluatorCount = request.evaluatorUserIds() == null ? 0 : request.evaluatorUserIds().size();
+    int positionCount = request.positionIds() == null ? 0 : request.positionIds().size();
+    log.info("API - Create course request: lessonCount={}, evaluatorCount={}, positionCount={}",
+        lessonCount,
+        evaluatorCount,
+        positionCount);
 
     adminCourseService.createCourse(
         courseApiMapper.toModel(request),
@@ -59,7 +69,8 @@ public class AdminCourseController {
         parseLessonIds(request.lessonIds()),
         parseEvaluatorUserIds(request.evaluatorUserIds()),
         parsePositionIds(request.positionIds()),
-        UserContext.requiredUserId());
+        actorId);
+    log.info("API - Create course response: result=success");
     return ResponseApi.noContent();
   }
 
@@ -69,8 +80,10 @@ public class AdminCourseController {
   @Operation(summary = "Danh sách khóa học", description = "Lấy danh sách khóa học có phân trang.")
   public ResponseApi<PaginatedData<CourseSummaryResponse>> getCourses(
       @PageableDefault(size = 10) Pageable pageable) {
+    log.info("API - Get courses request: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
     var page = adminCourseService.getCourses(pageable);
     var res = PaginationUtils.toPaginatedData(page, courseApiMapper::toSummaryResponse);
+    log.info("API - Get courses response: totalItems={}, totalPages={}", res.getTotalItems(), res.getTotalPages());
     return ResponseApi.ok(res);
   }
 
@@ -80,6 +93,7 @@ public class AdminCourseController {
   @Operation(summary = "Chi tiết khóa học", description = "Lấy chi tiết khóa học theo id.")
   public ResponseApi<CourseDetailResponse> getCourse(@PathVariable("courseId") String courseId) {
     Long courseIdValue = parseId(courseId, "courseId");
+    log.info("API - Get course detail request: courseId={}", courseIdValue);
     var model = adminCourseService.getCourse(courseIdValue);
     var lessons =
         courseService.getCourseLessons(courseIdValue).stream()
@@ -111,6 +125,10 @@ public class AdminCourseController {
             positionIds,
             lessons,
             evaluators);
+    log.info("API - Get course detail response: courseId={}, lessonCount={}, evaluatorCount={}",
+      courseIdValue,
+      lessons.size(),
+      evaluators.size());
     return ResponseApi.ok(res);
   }
 
@@ -124,14 +142,26 @@ public class AdminCourseController {
       @PathVariable("courseId") String courseId,
       @RequestPart("data") @Valid CourseCreateRequest request,
       @RequestPart(value = "image", required = false) MultipartFile image) {
+    Long courseIdValue = parseId(courseId, "courseId");
+    Long actorId = UserContext.requiredUserId();
+    int lessonCount = request.lessonIds() == null ? 0 : request.lessonIds().size();
+    int evaluatorCount = request.evaluatorUserIds() == null ? 0 : request.evaluatorUserIds().size();
+    int positionCount = request.positionIds() == null ? 0 : request.positionIds().size();
+    log.info("API - Update course request: courseId={}, lessonCount={}, evaluatorCount={}, positionCount={}, hasImage={}",
+        courseIdValue,
+        lessonCount,
+        evaluatorCount,
+        positionCount,
+        image != null && !image.isEmpty());
     adminCourseService.updateCourse(
-        parseId(courseId, "courseId"),
+        courseIdValue,
         courseApiMapper.toModel(request),
         image,
         parseLessonIdsForUpdate(request.lessonIds()),
         parseEvaluatorUserIdsForUpdate(request.evaluatorUserIds()),
         parsePositionIdsForUpdate(request.positionIds()),
-        UserContext.requiredUserId());
+        actorId);
+    log.info("API - Update course response: courseId={}, result=success", courseIdValue);
     return ResponseApi.noContent();
   }
 
@@ -140,7 +170,11 @@ public class AdminCourseController {
   @HasPermission(resource = "quan-ly-khoa-hoc", action = Action.DELETE)
   @Operation(summary = "Xóa khóa học", description = "Xóa khóa học theo id.")
   public ResponseApi<?> deleteCourse(@PathVariable("courseId") String courseId) {
-    adminCourseService.deleteCourse(parseId(courseId, "courseId"), UserContext.requiredUserId());
+    Long courseIdValue = parseId(courseId, "courseId");
+    Long actorId = UserContext.requiredUserId();
+    log.info("API - Delete course request: courseId={}", courseIdValue);
+    adminCourseService.deleteCourse(courseIdValue, actorId);
+    log.info("API - Delete course response: courseId={}, result=success", courseIdValue);
     return ResponseApi.noContent();
   }
 

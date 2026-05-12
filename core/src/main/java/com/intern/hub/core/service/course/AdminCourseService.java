@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class AdminCourseService {
 
   CourseRepository courseRepository;
@@ -65,6 +67,14 @@ public class AdminCourseService {
       List<Long> evaluatorUserIds,
       List<Long> positionIds,
       Long actorId) {
+    int lessonCount = lessonIds == null ? 0 : lessonIds.size();
+    int evaluatorCount = evaluatorUserIds == null ? 0 : evaluatorUserIds.size();
+    int positionCount = positionIds == null ? 0 : positionIds.size();
+    log.info("Core - Create course request: lessonCount={}, evaluatorCount={}, positionCount={}, hasImage={}",
+        lessonCount,
+        evaluatorCount,
+        positionCount,
+        image != null && !image.isEmpty());
     if (image == null || image.isEmpty()) {
       throw new BadRequestException("course.image.required", "Ảnh khóa học là bắt buộc");
     }
@@ -92,23 +102,30 @@ public class AdminCourseService {
 
     saved.setCourseImageUrl(imageUrl);
     courseRepository.save(saved);
+    log.info("Core - Create course response: courseId={}", courseId);
   }
 
   /** Lấy danh sách khóa học có phân trang cho màn admin. */
   @Transactional(readOnly = true)
   public Page<@NonNull CourseModel> getCourses(Pageable pageable) {
-    return courseRepository.findAll(pageable);
+    log.info("Core - Get courses request: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+    Page<@NonNull CourseModel> response = courseRepository.findAll(pageable);
+    log.info("Core - Get courses response: totalElements={}, totalPages={}", response.getTotalElements(), response.getTotalPages());
+    return response;
   }
 
   /** Lấy chi tiết một khóa học theo id. */
   @Transactional(readOnly = true)
   public CourseModel getCourse(Long courseId) {
-    return courseRepository
+    log.info("Core - Get course detail request: courseId={}", courseId);
+    CourseModel response = courseRepository
         .findById(courseId)
         .orElseThrow(
             () ->
                 new NotFoundException(
                     "course.not.found", "Không tìm thấy khóa học id: " + courseId));
+    log.info("Core - Get course detail response: courseId={}", courseId);
+    return response;
   }
 
   /** Lấy danh sách lesson id đang gắn với khóa học. */
@@ -137,6 +154,15 @@ public class AdminCourseService {
       List<Long> evaluatorUserIds,
       List<Long> positionIds,
       Long actorId) {
+    int lessonCount = lessonIds == null ? 0 : lessonIds.size();
+    int evaluatorCount = evaluatorUserIds == null ? 0 : evaluatorUserIds.size();
+    int positionCount = positionIds == null ? 0 : positionIds.size();
+    log.info("Core - Update course request: courseId={}, lessonCount={}, evaluatorCount={}, positionCount={}, hasNewImage={}",
+      courseId,
+      lessonCount,
+      evaluatorCount,
+      positionCount,
+      newImage != null && !newImage.isEmpty());
     validateRequiredAssignments(evaluatorUserIds, positionIds);
 
     CourseModel existing =
@@ -183,6 +209,7 @@ public class AdminCourseService {
     }
 
     courseRepository.save(existing);
+    log.info("Core - Update course response: courseId={}", courseId);
   }
 
   /**
@@ -191,6 +218,7 @@ public class AdminCourseService {
    */
   @Transactional
   public void deleteCourse(Long courseId, Long actorId) {
+    log.info("Core - Delete course request: courseId={}", courseId);
     CourseModel courseModel =
         courseRepository
             .findById(courseId)
@@ -203,6 +231,7 @@ public class AdminCourseService {
     if (hasText(courseModel.getCourseImageUrl())) {
       storageObjectLifecycleManager.deleteAfterCommit(courseModel.getCourseImageUrl(), actorId);
     }
+    log.info("Core - Delete course response: courseId={}", courseId);
   }
 
   // =========================== Utilities ===========================

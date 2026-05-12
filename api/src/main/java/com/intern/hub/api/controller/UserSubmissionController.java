@@ -16,6 +16,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/lms")
 @Tag(name = "User Submission", description = "API nguoi dung de xem va nop bai.")
+@Slf4j
 public class UserSubmissionController {
 
   SubmissionService submissionService;
@@ -41,8 +43,14 @@ public class UserSubmissionController {
       description = "Lay bai nop hien tai theo lesson enrollment id.")
   public ResponseApi<LessonSubmissionResponse> getSubmission(
       @PathVariable("lessonEnrollmentId") String lessonEnrollmentId) {
-    var result = submissionService.getSubmission(parseId(lessonEnrollmentId, "lessonEnrollmentId"));
-    return ResponseApi.ok(toResponse(result));
+    Long parsedLessonEnrollmentId = parseId(lessonEnrollmentId, "lessonEnrollmentId");
+    log.info("API - Get submission request: lessonEnrollmentId={}", parsedLessonEnrollmentId);
+    var result = submissionService.getSubmission(parsedLessonEnrollmentId);
+    LessonSubmissionResponse response = toResponse(result);
+    log.info("API - Get submission response: lessonEnrollmentId={}, submissionId={}",
+        parsedLessonEnrollmentId,
+        response.lessonSubmissionId());
+    return ResponseApi.ok(response);
   }
 
   @GetMapping("/course-enrollments/{courseEnrollmentId}/submissions")
@@ -53,10 +61,19 @@ public class UserSubmissionController {
   public ResponseApi<List<LessonSubmissionResponse>> getSubmissionsByCourseEnrollment(
       @PathVariable("courseEnrollmentId") String courseEnrollmentId) {
     Long userId = UserContext.requiredUserId();
+    Long parsedCourseEnrollmentId = parseId(courseEnrollmentId, "courseEnrollmentId");
+    log.info("API - Get submissions by course enrollment request: userId={}, courseEnrollmentId={}",
+      userId,
+      parsedCourseEnrollmentId);
     var result =
         submissionService.getSubmissionsByCourseEnrollment(
-            parseId(courseEnrollmentId, "courseEnrollmentId"), userId);
-    return ResponseApi.ok(result.stream().map(this::toResponse).toList());
+        parsedCourseEnrollmentId, userId);
+    List<LessonSubmissionResponse> response = result.stream().map(this::toResponse).toList();
+    log.info("API - Get submissions by course enrollment response: userId={}, courseEnrollmentId={}, total={}",
+      userId,
+      parsedCourseEnrollmentId,
+      response.size());
+    return ResponseApi.ok(response);
   }
 
   @PostMapping(
@@ -72,15 +89,28 @@ public class UserSubmissionController {
       @RequestPart("data") @Valid LessonSubmissionRequest request,
       @RequestPart(value = "files", required = false) List<MultipartFile> files) {
     Long userId = UserContext.requiredUserId();
+    Long parsedLessonEnrollmentId = parseId(lessonEnrollmentId, "lessonEnrollmentId");
+    int fileCount = files == null ? 0 : files.size();
+    int deleteAttachmentCount = request.deleteAttachmentIds() == null ? 0 : request.deleteAttachmentIds().size();
+    log.info("API - Submit lesson request: userId={}, lessonEnrollmentId={}, fileCount={}, deleteAttachmentCount={}",
+      userId,
+      parsedLessonEnrollmentId,
+      fileCount,
+      deleteAttachmentCount);
     var result =
         submissionService.submitLesson(
-            parseId(lessonEnrollmentId, "lessonEnrollmentId"),
+        parsedLessonEnrollmentId,
             userId,
             userId,
             request.comment(),
             parseIds(request.deleteAttachmentIds(), "deleteAttachmentIds"),
             files);
-    return ResponseApi.ok(toResponse(result));
+    LessonSubmissionResponse response = toResponse(result);
+    log.info("API - Submit lesson response: userId={}, lessonEnrollmentId={}, submissionId={}",
+      userId,
+      parsedLessonEnrollmentId,
+      response.lessonSubmissionId());
+    return ResponseApi.ok(response);
   }
 
   private Long parseId(String value, String field) {
