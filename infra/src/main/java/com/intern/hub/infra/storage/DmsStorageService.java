@@ -40,6 +40,11 @@ public class DmsStorageService implements FileStorageRepository {
       Long maxSizeBytes,
       String contentTypeRegex) {
 
+    log.info("Infra - Upload file to DMS request: keyPrefix={}, originalFileName={}, fileSize={}",
+        keyPrefix,
+        file.getOriginalFilename(),
+        file.getSize());
+
     if (file.getSize() > maxSizeBytes) {
       throw new BadRequestException(
           "file.size.exceeded",
@@ -62,6 +67,7 @@ public class DmsStorageService implements FileStorageRepository {
             "storage.upload.error", "DMS không trả về thông tin file sau khi upload");
       }
 
+      log.info("Infra - Upload file to DMS response: keyPrefix={}, objectKey={}", keyPrefix, response.data().objectKey());
       return response.data().objectKey();
     } catch (Exception e) {
       log.error("DMS upload failed for destination path {}", keyPrefix, e);
@@ -72,7 +78,9 @@ public class DmsStorageService implements FileStorageRepository {
 
   public void deleteFile(String key, Long actorId) {
     try {
+      log.info("Infra - Delete file from DMS request: key={}", key);
       dmsInternalFeignClient.deleteFile(key, actorId != null ? actorId : systemActorId);
+      log.info("Infra - Delete file from DMS response: key={}, result=success", key);
     } catch (FeignException.NotFound ex) {
       log.warn("DMS document not found when deleting key {}", key);
     } catch (Exception e) {
