@@ -6,8 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 /** Admin 1/27/2026 */
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
